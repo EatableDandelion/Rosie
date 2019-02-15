@@ -37,7 +37,7 @@ namespace Rosie{
 			char next();
 			char peek();
 			bool hasNext();
-			char getCurrentChar();
+			char getChar();
 		
 		private:
 			char c;
@@ -50,10 +50,6 @@ namespace Rosie{
 		bool matches(InputStream& stream, std::vector<Token>& tokens);
 		
 		virtual bool matches(InputStream& stream) = 0;
-		
-		virtual void reset();
-		
-		virtual void resetChild(){};
 		
 		bool addChar(InputStream& stream); //return true if can continue, false if eof
 		
@@ -69,11 +65,6 @@ namespace Rosie{
 	struct StringLex : Lex //IDENTIFIER or KEYWORD or LITERAL
 	{
 		virtual bool matches(InputStream& stream);
-		
-		virtual void resetChild();
-		
-		private:
-			bool inQuote = false;
 	};
 	
 	struct LiteralLex : Lex //LITERAL string
@@ -84,11 +75,6 @@ namespace Rosie{
 	struct NumeralLex : Lex //LITERAL number
 	{
 		virtual bool matches(InputStream& stream);
-		
-		virtual void resetChild();
-		
-		private:
-			bool hadDot = false;
 	};
 	
 	struct SpecialCharLex : Lex // SEPARATOR or OPERATOR
@@ -96,14 +82,14 @@ namespace Rosie{
 		virtual bool matches(InputStream& stream);
 	};
 	
-	struct IgnoreLex : Lex // white spaces and comments
+	struct WhiteSpaceLex : Lex // white spaces
 	{
 		virtual bool matches(InputStream& stream);
-		
-		virtual void resetChild();
-		
-		private:
-			bool commented = false;
+	};
+	
+	struct CommentLex : Lex // comments
+	{
+		virtual bool matches(InputStream& stream);
 	};
 	
 	class Lexer

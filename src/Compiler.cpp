@@ -18,7 +18,7 @@ namespace Rosie{
 		return c;
 	}
 	
-	char InputStream::getCurrentChar()
+	char InputStream::getChar()
 	{
 		return c;
 	}
@@ -100,7 +100,7 @@ namespace Rosie{
 		return false;
 	}
 	
-	bool StringLex::matches(InputStream& stream)
+	/*bool StringLex::matches(InputStream& stream)
 	{
 		if(c == '\"')
 		{
@@ -123,6 +123,11 @@ namespace Rosie{
 		{
 			return false;
 		}
+	}*/
+	
+	bool StringLex::matches(InputStream& stream)
+	{
+		
 	}
 	
 	void StringLex::resetChild()

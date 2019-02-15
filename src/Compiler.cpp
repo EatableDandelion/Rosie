@@ -75,18 +75,10 @@ namespace Rosie{
 		{
 			std::cout << token.value << std::endl;
 			tokens.push_back(token);
-			reset();
 		}
 
 		wasMatch = match;
 		return match;
-	}
-	
-	void Lex::reset()
-	{
-		token = Token();
-		wasMatch = false;
-		resetChild();
 	}
 	
 	bool Lex::addChar(InputStream& stream)
@@ -153,11 +145,6 @@ namespace Rosie{
 		return false;
 	}
 	
-	void StringLex::resetChild()
-	{
-		inQuote = false;
-	}
-	
 	/*bool LiteralLex::matches(InputStream& stream)
 	{
 		if(isDigit(c))
@@ -210,7 +197,7 @@ namespace Rosie{
 		return false;
 	}
 	
-	bool IgnoreLex::matches(InputStream& stream)
+	/*bool IgnoreLex::matches(InputStream& stream)
 	{
 		if(isWhiteSpace(c))
 		{
@@ -226,11 +213,39 @@ namespace Rosie{
 			return true;
 		}
 		return false;
+	}*/
+	
+	bool CommentLex::matches(InputStream& stream)
+	{
+		char c = stream.getChar();
+		
+		if(c == '#')
+		{
+			if(!stream.hasNext())
+			{
+				return false;
+			}
+			else
+			{
+				c = stream.next();
+			}
+			
+			while(c != '#' && stream.hasNext())
+			{
+				c = stream.next();
+			}
+		}
+		return false;
 	}
 	
-	void IgnoreLex::resetChild()
+	bool WhiteSpaceLex::matches(InputStream& stream)
 	{
-		commented = false;
+		char c = stream.getChar();
+		while(isWhiteSpace(c) && stream.hasNext())
+		{
+			c = stream.next();
+		}
+		return false;
 	}
 	
 	bool NumeralLex::matches(InputStream& stream)
@@ -247,11 +262,6 @@ namespace Rosie{
 			return true;
 		}
 		return false;
-	}
-	
-	void NumeralLex::resetChild()
-	{
-		hadDot = false;
 	}
 	
 	bool SpecialCharLex::matches(InputStream& stream)

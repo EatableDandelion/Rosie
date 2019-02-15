@@ -127,7 +127,30 @@ namespace Rosie{
 	
 	bool StringLex::matches(InputStream& stream)
 	{
-		
+		char c = stream.getChar();
+		if(c == '\"')
+		{
+			if(!stream.hasNext())
+			{
+				return false;
+			}
+			c = stream.next();
+			
+			while(c != '\"')
+			{
+				token += c;
+				if(!stream.hasNext())
+				{
+					return true;
+				}
+				else
+				{
+					c = stream.next();
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	void StringLex::resetChild()
@@ -135,7 +158,7 @@ namespace Rosie{
 		inQuote = false;
 	}
 	
-	bool LiteralLex::matches(InputStream& stream)
+	/*bool LiteralLex::matches(InputStream& stream)
 	{
 		if(isDigit(c))
 		{
@@ -152,6 +175,39 @@ namespace Rosie{
 		}
 		token+=c;
 		return true;
+	}*/
+	
+	bool LiteralLex::matches(InputStream& stream)
+	{
+		char c = stream.getChar();
+		if(isLetter(c))
+		{
+			token += c;
+			if(!stream.hasNext())
+			{
+				return true;
+			}
+			else
+			{
+				c = stream.next();
+			}
+			
+			while(isLetter(c) || isDigit(c))
+			{
+				token += c;
+				
+				if(!stream.hasNext())
+				{
+					return true;
+				}
+				else
+				{
+					c = stream.next();
+				}	
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	bool IgnoreLex::matches(InputStream& stream)

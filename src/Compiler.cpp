@@ -33,6 +33,19 @@ namespace Rosie{
 		return !stream.eof();
 	}
 	
+	bool InputStream::safeNext()//false if eof, true otherwise
+	{
+		if(hasNext())
+		{
+			next();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
 	int Token::length() const
 	{
 		return value.length();
@@ -91,6 +104,8 @@ namespace Rosie{
 		}
 		return false;
 	}
+	
+	
 	
 	/*bool StringLex::matches(InputStream& stream)
 	{
@@ -248,7 +263,7 @@ namespace Rosie{
 		return false;
 	}
 	
-	bool NumeralLex::matches(InputStream& stream)
+	/*bool NumeralLex::matches(InputStream& stream)
 	{
 		if(isDigit(c))
 		{
@@ -262,6 +277,18 @@ namespace Rosie{
 			return true;
 		}
 		return false;
+	}*/
+	
+	bool NumeralLex::matches(InputStream& stream)
+	{
+		
+		if(isDigit(c))
+		{
+			bool hadDot = false;
+			token+=c;
+			return true;
+		}
+		return false;
 	}
 	
 	bool SpecialCharLex::matches(InputStream& stream)
@@ -269,6 +296,10 @@ namespace Rosie{
 		if(isSpecialChar(c))
 		{
 			token+=c;
+			if(stream.hasNext())
+			{
+				stream.next();
+			}
 			return true;
 		}
 		return false;

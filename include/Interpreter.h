@@ -23,7 +23,6 @@ namespace Rosie{
 			Interpreter();
 			
 			void read(const std::string& fileName);
-			
 
 		private:
 			std::unordered_map<std::string, Variable> variables;

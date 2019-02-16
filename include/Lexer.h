@@ -1,49 +1,15 @@
 #pragma once
 
-#include <string>
+#include "InputStream.h"
+#include "Token.h"
 #include <memory>
 #include <vector>
+#include <string>
 #include <fstream>
 #include <iostream>
 
 namespace Rosie
-{
-	
-	enum TokenType{
-		IDENTIFIER, //all the variables
-		KEYWORD,	//if, while, return
-		SEPARATOR, 	//( ) ;
-		OPERATOR,	//+ =
-		LITERAL,	//"a", 58.0, true
-		UNDEFINED	//base value
-	};
-	
-	struct Token
-	{
-		Rosie::TokenType type = UNDEFINED;
-		std::string value;
-		
-		void operator+=(const char c);
-		
-		int length() const;
-	};
-	
-	class InputStream
-	{
-		public:
-			InputStream(const std::string& fileName);
-			~InputStream();
-			
-			bool next(char& ch);
-			char peek();
-			bool hasNext();
-			char getChar() const;
-		
-		private:
-			char c;
-			std::ifstream stream;
-	};
-	
+{	
 	struct Lex
 	{
 		

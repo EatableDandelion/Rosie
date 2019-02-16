@@ -1,56 +1,7 @@
 #include "Lexer.h"
 
 namespace Rosie
-{
-	InputStream::InputStream(const std::string& fileName)
-	{
-		stream.open(fileName);
-	}
-	
-	InputStream::~InputStream()
-	{
-		stream.close();
-	}
-	
-	bool InputStream::next(char& ch)//increment read character and returns false if eof, true otherwise
-	{
-		if(hasNext())
-		{
-			stream.get(c);
-			ch = c;
-			return true;
-		}
-		else
-		{	
-			return false;
-		}
-	}
-	
-	char InputStream::getChar() const
-	{
-		return c;
-	}
-	
-	char InputStream::peek()
-	{
-		return stream.peek();
-	}
-	
-	bool InputStream::hasNext()
-	{
-		return !stream.eof();
-	}
-	
-	int Token::length() const
-	{
-		return value.length();
-	}
-	
-	void Token::operator+=(const char c)
-	{
-		value.push_back(c);
-	}
-	
+{	
 	bool Lex::isWhiteSpace(const char c)
 	{
 		return c == ' ' || c == '\t' || c == '\n';
@@ -73,7 +24,8 @@ namespace Rosie
 	{
 		return 
 		c == ',' || c == ';' || c == '.' || 
-		c == ':' || c == '(' || c == ')';
+		c == ':' || c == '(' || c == ')' ||
+		c == '{' || c == '}';
 	}
 	
 	bool Lex::isDigit(const char c)
@@ -93,7 +45,7 @@ namespace Rosie
 			std::cout << token.value << "\t \t \t " << token.type << std::endl;
 			tokens.push_back(token);
 			token.value = "";
-			token.type = TokenType::UNDEFINED;
+			token.type = TokenTypes::UNDEFINED;
 			return true;
 		}
 		return false;
@@ -103,7 +55,7 @@ namespace Rosie
 	{
 		if(c == '\"')
 		{
-			token.type = TokenType::LITERAL;
+			token.type = TokenTypes::LITERAL;
 			if(!stream.next(c))
 				return false;
 			
@@ -168,7 +120,7 @@ namespace Rosie
 		{
 			bool hadDot = false;
 			token+=c;
-			token.type = TokenType::LITERAL;
+			token.type = TokenTypes::LITERAL;
 			if(!stream.next(c))
 				return true;
 			
@@ -195,10 +147,10 @@ namespace Rosie
 		{
 			if(isOperator(c))
 			{
-				token.type = TokenType::OPERATOR;
+				token.type = TokenTypes::OPERATOR;
 			}else if(isSeparator(c))
 			{
-				token.type = TokenType::SEPARATOR;
+				token.type = TokenTypes::SEPARATOR;
 			}
 			token+=c;
 			stream.next(c);

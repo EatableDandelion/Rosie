@@ -1,8 +1,8 @@
-#include "Compiler.h"
+#include "Interpreter.h"
 
 int main()
 {
-	Rosie::Compiler c;
+	Rosie::Interpreter c;
 	c.read("test.ros");
 	return 0;
 }

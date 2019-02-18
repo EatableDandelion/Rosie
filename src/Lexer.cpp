@@ -1,61 +1,11 @@
 #include "Lexer.h"
 
 namespace Rosie
-{	
-	bool Lex::isWhiteSpace(const char c)
-	{
-		return c == ' ' || c == '\t' || c == '\n';
-	}
-	
-	bool Lex::isSpecialChar(const char c)
-	{
-		return isOperator(c) || isSeparator(c);
-	}
-	
-	bool Lex::isOperator(const char c)
-	{
-		return 
-		c == '=' || c == '<' || c == '>' ||	
-		c == '+' || c == '-' || c == '*' ||
-		c == '/' || c == '^' || c == '%';
-	}
-	
-	bool Lex::isSeparator(const char c)
-	{
-		return 
-		c == ',' || c == ';' || c == '.' || 
-		c == ':' || c == '(' || c == ')' ||
-		c == '{' || c == '}';
-	}
-	
-	bool Lex::isDigit(const char c)
-	{
-		return isdigit(c);
-	}
-	
-	bool Lex::isLetter(const char c)
-	{
-		return isalpha(c);
-	}
-	
-	bool Lex::matches(char& c, InputStream& stream, std::vector<Token>& tokens)
-	{
-		if(matches(c, stream))
-		{
-			std::cout << token.value << "\t \t \t " << token.type << std::endl;
-			tokens.push_back(token);
-			token.value = "";
-			token.type = TokenTypes::UNDEFINED;
-			return true;
-		}
-		return false;
-	}
-	
+{		
 	bool StringLex::matches(char& c, InputStream& stream)
 	{
 		if(c == '\"')
 		{
-			token.type = TokenTypes::LITERAL;
 			if(!stream.next(c))
 				return false;
 			
@@ -75,7 +25,6 @@ namespace Rosie
 		if(isLetter(c))
 		{
 			token += c;
-			//token.type = TokenType::LITERAL;
 			if(!stream.next(c))
 				return true;
 			
@@ -120,7 +69,6 @@ namespace Rosie
 		{
 			bool hadDot = false;
 			token+=c;
-			token.type = TokenTypes::LITERAL;
 			if(!stream.next(c))
 				return true;
 			
@@ -144,19 +92,17 @@ namespace Rosie
 	bool SpecialCharLex::matches(char& c, InputStream& stream)
 	{
 		if(isSpecialChar(c))
-		{
-			if(isOperator(c))
-			{
-				token.type = TokenTypes::OPERATOR;
-			}else if(isSeparator(c))
-			{
-				token.type = TokenTypes::SEPARATOR;
-			}
+		{			
 			token+=c;
 			stream.next(c);
 			return true;
 		}
 		return false;
+	}
+	
+	bool SpecialCharLex::isSpecialChar(const char c)
+	{
+		return typeCaster.isSpecialChar(c);
 	}
 	
 	
@@ -170,15 +116,15 @@ namespace Rosie
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
 	}
 	
-	void Lexer::getTokens(std::vector<Token>& tokens)
+	void Lexer::getTokens(std::shared_ptr<Instruction>& instruction)
 	{
 		char c;
 		stream.next(c);
 		while(stream.hasNext())
 		{	
-			for(std::shared_ptr<Lex> lex : rules)
+			for(std::shared_ptr<Rule> rule : rules)
 			{
-				lex->matches(c, stream, tokens);			
+				rule->matches(c, stream, instruction);			
 			}
 		}
 	}

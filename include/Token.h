@@ -12,12 +12,12 @@ namespace Rosie
 	/*2*/	OPERATOR,	//+ =
 	/*3*/	COMPARATOR, //>, <, ==, &&
 	/*4*/	VARNAME, 	//all the variables		
-	/*5*/	VARTYPE,	//float, int, double, string
+	/*5*/	VARTYPE,	//float, int, double, string, var
 	/*6*/	VARVALUE,	//"a", 58.0, true
 	/*7*/	UNDEFINED	//base value
 	};
 	
-	enum Keywords
+	/*enum Keywords
 	{
 		IF, WHILE, FOR, RETURN
 	};
@@ -38,8 +38,8 @@ namespace Rosie
 	
 	enum Primitives
 	{
-		STRING,	DOUBLE, INT, FLOAT, BOOLEAN
-	};
+		STRING,	DOUBLE, INT, FLOAT, BOOLEAN, VAR
+	};*/
 	
 	struct Token
 	{

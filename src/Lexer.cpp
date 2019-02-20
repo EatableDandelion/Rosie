@@ -2,7 +2,7 @@
 
 namespace Rosie
 {		
-	bool StringLex::matches(char& c, InputStream& stream)
+	bool StringLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{
 		if(c == '\"')
 		{
@@ -20,7 +20,7 @@ namespace Rosie
 		return false;
 	}
 	
-	bool LiteralLex::matches(char& c, InputStream& stream)
+	bool LiteralLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{
 		if(isLetter(c))
 		{
@@ -38,7 +38,7 @@ namespace Rosie
 		return false;
 	}
 
-	bool CommentLex::matches(char& c, InputStream& stream)
+	bool CommentLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{		
 		if(c == '#')
 		{
@@ -54,7 +54,7 @@ namespace Rosie
 		return false;
 	}
 	
-	bool WhiteSpaceLex::matches(char& c, InputStream& stream)
+	bool WhiteSpaceLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{
 		while(isWhiteSpace(c) && stream.hasNext())
 		{
@@ -63,7 +63,7 @@ namespace Rosie
 		return false;
 	}
 	
-	bool NumeralLex::matches(char& c, InputStream& stream)
+	bool NumeralLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{
 		if(isDigit(c))
 		{
@@ -89,7 +89,7 @@ namespace Rosie
 		return false;
 	}
 	
-	bool SpecialCharLex::matches(char& c, InputStream& stream)
+	bool SpecialCharLex::appendToToken(char& c, InputStream& stream, Token& token)
 	{
 		if(isSpecialChar(c))
 		{			
@@ -116,16 +116,26 @@ namespace Rosie
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
 	}
 	
-	void Lexer::getTokens(std::shared_ptr<Instruction>& instruction)
+	bool Lexer::next()
 	{
-		char c;
-		stream.next(c);
+		char c = stream.getChar();
+		Token token;
 		while(stream.hasNext())
 		{	
 			for(std::shared_ptr<Rule> rule : rules)
 			{
-				rule->matches(c, stream, instruction);			
+				if(rule->nextToken(c, stream, token))
+				{
+					m_token = token;
+					return true;
+				}
 			}
 		}
+		return false;
+	}
+	
+	Token Lexer::getToken()
+	{
+		return m_token;
 	}
 }

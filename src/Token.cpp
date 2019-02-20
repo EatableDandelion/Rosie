@@ -64,6 +64,7 @@ namespace Rosie
 		types.insert("double");
 		types.insert("boolean");
 		types.insert("string");
+		types.insert("var");
 	}
 	
 	void LiteralCaster::assign(Token& token)

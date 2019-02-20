@@ -5,6 +5,7 @@ namespace Rosie
 	InputStream::InputStream(const std::string& fileName)
 	{
 		stream.open(fileName);
+		stream.get(c);
 	}
 	
 	InputStream::~InputStream()

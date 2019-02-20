@@ -2,24 +2,53 @@
 
 namespace Rosie{
 	
+	void Program::appendInstruction(const int& instructionId)
+	{
+		instructions.push_back(instructionId);
+	}
+	
+	void Program::addVariable(const std::string& name, const Variable& variable)
+	{
+		variables.insert(name, variable);
+	}
+	
+	void AssignementParser::parse(Lexer& lexer, Program& program)
+	{
+		Token token = lexer.getToken();
+		if(token.type == TokenTypes::VARTYPE)
+		{
+			Variable newVar;
+			newVar.type = token.type;
+			
+			lexer.next();
+			std::string name = lexer.getToken().name;
+			
+			
+			lexer.next();
+			lexer.next();
+			newVar.value = lexer.getToken().value;
+			
+			program.addVariable(name, newVar);
+		}
+	}
+	
 	Interpreter::Interpreter()	
 	{
 		//addFunction()
 	}
 	
-	void Interpreter::read(const std::string& fileName)
+	Program Interpreter::read(const std::string& fileName)
 	{
-		Lexer stream(fileName);
-		//std::vector<Token> tokens;
-		std::shared_ptr<Instruction> root = std::make_shared<Instruction>();
-		std::shared_ptr<Instruction> instruction = std::make_shared<Instruction>(root);
+		Program program;
 		
-		stream.getTokens(instruction);
-		instruction->getRoot()->print();
-		/*for(Token token : tokens)
+		Lexer stream(fileName);
+		
+		while(stream.next())
 		{
-			std::cout << token.value << "\t \t \t " << token.type << std::endl;			
-		}*/
+			std::cout << stream.getToken().value <<std::endl;
+		}
+		
+		return program;
 	}
 
 }

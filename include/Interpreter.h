@@ -7,14 +7,31 @@
 
 namespace Rosie{
 	
-	struct Parser
+	struct Variable
 	{
-		void parse();
+		int type;
+		std::string value;
 	};
 	
-	struct FunctionParser : public Parser
+	class Program
 	{
-		
+		public:
+			void appendInstruction(const int& instruction);
+			void addVariable(const std::string& name, const Variable& variable);
+			
+		private:
+			std::vector<int> instructions;
+			std::unordered_map<std::string, Variable> variables;
+	};
+	
+	struct Parser
+	{
+		virtual void parse(Lexer& lexer, Program& program) = 0;
+	};
+	
+	struct AssignementParser : public Parser
+	{
+		virtual void parse(Lexer& lexer, Program& program);
 	};
 	
 	class Interpreter
@@ -22,7 +39,7 @@ namespace Rosie{
 		public:
 			Interpreter();
 			
-			void read(const std::string& fileName);
+			Program read(const std::string& fileName);
 	};	
 
 }

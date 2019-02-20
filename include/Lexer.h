@@ -14,21 +14,21 @@ namespace Rosie
 
 	struct Rule
 	{
-		virtual bool matches(char& c, InputStream& stream, std::shared_ptr<Instruction>& instruction) = 0;
+		virtual bool nextToken(char& c, InputStream& stream, Token& token) = 0;
 	};
 	
 	template<typename Caster>
 	struct Lex : public Rule
 	{
-		virtual bool matches(char& c, InputStream& stream, std::shared_ptr<Instruction>& instruction)
+		virtual bool nextToken(char& c, InputStream& stream, Token& token)
 		{
-			if(matches(c, stream))
+			if(appendToToken(c, stream, token))
 			{
-				assignType();
-				
+				assignType(token);
+				/*
 				if(token.value == ")" || token.value == "," || token.value == ";")
 				{
-					std::shared_ptr<Instruction> nextInstruction = std::make_shared<Instruction>(instruction);
+					std::shared_ptr<Instruction> nextInstruction = std::make_shared<Instruction>();
 					instruction = instruction->next(nextInstruction);
 				}
 				else if(token.value == "(")
@@ -38,22 +38,21 @@ namespace Rosie
 				}
 				else
 				{
-					std::cout << "adding " << token.value << " to " << instruction->id <<std::endl;
 					instruction->addToken(token);
 				}
 				
 				token.value = "";
 				token.type = TokenTypes::UNDEFINED;
+				*/
 				return true;
 			}
 			return false;
 		}
 		
-		virtual bool matches(char& c, InputStream& stream) = 0; //returns true if has token to stack, false otherwise
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token) = 0; //returns true if has token to stack, false otherwise
 		
 		protected:
 			Caster typeCaster;
-			Token token;
 			
 			bool isWhiteSpace(const char c)
 			{
@@ -70,9 +69,7 @@ namespace Rosie
 				return isalpha(c);
 			}
 		private:
-			
-			
-			void assignType()
+			void assignType(Token& token)
 			{
 				typeCaster.assign(token);
 			}
@@ -80,22 +77,22 @@ namespace Rosie
 		
 	struct StringLex : Lex<ValueCaster> //VARVALUE string
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
 	struct LiteralLex : Lex<LiteralCaster> //VARVALUE, VARTYPE, VARNAME or KEYWORD
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
 	struct NumeralLex : Lex<ValueCaster> //VARVALUE number
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
 	struct SpecialCharLex : Lex<SpecialCharCaster> //SEPARATOR or OPERATOR
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 		
 		private:
 			bool isSpecialChar(const char c);
@@ -103,12 +100,12 @@ namespace Rosie
 	
 	struct WhiteSpaceLex : Lex<VoidCaster> // white spaces
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
 	struct CommentLex : Lex<VoidCaster> // comments
 	{
-		virtual bool matches(char& c, InputStream& stream);
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
 	class Lexer
@@ -116,10 +113,13 @@ namespace Rosie
 		public:
 			Lexer(const std::string& fileName);
 			
-			void getTokens(std::shared_ptr<Instruction>& instruction);
+			bool next();
+			
+			Token getToken();
 			
 		private:
 			InputStream stream;
 			std::vector<std::shared_ptr<Rule>> rules;
+			Token m_token;
 	};
 }

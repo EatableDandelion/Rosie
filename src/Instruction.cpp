@@ -2,14 +2,23 @@
 
 namespace Rosie
 {
-	Variable::Variable(const std::string& type, const std::string& name, const std::string& value):m_type(type), m_name(name), m_value(value)
-	{}
-	
-	/*Instruction::Instruction(const Variable& returnValue, const Variable& arg1, const Variable& arg2):m_returnValue(std::make_shared<Variable>(returnValue))
+	Variable::Variable(const float& floatValue):type(0)
 	{
-		m_arguments.push_back(std::make_shared<Variable>(arg1));
-		m_arguments.push_back(std::make_shared<Variable>(arg2));
-	}*/
+		f = floatValue;
+	}
+
+	Variable::Variable(const int& integerValue):type(1)
+	{
+		i = integerValue;
+	}
+	
+	Variable::Variable(const bool& booleanValue):type(2)
+	{
+		b = booleanValue;
+	}
+	
+	Variable::Variable()
+	{}
 	
 	Instruction::Instruction(const std::shared_ptr<Instruction>& parent):m_parent(std::weak_ptr<Instruction>(parent))
 	{

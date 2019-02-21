@@ -134,6 +134,24 @@ namespace Rosie
 		return false;
 	}
 	
+	void Lexer::operator++(int)
+	{
+		next();
+	}
+			
+	void Lexer::operator+=(const int& nbIterations)
+	{
+		for(int i = 0; i<nbIterations; i++)
+		{
+			next();
+		}
+	}
+			
+	bool Lexer::hasNext()
+	{
+		return stream.hasNext();
+	}
+	
 	Token Lexer::getToken()
 	{
 		return m_token;

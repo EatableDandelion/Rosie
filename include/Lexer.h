@@ -25,25 +25,7 @@ namespace Rosie
 			if(appendToToken(c, stream, token))
 			{
 				assignType(token);
-				/*
-				if(token.value == ")" || token.value == "," || token.value == ";")
-				{
-					std::shared_ptr<Instruction> nextInstruction = std::make_shared<Instruction>();
-					instruction = instruction->next(nextInstruction);
-				}
-				else if(token.value == "(")
-				{
-					std::shared_ptr<Instruction> child = std::make_shared<Instruction>(instruction);
-					instruction = instruction->sub(child);
-				}
-				else
-				{
-					instruction->addToken(token);
-				}
-				
-				token.value = "";
-				token.type = TokenTypes::UNDEFINED;
-				*/
+
 				return true;
 			}
 			return false;
@@ -112,14 +94,19 @@ namespace Rosie
 	{
 		public:
 			Lexer(const std::string& fileName);
+					
+			void operator++(int);
 			
-			bool next();
+			void operator+=(const int& nbIterations);
 			
 			Token getToken();
+			
+			bool hasNext();
 			
 		private:
 			InputStream stream;
 			std::vector<std::shared_ptr<Rule>> rules;
 			Token m_token;
+			bool next();
 	};
 }

@@ -17,30 +17,6 @@ namespace Rosie
 	/*7*/	UNDEFINED	//base value
 	};
 	
-	/*enum Keywords
-	{
-		IF, WHILE, FOR, RETURN
-	};
-	
-	enum Operators
-	{
-		EQUAL,		LESSTHAN,	GREATERTHAN,
-		PLUS,		MINUS,		MULTIPLY,
-		DIVIDE,		POWER,		MODULO
-	};
-	
-	enum Separators
-	{
-		COMMA,	SEMICOLON,		DOT,
-		COLON,	LPARENTHESIS,	RPARENTHESIS,
-		LBKT,	RBKT
-	};
-	
-	enum Primitives
-	{
-		STRING,	DOUBLE, INT, FLOAT, BOOLEAN, VAR
-	};*/
-	
 	struct Token
 	{
 		Rosie::TokenTypes type = UNDEFINED;

@@ -8,18 +8,21 @@
 
 namespace Rosie{
 	
-	class Variable;
-	class Instruction;
-	
-	class Variable
+	struct Variable
 	{
-		public:
-			Variable(const std::string& type, const std::string& name, const std::string& value);
+		Variable(const float& floatValue);
+		Variable(const int& integerValue);
+		Variable(const bool& booleanValue);
+		Variable();
 		
-		private:
-			std::string m_type;
-			std::string m_name;
-			std::string m_value;
+		int type;
+		
+		union
+		{
+			float f;
+			int i;
+			bool b;
+		};
 	};
 	
 	class Instruction : public std::enable_shared_from_this<Instruction>

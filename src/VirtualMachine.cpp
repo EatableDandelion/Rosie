@@ -22,5 +22,4 @@ namespace Rosie
 			}
 		}
 	}
-	std::set<float> variables;
 }

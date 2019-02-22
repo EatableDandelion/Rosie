@@ -176,16 +176,17 @@ namespace Rosie
 
 		while(charStream.hasNext())
 		{
-			if(nextToken(stream, token))
+			if(nextToken(charStream, token))
 			{
 				tokens.push(token);
+				token.clear();
 			}
 		}
 		
 		return !tokens.empty();
 	}
 	
-	bool Lexer::nextToken(InputStream& stream, Token& token)
+	bool Lexer::nextToken(InputStream& charStream, Token& token)
 	{
 		char c = charStream.getChar();
 

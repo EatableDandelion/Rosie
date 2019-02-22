@@ -177,16 +177,22 @@ namespace Rosie
 
 		while(charStream.hasNext())
 		{
-			for(std::shared_ptr<Rule> rule : rules)
-			{
-				if(rule->nextToken(c, charStream, token))
-				{
-					tokens.push(token);				
-				}
-			}
+			nextToken(c, stream, token);
 		}
 		
 		return !tokens.empty();
+	}
+	
+	bool Lexer::nextToken(char& c, InputStream& stream, Token& token)
+	{
+		for(std::shared_ptr<Rule> rule : rules)
+		{
+			if(rule->nextToken(c, charStream, token))
+			{
+				tokens.push(token);
+				token.clear();
+			}
+		}
 	}
 	
 	void Lexer::operator++(int)

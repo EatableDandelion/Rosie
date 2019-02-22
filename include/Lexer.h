@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -104,9 +105,12 @@ namespace Rosie
 			bool hasNext();
 			
 		private:
-			InputStream stream;
+			LineStream lineStream;
 			std::vector<std::shared_ptr<Rule>> rules;
 			Token m_token;
+			std::queue<Token> tokens;
+			
 			bool next();
+			bool loadNextLine();
 	};
 }

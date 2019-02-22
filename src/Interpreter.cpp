@@ -11,7 +11,7 @@ namespace Rosie{
 	bool Program::hasVariable(const std::string& name)
 	{
 		std::size_t id = getId(name);
-		return variables.find(id) != variables.end();
+		return std::find(variables.begin(), variables.end(), id) != variables.end();
 	}
 	
 	int Program::getVarIndex(const std::string& name)
@@ -118,10 +118,10 @@ namespace Rosie{
 		return program.addConstant(variable);
 	}
 	
-	int Lexer::parseVariable(Lexer& lexer, Program& program)
+	int Parser::parseVariable(Lexer& lexer, Program& program)
 	{
 		std::string varName = lexer.getToken().value;
-		if(!program.hasVariable())
+		if(!program.hasVariable(varName))
 		{
 			std::cout << "Error, variable " << varName << " undefined." <<std::endl;
 			return 0;

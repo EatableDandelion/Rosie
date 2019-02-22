@@ -106,7 +106,7 @@ namespace Rosie
 	}
 	
 	
-	Lexer::Lexer(const std::string& fileName): stream(fileName)
+	Lexer::Lexer(const std::string& fileName): lineStream(fileName)
 	{
 		rules.push_back(std::make_shared<StringLex>());
 		rules.push_back(std::make_shared<LiteralLex>());
@@ -118,6 +118,38 @@ namespace Rosie
 	
 	bool Lexer::next()
 	{
+		bool hasTokens = true;
+		if(tokens.empty())
+		{
+			hasTokens = loadNextLine();
+		}
+		if(hasTokens)
+		{
+			m_token = token.pop();
+		}
+		return hasTokens;
+		/*InputStream charStream;
+		while(lineStream.nextLine())
+		{
+			charStream.setLine(lineStream.getLine());
+			
+			char c = charStream.getChar();
+			Token token;
+			while(charStream.hasNext())
+			{
+				for(std::shared_ptr<Rule> rule : rules)
+				{
+					if(rule->nextToken(c, charStream, token))
+					{
+						m_token = token;
+						
+					}
+				}
+			}
+		}
+		return false;*/
+		
+		/*
 		char c = stream.getChar();
 		Token token;
 		while(stream.hasNext())
@@ -131,7 +163,30 @@ namespace Rosie
 				}
 			}
 		}
-		return false;
+		return false;*/
+	}
+	
+	bool Lexer::loadNextLine()
+	{
+		if(!lineStream.hasNextLine())return false;
+		
+		InputStream charStream(lineStream.getLine());
+		
+		char c = charStream.getChar();
+		Token token;
+
+		while(charStream.hasNext())
+		{
+			for(std::shared_ptr<Rule> rule : rules)
+			{
+				if(rule->nextToken(c, charStream, token))
+				{
+					tokens.push(token);				
+				}
+			}
+		}
+		
+		return !tokens.empty();
 	}
 	
 	void Lexer::operator++(int)
@@ -149,7 +204,7 @@ namespace Rosie
 			
 	bool Lexer::hasNext()
 	{
-		return stream.hasNext();
+		return lineStream.hasNextLine();
 	}
 	
 	Token Lexer::getToken()

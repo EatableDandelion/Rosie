@@ -112,5 +112,6 @@ namespace Rosie
 			
 			bool next();
 			bool loadNextLine();
+			bool nextToken(InputStream& charStream, Token& token);
 	};
 }

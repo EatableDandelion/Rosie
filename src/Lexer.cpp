@@ -125,29 +125,9 @@ namespace Rosie
 		}
 		if(hasTokens)
 		{
-			m_token = token.pop();
+			m_token = token.pop_front();
 		}
 		return hasTokens;
-		/*InputStream charStream;
-		while(lineStream.nextLine())
-		{
-			charStream.setLine(lineStream.getLine());
-			
-			char c = charStream.getChar();
-			Token token;
-			while(charStream.hasNext())
-			{
-				for(std::shared_ptr<Rule> rule : rules)
-				{
-					if(rule->nextToken(c, charStream, token))
-					{
-						m_token = token;
-						
-					}
-				}
-			}
-		}
-		return false;*/
 		
 		/*
 		char c = stream.getChar();
@@ -168,7 +148,7 @@ namespace Rosie
 	
 	bool Lexer::loadNextLine()
 	{
-		if(!lineStream.hasNextLine())return false;
+		if(!lineStream.nextLine())return false;
 		
 		InputStream charStream(lineStream.getLine());
 		
@@ -178,7 +158,7 @@ namespace Rosie
 		{
 			if(nextToken(charStream, token))
 			{
-				tokens.push(token);
+				tokens.push_back(token);
 				token.clear();
 			}
 		}
@@ -221,5 +201,12 @@ namespace Rosie
 	Token Lexer::getToken()
 	{
 		return m_token;
+	}
+	
+	bool Lexer::peekToken(Token& token, const int& index)
+	{
+		if(index >= tokens.size())return false;
+		token = tokens[index];
+		return true;
 	}
 }

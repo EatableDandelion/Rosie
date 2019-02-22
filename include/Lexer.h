@@ -104,7 +104,7 @@ namespace Rosie
 			
 			bool hasNext();
 		
-			Token getToken(const int& index);
+			bool peekToken(Token& token, const int& index)
 			
 		private:
 			LineStream lineStream;

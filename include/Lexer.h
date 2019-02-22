@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#include <queue>
+#include <deque>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -103,12 +103,14 @@ namespace Rosie
 			Token getToken();
 			
 			bool hasNext();
+		
+			Token getToken(const int& index);
 			
 		private:
 			LineStream lineStream;
 			std::vector<std::shared_ptr<Rule>> rules;
 			Token m_token;
-			std::queue<Token> tokens;
+			std::deque<Token> tokens;
 			
 			bool next();
 			bool loadNextLine();

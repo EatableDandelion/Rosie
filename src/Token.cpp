@@ -12,6 +12,12 @@ namespace Rosie
 		value.push_back(c);
 	}
 	
+	void Token::clear()
+	{
+		type = UNDEFINED;
+		value = "";
+	}
+	
 	bool SpecialCharCaster::isSpecialChar(const char c) const
 	{
 		std::string s;

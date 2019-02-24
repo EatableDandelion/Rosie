@@ -104,13 +104,13 @@ namespace Rosie
 			
 			bool hasNext();
 		
-			bool peekToken(Token& token, const int& index)
+			bool peekToken(Token& token, const int& index);
 			
 		private:
 			LineStream lineStream;
 			std::vector<std::shared_ptr<Rule>> rules;
-			Token m_token;
 			std::deque<Token> tokens;
+			bool m_hasNext;
 			
 			bool next();
 			bool loadNextLine();

@@ -114,36 +114,19 @@ namespace Rosie
 		rules.push_back(std::make_shared<SpecialCharLex>());
 		rules.push_back(std::make_shared<CommentLex>());
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
+		m_hasNext = true;
+		loadNextLine();
 	}
 	
 	bool Lexer::next()
 	{
-		bool hasTokens = true;
+		tokens.pop_front();
 		if(tokens.empty())
-		{
-			hasTokens = loadNextLine();
-		}
-		if(hasTokens)
-		{
-			m_token = token.pop_front();
-		}
-		return hasTokens;
-		
-		/*
-		char c = stream.getChar();
-		Token token;
-		while(stream.hasNext())
 		{	
-			for(std::shared_ptr<Rule> rule : rules)
-			{
-				if(rule->nextToken(c, stream, token))
-				{
-					m_token = token;
-					return true;
-				}
-			}
+			return loadNextLine();
 		}
-		return false;*/
+		
+		return true;
 	}
 	
 	bool Lexer::loadNextLine()
@@ -159,10 +142,10 @@ namespace Rosie
 			if(nextToken(charStream, token))
 			{
 				tokens.push_back(token);
-				token.clear();
+				token.clear();				
 			}
 		}
-		
+
 		return !tokens.empty();
 	}
 	
@@ -182,7 +165,7 @@ namespace Rosie
 	
 	void Lexer::operator++(int)
 	{
-		next();
+		m_hasNext = next();
 	}
 			
 	void Lexer::operator+=(const int& nbIterations)
@@ -195,12 +178,12 @@ namespace Rosie
 			
 	bool Lexer::hasNext()
 	{
-		return lineStream.hasNextLine();
+		return m_hasNext;//lineStream.hasNextLine();
 	}
 	
 	Token Lexer::getToken()
 	{
-		return m_token;
+		return tokens.front();
 	}
 	
 	bool Lexer::peekToken(Token& token, const int& index)

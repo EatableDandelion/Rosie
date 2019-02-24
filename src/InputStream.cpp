@@ -45,6 +45,7 @@ namespace Rosie
 	
 	bool LineStream::nextLine()
 	{
+		
 		if(!hasNextLine())return false;
 		std::getline(stream, line);
 		return true;

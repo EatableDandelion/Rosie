@@ -147,11 +147,17 @@ namespace Rosie{
 		
 		parser.parse(stream, program);
 		
-	/*	while(stream.next())
+		/*while(stream.hasNext())
 		{
+			Token test;
+			if(stream.peekToken(test, 2))
+			{
+				std::cout << test.value << " ";
+			}
 			std::cout << stream.getToken().value <<std::endl;
-		}
-	*/	
+			stream++;
+		}*/
+	
 		return program;
 	}
 

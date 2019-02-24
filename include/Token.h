@@ -25,6 +25,8 @@ namespace Rosie
 		void operator+=(const char c);
 		
 		int length() const;
+		
+		void clear();
 	};
 	
 	class TypeCaster

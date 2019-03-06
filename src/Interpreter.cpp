@@ -2,135 +2,359 @@
 
 namespace Rosie{
 	
-	void Program::addInstruction(const std::string& instruction)
-	{
-		std::cout << instruction << std::endl;
-		//instructions.push_back(instruction);
-	}
+	Memory::Memory(const AddressType& type, const int& startIndex):type(type), head(startIndex)
+	{}
 	
-	bool Program::hasVariable(const std::string& name)
+	Address Memory::newAddress(const std::string& name)
 	{
-		std::size_t id = getId(name);
-		return std::find(variables.begin(), variables.end(), id) != variables.end();
-	}
-	
-	int Program::getVarIndex(const std::string& name)
-	{
-		std::size_t id = getId(name);
-		std::vector<std::size_t>::iterator it = std::find(variables.begin(), variables.end(), id);
-		
-		if(it != variables.end())
+		if(isLeaf())
 		{
-			return std::distance(variables.begin(), it)+1;
+			return newAddressInScope(name);
 		}
 		else
 		{
-			variables.push_back(id);
-			return getVarIndex(name);
+			return child->newAddress(name);
 		}
 	}
 	
-	int Program::addConstant(const Variable& variable)
+	Address Memory::newAddressInScope(const std::string& name)
 	{
-		constants.push_back(variable);
-		return -constants.size();//Constants have a negative index to differentiate from addresses.
+		std::size_t id = getId(name);
+		if(available.empty())
+		{
+			int index = head++;
+			addresses.insert(std::pair<std::size_t, Address>(id, Address(index, type)));
+		}
+		else
+		{
+			Address address = available.top();
+			available.pop();
+			addresses.insert(std::pair<std::size_t, Address>(id, address));
+		}
+		return addresses[id];
+	}
+			
+	void Memory::destroy(const Address& address)
+	{
+		//TODO
+	}
+			
+	Address Memory::getAddress(const std::string& name)
+	{
+		if(hasAddressInScope(name))
+		{
+			return addresses[getId(name)];
+		}
+		else
+		{
+			return child->getAddress(name);
+		}
 	}
 	
-	std::size_t Program::getId(const std::string& name)
+	bool Memory::hasAddress(const std::string& name)
+	{
+		if(hasAddressInScope(name))
+		{
+			return true;
+		}
+		else
+		{
+			if(!isLeaf())
+			{
+				return child->hasAddress(name);
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	std::size_t Memory::getId(const std::string& name)
 	{
 		return std::hash<std::string>{}(name);
 	}
+
+	void Memory::startScope()
+	{
+		if(child == nullptr)
+		{
+			child = std::make_shared<Memory>(type, head);
+		}
+		else
+		{
+			child->startScope();
+		}
+	}
+			
+	void Memory::endScope()
+	{
+		if(child->isLeaf())
+		{
+			child.reset();
+		}
+		else
+		{
+			child->endScope();
+		}
+	}
+
+	bool Memory::isLeaf() const
+	{
+		return child == nullptr;
+	}
+	
+	bool Memory::hasAddressInScope(const std::string& name)
+	{
+		return addresses.find(getId(name)) != addresses.end();
+	}
+	
+	
+	Program::Program():variables(AddressType::VARIABLE), functions(AddressType::FUNCTION)
+	{}
+	
+	/*void Program::addInstruction(const std::string& instruction)
+	{
+		std::cout << instruction << std::endl;
+	}*/
+	
+	Address Program::newCstAddress(const Token& token)
+	{
+		std::string value = token.value;
+		TokenType type = token.type;
+		
+		Address address(constants.size(), AddressType::CONSTANT);
+		
+		if(type == TokenType::CSTFLOAT)
+		{
+			 constants.push_back(Variable(std::stof(value)));
+		}
+		else if(type == TokenType::CSTINT)
+		{
+			constants.push_back(Variable(std::stoi(value)));
+		}
+		else if(type == TokenType::CSTBOOLEAN)
+		{
+			if(value == "true")
+			{
+				constants.push_back(Variable(true));
+			}
+			else if(value == "false")
+			{
+				constants.push_back(Variable(false));
+			}
+		}
+		return address;//Constants have a negative index to differentiate from addresses.	
+	}
+	
+	Address Program::newVarAddress(const std::string& name)
+	{
+		return variables.newAddress(name);
+	}
+	
+	Address Program::newVarAddress(const Token& token)
+	{
+		return newVarAddress(token.value);
+	}
+	
+	Address Program::getVarAddress(const Token& token)
+	{
+		if(!hasVarAddress(token))
+		{
+			std::cout << "Error, variable " << token << " undefined." <<std::endl;
+		}
+		return variables.getAddress(token.value);
+	}
+	
+	bool Program::hasVarAddress(const Token& token)
+	{
+		return variables.hasAddress(token.value);
+	}
+	
+	Address Program::newFunctionAddress(const std::string& name)
+	{
+		return functions.newAddress(name);
+	}
+	
+	Address Program::getFunctionAddress(const Token& token)
+	{
+		if(!hasFunctionAddress(token))
+		{
+			std::cout << "Error, function " << token << " undefined." <<std::endl;
+		}
+		return functions.getAddress(token.value);
+	}
+	
+	bool Program::hasFunctionAddress(const Token& token)
+	{
+		return functions.hasAddress(token.value);
+	}
+	
+	void Program::startScope()
+	{
+		std::cout << "Starting scope" << std::endl;
+		variables.startScope();
+	}
+	
+	void Program::endScope()
+	{
+		std::cout << "End scope" << std::endl;
+		variables.endScope();
+	}
+	
+	
+	
+	
 	
 	void Parser::parse(Lexer& lexer, Program& program)
 	{
 		while(lexer.hasNext())
 		{
+			if(lexer.getToken().type == TokenType::VARTYPE) 		//If it's a type such as float, int
+			{		
+				parseDeclaration(lexer, program); 					//float a = 2.1;
+			}
+			else if(isFunction(lexer))								//If it's a function
+			{
+				parseFunction(Address(), lexer, program);					//add(a, b);
+			}
+			else if(isVariable(lexer))								//Else it's a variable
+			{
+				parseAssignment(lexer, program);					//a = 2.1;
+			}
 			lexer++;
-			if(lexer.getToken().type == TokenTypes::VARTYPE)
-			{
-				varDeclaration(lexer, program);
-			}
 		}
 	}
 	
-	void Parser::varDeclaration(Lexer& lexer, Program& program)
-	{		
-		Token token = lexer.getToken();
+	void Parser::parseDeclaration(Lexer& lexer, Program& program)
+	{	
+		Address returnAddress; 
 		
-		std::string type = token.value;
-		
-		lexer++;
-		std::size_t index = program.getVarIndex(lexer.getToken().value);
-		
-		lexer++;
-		token = lexer.getToken();
-		if(token.value == "=")
+		if(lexer.getToken() == "function")
 		{
-			varInitialization(index, type, lexer, program);
-		}
-		else if(token.value != ";")
-		{
-			std::cout << "Error: unexpected character " << token.value << std::endl; 
-		}	
-	}
-	
-	void Parser::varInitialization(const std::size_t& varIndex, const std::string& type, Lexer& lexer, Program& program)
-	{
-		lexer++;
-		
-		int valueIndex;
-		if(lexer.getToken().type == TokenTypes::VARVALUE)
-		{
-			valueIndex = parseConstant(type, lexer, program);
-		}
-		else if(lexer.getToken().type == TokenTypes::VARNAME)
-		{
-			valueIndex = parseVariable(lexer, program);
-		}
-		
-		program.addInstruction("SET "+std::to_string(varIndex)+" "+std::to_string(valueIndex));
-	}
-	
-	int Parser::parseConstant(const std::string& type, Lexer& lexer, Program& program)
-	{
-		Variable variable;
-		std::string value = lexer.getToken().value;
-		if(type == "float")
-		{
-			variable = Variable(std::stof(value));
-		}
-		else if(type == "int")
-		{
-			variable = Variable(std::stoi(value));
-		}
-		else if(type == "boolean")
-		{
-			if(value == "true")
-			{
-				variable = Variable(true);
-			}
-			else
-			{
-				variable = Variable(false);
-			}
-		}
-		
-		return program.addConstant(variable);
-	}
-	
-	int Parser::parseVariable(Lexer& lexer, Program& program)
-	{
-		std::string varName = lexer.getToken().value;
-		if(!program.hasVariable(varName))
-		{
-			std::cout << "Error, variable " << varName << " undefined." <<std::endl;
-			return 0;
+			lexer++;
+			returnAddress = program.newFunctionAddress(lexer.getToken().value);
 		}
 		else
 		{
-			return program.getVarIndex(varName);
+			lexer++;
+			returnAddress = program.newVarAddress(lexer.getToken());
+		}
+		
+		Token nextToken;
+		if(lexer.peekToken(nextToken, 1) && nextToken == "=")
+		{
+			parseAssignment(lexer, program);
 		}
 	}
+	
+	void Parser::parseFunction(const Address& destAddress, Lexer& lexer, Program& program)
+	{
+		program.startScope();
+		
+		Address functionAddress = program.getFunctionAddress(lexer.getToken());
+		
+		lexer++;
+		checkToken("(", lexer);
+		
+		int argIndex = 0;
+		while(lexer.getToken() != ")")
+		{
+			//TODO check for comma
+			lexer++;
+			Address arg = program.newVarAddress("arg"+std::to_string(argIndex));
+			varInitialization(arg, lexer, program);
+			
+			lexer++;
+			argIndex++;
+		}
+		std::cout << "aa" << std::to_string(functionAddress.id) <<std::endl;
+		//program.addInstruction("CALL "+std::to_string(functionAddress.id)+" "+std::to_string(argIndex)+" "+std::to_string(destAddress.id));
+		program.addInstruction(1, functionAddress, Address(argIndex, AddressType::INTEGER), destAddress);
+		program.endScope();
+	}
+	
+	void Parser::parseAssignment(Lexer& lexer, Program& program)
+	{
+		Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
+		
+		lexer++;//token = "="
+		checkToken("=",lexer);
+		
+		lexer++;//token = "2.21"
+		
+		varInitialization(destAddress, lexer, program);
+		lexer++;
+		checkToken(";", lexer);
+	}
+	
+	void Parser::varInitialization(const Address& destAddress, Lexer& lexer, Program& program)
+	{
+		if(isFunction(lexer))
+		{
+			parseFunction(destAddress, lexer, program);
+		}
+		else
+		{
+			Address srcAddress;
+			if(lexer.getToken().type == TokenType::VARNAME)
+			{
+				srcAddress = parseVariable(lexer, program);
+			}
+			else
+			{
+				srcAddress = program.newCstAddress(lexer.getToken());
+			}
+			//program.addInstruction("SET "+std::to_string(destAddress.id)+" "+std::to_string(srcAddress.id));
+			program.addInstruction(0, destAddress, srcAddress);
+		}
+	}
+	
+	Address Parser::parseVariable(Lexer& lexer, Program& program)
+	{
+		return program.getVarAddress(lexer.getToken());
+	}
+	
+	bool Parser::isFunction(Lexer& lexer)
+	{
+		Token nextToken;
+		if(lexer.getToken().type == TokenType::VARNAME && lexer.peekToken(nextToken, 1) && nextToken == "(")
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	bool Parser::isVariable(Lexer& lexer)
+	{
+		TokenType type = lexer.getToken().type;
+		if(type == TokenType::CSTBOOLEAN || type == TokenType::CSTSTRING || type == TokenType::CSTINT || type == TokenType::CSTFLOAT || type == TokenType::VARNAME)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	void Parser::error(const std::string& text, const Lexer& lexer)
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, 12);
+		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token [ "<<lexer.getToken()<<" ]:"<< std::endl;
+		std::cout << lexer.getLine() << std::endl;
+		std::cout << text << std::endl;
+		SetConsoleTextAttribute(hConsole, 7);
+	}
+	
+	void Parser::checkToken(const std::string& expectedToken, const Lexer& lexer)
+	{
+		if(lexer.getToken() != expectedToken)
+		{
+			error("Expected token: "+expectedToken, lexer);
+		}
+	}
+	
+	
+	
 	
 	Interpreter::Interpreter()	
 	{

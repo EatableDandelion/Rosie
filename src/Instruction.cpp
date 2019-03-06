@@ -2,6 +2,15 @@
 
 namespace Rosie
 {
+	Address::Address(const std::size_t& location, const AddressType& type):id(location), type(type)
+	{}
+	
+	Address::Address(const Address& address):id(address.id), type(address.type)
+	{}
+	
+	Address::Address():id(0), type(AddressType::VARIABLE)
+	{}
+	
 	Variable::Variable(const float& floatValue):type(0)
 	{
 		f = floatValue;

@@ -68,6 +68,7 @@ namespace Rosie
 		if(isDigit(c))
 		{
 			bool hadDot = false;
+			token.type = TokenType::CSTINT;
 			token+=c;
 			if(!stream.next(c))
 				return true;
@@ -77,6 +78,7 @@ namespace Rosie
 				if(c == '.')
 				{
 					hadDot = true;
+					token.type = TokenType::CSTFLOAT;
 				}
 				token += c;
 				
@@ -181,7 +183,7 @@ namespace Rosie
 		return m_hasNext;//lineStream.hasNextLine();
 	}
 	
-	Token Lexer::getToken()
+	Token Lexer::getToken() const
 	{
 		return tokens.front();
 	}
@@ -191,5 +193,15 @@ namespace Rosie
 		if(index >= tokens.size())return false;
 		token = tokens[index];
 		return true;
+	}
+	
+	int Lexer::getLineIndex() const
+	{
+		return lineStream.getLineIndex();
+	}
+	
+	std::string Lexer::getLine() const
+	{
+		return lineStream.getLine();
 	}
 }

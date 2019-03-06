@@ -12,6 +12,16 @@ namespace Rosie
 		value.push_back(c);
 	}
 	
+	bool Token::operator==(const std::string& stringValue)
+	{
+		return value == stringValue;
+	}
+	
+	bool Token::operator!=(const std::string& stringValue)
+	{
+		return value != stringValue;
+	}
+	
 	void Token::clear()
 	{
 		type = UNDEFINED;
@@ -51,15 +61,15 @@ namespace Rosie
 	{
 		if(isOperator(token.value))
 		{
-			token.type = TokenTypes::OPERATOR;
+			token.type = TokenType::OPERATOR;
 		}
 		else if(isSeparator(token.value))
 		{
-			token.type = TokenTypes::SEPARATOR;
+			token.type = TokenType::SEPARATOR;
 		}
 		else if(isComparator(token.value))
 		{
-			token.type = TokenTypes::COMPARATOR;
+			token.type = TokenType::COMPARATOR;
 		}
 	}
 
@@ -71,25 +81,26 @@ namespace Rosie
 		types.insert("boolean");
 		types.insert("string");
 		types.insert("var");
+		types.insert("function");
 	}
 	
 	void LiteralCaster::assign(Token& token)
 	{
 		if(isKeyword(token.value))
 		{
-			token.type = TokenTypes::KEYWORD;
+			token.type = TokenType::KEYWORD;
 		}
 		else if(isType(token.value))
 		{
-			token.type = TokenTypes::VARTYPE;
+			token.type = TokenType::VARTYPE;
 		}
-		else if(isValue(token.value))
+		else if(isBoolean(token.value))
 		{
-			token.type = TokenTypes::VARVALUE;
+			token.type = TokenType::CSTBOOLEAN;
 		}
 		else
 		{
-			token.type = TokenTypes::VARNAME;
+			token.type = TokenType::VARNAME;
 		}
 	}
 	
@@ -109,15 +120,14 @@ namespace Rosie
 		return false;
 	}
 	
-	bool LiteralCaster::isValue(const std::string& name)
+	bool LiteralCaster::isBoolean(const std::string& name)
 	{
-		return
-		name == "true" || name == "false";
+		return name == "true" || name == "false";
 	}
-
-	void ValueCaster::assign(Token& token)
+	
+	void StringCaster::assign(Token& token)
 	{
-		token.type = TokenTypes::VARVALUE;
+		token.type = TokenType::CSTSTRING;
 	}
 	
 	void VoidCaster::assign(Token& token)

@@ -8,6 +8,23 @@
 
 namespace Rosie{
 	
+	enum AddressType
+	{
+		INTEGER,
+		VARIABLE,
+		CONSTANT,
+		FUNCTION,
+	};
+	
+	struct Address
+	{
+		Address(const std::size_t& location, const AddressType& type);
+		Address(const Address& address);
+		Address();
+		std::size_t id;
+		AddressType type;
+	};
+	
 	struct Variable
 	{
 		Variable(const float& floatValue);

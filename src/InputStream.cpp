@@ -36,6 +36,7 @@ namespace Rosie
 	LineStream::LineStream(const std::string& fileName)
 	{
 		stream.open(fileName);
+		lineIndex = 0;
 	}
 	
 	LineStream::~LineStream()
@@ -48,6 +49,7 @@ namespace Rosie
 		
 		if(!hasNextLine())return false;
 		std::getline(stream, line);
+		lineIndex++;
 		return true;
 	}
 	
@@ -59,5 +61,10 @@ namespace Rosie
 	std::string LineStream::getLine() const
 	{
 		return line;
+	}
+	
+	int LineStream::getLineIndex() const
+	{
+		return lineIndex;
 	}
 }

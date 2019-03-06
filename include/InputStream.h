@@ -31,10 +31,12 @@ namespace Rosie
 			bool nextLine();
 			bool hasNextLine();
 			std::string getLine() const;
+			int getLineIndex() const;
 		
 		private:
 			std::ifstream stream;
 			std::string line;
+			int lineIndex;
 	};
 
 }

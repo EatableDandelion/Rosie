@@ -58,17 +58,17 @@ namespace Rosie
 			}
 	};
 		
-	struct StringLex : Lex<ValueCaster> //VARVALUE string
+	struct StringLex : Lex<StringCaster> //CSTSTRING
 	{
 		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
-	struct LiteralLex : Lex<LiteralCaster> //VARVALUE, VARTYPE, VARNAME or KEYWORD
+	struct LiteralLex : Lex<LiteralCaster> //CSTBOOLEAN, VARTYPE, VARNAME or KEYWORD
 	{
 		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
 	
-	struct NumeralLex : Lex<ValueCaster> //VARVALUE number
+	struct NumeralLex : Lex<VoidCaster> //CSTFLOAT, CSTINT number
 	{
 		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
 	};
@@ -100,11 +100,15 @@ namespace Rosie
 			
 			void operator+=(const int& nbIterations);
 			
-			Token getToken();
+			Token getToken() const;
 			
 			bool hasNext();
 		
 			bool peekToken(Token& token, const int& index);
+			
+			int getLineIndex() const;
+			
+			std::string getLine() const;
 			
 		private:
 			LineStream lineStream;

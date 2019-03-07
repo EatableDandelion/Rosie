@@ -2,7 +2,7 @@
 
 namespace Rosie{
 	
-	Memory::Memory(const AddressType& type, const int& startIndex):type(type), head(startIndex)
+	Memory::Memory(const int& startIndex):head(startIndex)
 	{}
 	
 	Address Memory::newAddress(const std::string& name)
@@ -23,7 +23,7 @@ namespace Rosie{
 		if(available.empty())
 		{
 			int index = head++;
-			addresses.insert(std::pair<std::size_t, Address>(id, Address(index, type)));
+			addresses.insert(std::pair<std::size_t, Address>(id, Address(index)));
 		}
 		else
 		{
@@ -79,7 +79,7 @@ namespace Rosie{
 	{
 		if(child == nullptr)
 		{
-			child = std::make_shared<Memory>(type, head);
+			child = std::make_shared<Memory>(head);
 		}
 		else
 		{
@@ -110,7 +110,7 @@ namespace Rosie{
 	}
 	
 	
-	Program::Program():variables(AddressType::VARIABLE), functions(AddressType::FUNCTION)
+	Program::Program()
 	{}
 	
 	/*void Program::addInstruction(const std::string& instruction)
@@ -123,7 +123,7 @@ namespace Rosie{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), AddressType::CONSTANT);
+		Address address(constants.size());
 		
 		if(type == TokenType::CSTFLOAT)
 		{
@@ -260,7 +260,6 @@ namespace Rosie{
 		int argIndex = 0;
 		while(lexer.getToken() != ")")
 		{
-			//TODO check for comma
 			lexer++;
 			Address arg = program.newVarAddress("arg"+std::to_string(argIndex));
 			varInitialization(arg, lexer, program);
@@ -268,9 +267,7 @@ namespace Rosie{
 			lexer++;
 			argIndex++;
 		}
-		std::cout << "aa" << std::to_string(functionAddress.id) <<std::endl;
-		//program.addInstruction("CALL "+std::to_string(functionAddress.id)+" "+std::to_string(argIndex)+" "+std::to_string(destAddress.id));
-		program.addInstruction(1, functionAddress, Address(argIndex, AddressType::INTEGER), destAddress);
+		program.addInstruction(Opcode::CALL, functionAddress, Address(argIndex), destAddress);
 		program.endScope();
 	}
 	
@@ -296,17 +293,15 @@ namespace Rosie{
 		}
 		else
 		{
-			Address srcAddress;
 			if(lexer.getToken().type == TokenType::VARNAME)
 			{
-				srcAddress = parseVariable(lexer, program);
+				program.addInstruction(Opcode::SETV, destAddress, parseVariable(lexer, program));
 			}
 			else
 			{
-				srcAddress = program.newCstAddress(lexer.getToken());
+				program.addInstruction(Opcode::SETK, destAddress, program.newCstAddress(lexer.getToken()));
 			}
-			//program.addInstruction("SET "+std::to_string(destAddress.id)+" "+std::to_string(srcAddress.id));
-			program.addInstruction(0, destAddress, srcAddress);
+
 		}
 	}
 	

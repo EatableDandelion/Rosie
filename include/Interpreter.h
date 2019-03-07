@@ -12,10 +12,23 @@
 
 namespace Rosie{
 	
+	enum Opcode
+	{
+		SETK,		//set variable from constant: 	SETK	destAddress	cstSrcAddress
+		SETV,		//set variable from variable: 	SETV	destAddress	varSrcAddress
+		CALL,		//call function:				CALL	funcAddress	nbArguments		returnAddress
+		PRINT		//print value to console		PRINT	varAddress
+	};
+	
+	const std::vector<std::string> OpcodeNames {"SETK", 
+												"SETV", 
+												"CALL",
+												"PRINT"};
+	
 	struct Memory //collection of addresses
 	{
 		public:	
-			Memory(const AddressType& type, const int& startIndex = 1);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
+			Memory(const int& startIndex = 1);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
 		
 			Address newAddress(const std::string& name);
 			
@@ -35,9 +48,7 @@ namespace Rosie{
 			std::stack<Address> available;
 			std::size_t getId(const std::string& name);
 			int head;
-			AddressType type;
 			std::shared_ptr<Memory> child;
-			
 			bool isLeaf() const;
 			bool hasAddressInScope(const std::string& name);
 			Address newAddressInScope(const std::string& name);
@@ -49,11 +60,12 @@ namespace Rosie{
 			Program();
 			
 			template<typename... As>
-			void addInstruction(const int& command, As... addresses)
+			void addInstruction(const Opcode& command, As... addresses)
 			{
-				std::string instruction = std::to_string(command)+" "+translateInstruction(command, addresses...);
-				std::cout << instruction << std::endl;
-				instructions.push_back(instruction);
+				
+				std::string instruction = translateInstruction(addresses...);
+				std::cout << OpcodeNames[command] << " " << instruction << std::endl;
+				instructions.push_back(std::to_string(command)+" "+instruction);
 			}
 			
 			Address newCstAddress(const Token& token);
@@ -77,15 +89,15 @@ namespace Rosie{
 			std::vector<std::string> instructions;
 			
 			template<typename A>
-			std::string translateInstruction(const int& command, A address)
+			std::string translateInstruction(A address)
 			{
-				return std::to_string(address.id)+"_"+std::to_string(address.type);
+				return std::to_string(address.id);
 			}
 			
 			template<typename A, typename... As>
-			std::string translateInstruction(const int& command, A address, As... addresses)
+			std::string translateInstruction(A address, As... addresses)
 			{
-				return std::to_string(address.id)+"_"+std::to_string(address.type)+" "+translateInstruction(command, addresses...);
+				return std::to_string(address.id)+" "+translateInstruction(addresses...);
 			}
 	};
 	

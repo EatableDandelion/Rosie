@@ -3,7 +3,7 @@
 int main()
 {
 	Rosie::Interpreter c;
-	c.read("test.ros");
+	Rosie::Program program(c.read("test.ros"));
 	
 	return 0;
 }

@@ -18,11 +18,10 @@ namespace Rosie{
 	
 	struct Address
 	{
-		Address(const std::size_t& location, const AddressType& type);
+		Address(const std::size_t& location);
 		Address(const Address& address);
 		Address();
 		std::size_t id;
-		AddressType type;
 	};
 	
 	struct Variable

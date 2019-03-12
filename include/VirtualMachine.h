@@ -2,34 +2,19 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
-#include <set>
+#include "Objects.h"
 
 namespace Rosie
 {
-	enum Functions
-	{
-		
-		SET = 0x00,
-		GET = 0x01,
-		ADD = 0x02
-	};
-	
-	struct Command
-	{
-		Functions func;
-		std::vector<int> args;
-	};
-	
 	class VirtualMachine
 	{
 		public:
 			VirtualMachine();
 			
-			void execute();
-
-		private:
-			std::vector<Command> commands;
-			std::set<float> variables;
+			void execute(const std::vector<Variable>& constants, const std::vector<std::string>& commands);
+	
+			std::vector<int> split(const std::string& line);
 	};
 }

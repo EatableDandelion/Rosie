@@ -2,31 +2,6 @@
 
 namespace Rosie
 {
-	int Token::length() const
-	{
-		return value.length();
-	} 
-	
-	void Token::operator+=(const char c)
-	{
-		value.push_back(c);
-	}
-	
-	bool Token::operator==(const std::string& stringValue)
-	{
-		return value == stringValue;
-	}
-	
-	bool Token::operator!=(const std::string& stringValue)
-	{
-		return value != stringValue;
-	}
-	
-	void Token::clear()
-	{
-		type = UNDEFINED;
-		value = "";
-	}
 	
 	bool SpecialCharCaster::isSpecialChar(const char c) const
 	{

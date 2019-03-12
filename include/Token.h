@@ -3,59 +3,10 @@
 #include <string>
 #include <set>
 #include <vector>
+#include "Objects.h"
 
 namespace Rosie
-{
-	enum TokenType
-	{
-	/*0*/	KEYWORD,	//if, while, return
-	/*1*/	SEPARATOR, 	//( ) ;
-	/*2*/	OPERATOR,	//+ =
-	/*3*/	COMPARATOR, //>, <, ==, &&
-	/*4*/	VARNAME, 	//all the variables		
-	/*5*/	VARTYPE,	//float, int, double, string, var
-	/*6*/	CSTSTRING,	//"a"
-	/*7*/	CSTFLOAT,	//58.0
-	/*8*/	CSTINT,		//5
-	/*9*/	CSTBOOLEAN,	//true, false
-	/*10*/	UNDEFINED	//base value
-	};
-	
-	const std::vector<std::string> typeNames {	"Keyword", 
-												"Separator", 
-												"Operator", 
-												"Comparator", 
-												"Variable name", 
-												"Variable type",
-												"String constant",
-												"Float constant",
-												"Integer constant",
-												"Boolean constant",
-												"Undefined"};
-	
-	struct Token
-	{
-		Rosie::TokenType type = UNDEFINED;
-		std::string value;
-		
-		void operator+=(const char c);
-		
-		bool operator==(const std::string& stringValue);
-		
-		bool operator!=(const std::string& stringValue);
-		
-		int length() const;
-		
-		void clear();
-		
-		friend std::ostream& operator <<(std::ostream& os, const Token& token)
-		{
-			os << token.value+" ("+Rosie::typeNames[token.type]+")"  ;
-			return os;
-		}
-	};
-
-	
+{	
 	class TypeCaster
 	{
 		public:

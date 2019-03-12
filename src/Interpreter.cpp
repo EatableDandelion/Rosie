@@ -2,7 +2,7 @@
 
 namespace Rosie{
 	
-	Memory::Memory(const int& startIndex):head(startIndex)
+	Memory::Memory(const std::size_t& type, const int& startIndex):type(type), head(startIndex)
 	{}
 	
 	Address Memory::newAddress(const std::string& name)
@@ -23,7 +23,7 @@ namespace Rosie{
 		if(available.empty())
 		{
 			int index = head++;
-			addresses.insert(std::pair<std::size_t, Address>(id, Address(index)));
+			addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name, type)));
 		}
 		else
 		{
@@ -79,7 +79,7 @@ namespace Rosie{
 	{
 		if(child == nullptr)
 		{
-			child = std::make_shared<Memory>(head);
+			child = std::make_shared<Memory>(type, head);
 		}
 		else
 		{
@@ -110,20 +110,31 @@ namespace Rosie{
 	}
 	
 	
-	Program::Program()
+	Program::Program():variables(2), functions(3)
 	{}
 	
-	/*void Program::addInstruction(const std::string& instruction)
+	Address Program::getAddress(const Token& token)
 	{
-		std::cout << instruction << std::endl;
-	}*/
+		if(hasFunctionAddress(token))
+		{
+			return getFunctionAddress(token);
+		}
+		else if(hasVarAddress(token))
+		{
+			return getVarAddress(token);
+		}
+		else
+		{
+			return newCstAddress(token);
+		}
+	}
 	
 	Address Program::newCstAddress(const Token& token)
 	{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size());
+		Address address(constants.size(), value, 1);
 		
 		if(type == TokenType::CSTFLOAT)
 		{
@@ -143,6 +154,10 @@ namespace Rosie{
 			{
 				constants.push_back(Variable(false));
 			}
+		}
+		else
+		{
+			std::cout << "Constant type undefined" << std::endl;
 		}
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
@@ -202,6 +217,16 @@ namespace Rosie{
 		variables.endScope();
 	}
 	
+	std::vector<Variable> Program::getConstants() const
+	{
+		return constants;
+	}
+	
+	std::vector<std::string> Program::getCommands() const
+	{
+		return instructions;
+	}
+	
 	
 	
 	
@@ -214,9 +239,9 @@ namespace Rosie{
 			{		
 				parseDeclaration(lexer, program); 					//float a = 2.1;
 			}
-			else if(isFunction(lexer))								//If it's a function
+			else if(program.hasFunctionAddress(lexer.getToken()))	//If it's a function
 			{
-				parseFunction(Address(), lexer, program);					//add(a, b);
+				parseFunction(lexer, program);						//add(a, b);
 			}
 			else if(isVariable(lexer))								//Else it's a variable
 			{
@@ -248,12 +273,15 @@ namespace Rosie{
 		}
 	}
 	
-	void Parser::parseFunction(const Address& destAddress, Lexer& lexer, Program& program)
+	/*Address Parser::parseFunction(const Address& destAddress, Lexer& lexer, Program& program)
 	{
-		program.startScope();
-		
+		if(!program.hasFunctionAddress(lexer.getToken()))
+		{
+			program.newFunctionAddress(lexer.getToken().value);
+		}
 		Address functionAddress = program.getFunctionAddress(lexer.getToken());
 		
+		program.startScope();
 		lexer++;
 		checkToken("(", lexer);
 		
@@ -269,6 +297,12 @@ namespace Rosie{
 		}
 		program.addInstruction(Opcode::CALL, functionAddress, Address(argIndex), destAddress);
 		program.endScope();
+	}*/
+	
+	Address Parser::parseFunction(Lexer& lexer, Program& program)
+	{
+		functionParser.parse(lexer, program);
+		return Address(0);
 	}
 	
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
@@ -280,14 +314,15 @@ namespace Rosie{
 		
 		lexer++;//token = "2.21"
 		
-		varInitialization(destAddress, lexer, program);
-		lexer++;
+		Address srcAddress = getAddress(lexer, program);
+		
+		program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	
 	void Parser::varInitialization(const Address& destAddress, Lexer& lexer, Program& program)
 	{
-		if(isFunction(lexer))
+		/*if(program.hasFunctionAddress(lexer.getToken()))
 		{
 			parseFunction(destAddress, lexer, program);
 		}
@@ -302,22 +337,34 @@ namespace Rosie{
 				program.addInstruction(Opcode::SETK, destAddress, program.newCstAddress(lexer.getToken()));
 			}
 
-		}
+		}*/
 	}
 	
-	Address Parser::parseVariable(Lexer& lexer, Program& program)
+	Address Parser::getVariable(const Token& token, Program& program)
 	{
-		return program.getVarAddress(lexer.getToken());
+		return program.getVarAddress(token);
 	}
 	
-	bool Parser::isFunction(Lexer& lexer)
+	Address Parser::getAddress(Lexer& lexer, Program& program)
 	{
-		Token nextToken;
-		if(lexer.getToken().type == TokenType::VARNAME && lexer.peekToken(nextToken, 1) && nextToken == "(")
+		if(program.hasFunctionAddress(lexer.getToken()))
 		{
-			return true;
+			return parseFunction(lexer, program);
 		}
-		return false;
+		else
+		{
+			Token token = lexer.getToken();
+			lexer++;
+			if(token.type == TokenType::VARNAME)
+			{
+				return program.getVarAddress(token);
+			}
+			else
+			{
+				return program.newCstAddress(token);
+			}
+		}
+		
 	}
 	
 	bool Parser::isVariable(Lexer& lexer)
@@ -334,7 +381,7 @@ namespace Rosie{
 	{
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, 12);
-		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token [ "<<lexer.getToken()<<" ]:"<< std::endl;
+		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
 		std::cout << lexer.getLine() << std::endl;
 		std::cout << text << std::endl;
 		SetConsoleTextAttribute(hConsole, 7);
@@ -348,6 +395,178 @@ namespace Rosie{
 		}
 	}
 	
+	
+	
+	
+	Address FunctionParser::parse(Lexer& lexer, Program& program)
+	{
+		std::vector<Token> infixInput;
+		while(lexer.getToken() != ";")
+		{
+			Token token = lexer.getToken();
+			if(program.hasFunctionAddress(token))
+			{
+				token.type = TokenType::FUNCNAME;
+			}
+			infixInput.push_back(token);
+			lexer++;
+		}
+		std::vector<Token> rpn = getRPN(infixInput);
+
+		std::stack<Token> stack;
+		for(Token token : rpn)
+		{
+			std::cout << token << std::endl;
+			if(isNumber(token) || token.type == TokenType::VARNAME || token == "|")
+			{
+				stack.push(token);
+			}
+			else
+			{
+				if(token.type == TokenType::OPERATOR)
+				{
+					if(token != "u-" && token != "u+")
+					{						
+						program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
+						stack.pop();
+					}
+					program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
+					stack.pop();
+					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+
+					stack.push();//push temp result
+				}
+				else
+				{
+					while(stack.top() != "|")
+					{
+						program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
+						stack.pop();
+					}
+					stack.pop();
+					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+				}
+			}
+		}
+		
+		return Address(0);//stack
+	}
+	
+	std::vector<Token> FunctionParser::getRPN(const std::vector<Token>& input)
+	{
+		std::stack<Token> stack;
+		std::vector<Token> output;
+		Token previousToken;
+		bool firstToken = true;
+		for(Token token : input)
+		{		
+			if(isNumber(token) || token.type == TokenType::VARNAME)
+			{
+				output.push_back(token);
+			}
+			else if(token.type == TokenType::FUNCNAME)
+			{
+				stack.push(token);
+			}
+			else if((token.type == TokenType::OPERATOR && firstToken) || isUnary(token, previousToken))
+			{
+				token.value = "u"+token.value;
+				stack.push(token);
+			}
+			else if(token.type == TokenType::OPERATOR)
+			{			
+				while(
+					!stack.empty() && stack.top() != "(" &&
+					(stack.top().type == TokenType::FUNCNAME ||
+					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
+					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
+					)
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+				stack.push(token);				
+			}
+			else if(token == ",")
+			{
+				while(stack.top() != "(")
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+			}
+			else if(token == "(")
+			{
+				Token wallSeparator; //WAAAALL notation, to know how many args for the function called
+				wallSeparator.value = "|";
+				wallSeparator.type = TokenType::SEPARATOR;
+				output.push_back(wallSeparator);
+				stack.push(token);
+			}				
+			else if(token == ")")
+			{
+				while(stack.top() != "(")
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+				stack.pop();
+			}
+			previousToken = token;
+			firstToken = false;
+		}
+		while(!stack.empty())
+		{
+			output.push_back(stack.top());
+			stack.pop();
+		}
+		for(Token token : output)
+		{
+			std::cout << token.value << " ";
+		}
+		std::cout << std::endl;
+		return output;
+	}
+	
+	bool FunctionParser::isNumber(Token& token)
+	{
+		return token.type == TokenType::CSTFLOAT || token.type == TokenType::CSTINT;
+	}
+	
+	bool FunctionParser::isUnary(Token& token, Token& previousToken)
+	{
+		if(token.type != TokenType::OPERATOR)return false;
+		if(previousToken == ")")return false;
+		if(previousToken.type == TokenType::SEPARATOR || previousToken.type == TokenType::OPERATOR) return true;
+		return false;
+	}
+	
+	int FunctionParser::getOperatorPrecedence(Token& token)
+	{
+		if(token == "+" || token == "-")
+		{
+			return 2;
+		}
+		else if(token == "*" || token == "/")
+		{
+			return 3;
+		}
+		else if(token == "^")
+		{
+			return 4;
+		}
+		return 0;
+	}
+	
+	bool FunctionParser::isLeftAssociative(Token& token)
+	{
+		return token != "^";
+	}
+
+	std::size_t FunctionParser::getNbOperands(const Token& token)
+	{
+		return 2;
+	}
 	
 	
 	

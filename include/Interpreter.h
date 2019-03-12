@@ -122,7 +122,6 @@ namespace Rosie{
 			bool isUnary(Token& token, Token& previousToken);
 			int getOperatorPrecedence(Token& token);
 			bool isLeftAssociative(Token& token);
-			std::size_t getNbOperands(const Token& token);
 	};
 	
 

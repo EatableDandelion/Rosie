@@ -413,13 +413,22 @@ namespace Rosie{
 		}
 		std::vector<Token> rpn = getRPN(infixInput);
 
-		std::stack<Token> stack;
+		std::stack<std::stack<Address>> stack; //stack of stack to handle variable nb of args.
+		std::stack activeStack;
+		
+		
 		for(Token token : rpn)
 		{
 			std::cout << token << std::endl;
-			if(isNumber(token) || token.type == TokenType::VARNAME || token == "|")
+			if(isNumber(token) || token.type == TokenType::VARNAME)
 			{
-				stack.push(token);
+				activeStack.push(program.getAddress(token));
+			}
+			else if(token == "|")
+			{
+				stack.push(activeStack);
+				std::stack newActiveStack;
+				activeStack = newActiveStack;
 			}
 			else
 			{
@@ -427,29 +436,36 @@ namespace Rosie{
 				{
 					if(token != "u-" && token != "u+")
 					{						
-						program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
-						stack.pop();
+						program.addInstruction(Opcode::ARG, activeStack.top());
+						activeStack.pop();
 					}
-					program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
-					stack.pop();
-					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
-
-					stack.push();//push temp result
+					program.addInstruction(Opcode::ARG, activeStack.top());
+					activeStack.pop();
+					
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					activeStack.push(Address(0));
 				}
 				else
 				{
-					while(stack.top() != "|")
+					while(!activeStack.empty())
 					{
-						program.addInstruction(Opcode::ARG, program.getAddress(stack.top()));
+						program.addInstruction(Opcode::ARG, activeStack.top());
+						activeStack.pop();
+					}
+					
+					if(!stack.empty())
+					{
+						activeStack = stack.top();
 						stack.pop();
 					}
-					stack.pop();
-					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					activeStack.push(Address(0));
 				}
 			}
 		}
 		
-		return Address(0);//stack
+		return Address(0);//callstack address
 	}
 	
 	std::vector<Token> FunctionParser::getRPN(const std::vector<Token>& input)
@@ -563,10 +579,6 @@ namespace Rosie{
 		return token != "^";
 	}
 
-	std::size_t FunctionParser::getNbOperands(const Token& token)
-	{
-		return 2;
-	}
 	
 	
 	

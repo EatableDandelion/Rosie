@@ -114,7 +114,7 @@ namespace Rosie{
 	class FunctionParser
 	{	
 		public:
-			Address parse(Lexer& lexer, Program& program);
+			void parse(Lexer& lexer, Program& program, const Address& destAddress = Address(0));
 		
 		private:
 			std::vector<Token> getRPN(const std::vector<Token>& input);//reverse polish notation
@@ -132,14 +132,12 @@ namespace Rosie{
 		
 		private:
 			FunctionParser functionParser;
-			Address parseFunction(Lexer& lexer, Program& program);
 			
 			void parseAssignment(Lexer& lexer, Program& program);
 			void parseDeclaration(Lexer& lexer, Program& program);
-			void varInitialization(const Address& destAddress, Lexer& lexer, Program& program);
 			Address getVariable(const Token& token, Program& program);
 			bool isVariable(Lexer& lexer);
-			Address getAddress(Lexer& lexer, Program& program);
+			//Address setAddress(Lexer& lexer, Program& program);
 			
 			void error(const std::string& text, const Lexer& lexer);
 			void checkToken(const std::string& expectedToken, const Lexer& lexer);

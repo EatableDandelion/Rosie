@@ -241,7 +241,7 @@ namespace Rosie{
 			}
 			else if(program.hasFunctionAddress(lexer.getToken()))	//If it's a function
 			{
-				parseFunction(lexer, program);						//add(a, b);
+				functionParser.parse(lexer, program);				//add(a, b);
 			}
 			else if(isVariable(lexer))								//Else it's a variable
 			{
@@ -273,38 +273,6 @@ namespace Rosie{
 		}
 	}
 	
-	/*Address Parser::parseFunction(const Address& destAddress, Lexer& lexer, Program& program)
-	{
-		if(!program.hasFunctionAddress(lexer.getToken()))
-		{
-			program.newFunctionAddress(lexer.getToken().value);
-		}
-		Address functionAddress = program.getFunctionAddress(lexer.getToken());
-		
-		program.startScope();
-		lexer++;
-		checkToken("(", lexer);
-		
-		int argIndex = 0;
-		while(lexer.getToken() != ")")
-		{
-			lexer++;
-			Address arg = program.newVarAddress("arg"+std::to_string(argIndex));
-			varInitialization(arg, lexer, program);
-			
-			lexer++;
-			argIndex++;
-		}
-		program.addInstruction(Opcode::CALL, functionAddress, Address(argIndex), destAddress);
-		program.endScope();
-	}*/
-	
-	Address Parser::parseFunction(Lexer& lexer, Program& program)
-	{
-		functionParser.parse(lexer, program);
-		return Address(0);
-	}
-	
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
 	{
 		Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
@@ -314,30 +282,10 @@ namespace Rosie{
 		
 		lexer++;//token = "2.21"
 		
-		Address srcAddress = getAddress(lexer, program);
+		functionParser.parse(lexer, program, destAddress);
 		
-		program.addInstruction(Opcode::SET, destAddress, srcAddress);
+		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
-	}
-	
-	void Parser::varInitialization(const Address& destAddress, Lexer& lexer, Program& program)
-	{
-		/*if(program.hasFunctionAddress(lexer.getToken()))
-		{
-			parseFunction(destAddress, lexer, program);
-		}
-		else
-		{
-			if(lexer.getToken().type == TokenType::VARNAME)
-			{
-				program.addInstruction(Opcode::SETV, destAddress, parseVariable(lexer, program));
-			}
-			else
-			{
-				program.addInstruction(Opcode::SETK, destAddress, program.newCstAddress(lexer.getToken()));
-			}
-
-		}*/
 	}
 	
 	Address Parser::getVariable(const Token& token, Program& program)
@@ -345,8 +293,9 @@ namespace Rosie{
 		return program.getVarAddress(token);
 	}
 	
-	Address Parser::getAddress(Lexer& lexer, Program& program)
+	/*Address Parser::setAddress(Lexer& lexer, Program& program)
 	{
+
 		if(program.hasFunctionAddress(lexer.getToken()))
 		{
 			return parseFunction(lexer, program);
@@ -365,7 +314,7 @@ namespace Rosie{
 			}
 		}
 		
-	}
+	}*/
 	
 	bool Parser::isVariable(Lexer& lexer)
 	{
@@ -398,7 +347,7 @@ namespace Rosie{
 	
 	
 	
-	Address FunctionParser::parse(Lexer& lexer, Program& program)
+	void FunctionParser::parse(Lexer& lexer, Program& program, const Address& destAddress)
 	{
 		std::vector<Token> infixInput;
 		while(lexer.getToken() != ";")
@@ -414,12 +363,11 @@ namespace Rosie{
 		std::vector<Token> rpn = getRPN(infixInput);
 
 		std::stack<std::stack<Address>> stack; //stack of stack to handle variable nb of args.
-		std::stack activeStack;
+		std::stack<Address> activeStack;
 		
 		
 		for(Token token : rpn)
 		{
-			std::cout << token << std::endl;
 			if(isNumber(token) || token.type == TokenType::VARNAME)
 			{
 				activeStack.push(program.getAddress(token));
@@ -427,7 +375,7 @@ namespace Rosie{
 			else if(token == "|")
 			{
 				stack.push(activeStack);
-				std::stack newActiveStack;
+				std::stack<Address> newActiveStack;
 				activeStack = newActiveStack;
 			}
 			else
@@ -436,20 +384,20 @@ namespace Rosie{
 				{
 					if(token != "u-" && token != "u+")
 					{						
-						program.addInstruction(Opcode::ARG, activeStack.top());
+						program.addInstruction(Opcode::SET, activeStack.top());
 						activeStack.pop();
 					}
-					program.addInstruction(Opcode::ARG, activeStack.top());
+					program.addInstruction(Opcode::SET, activeStack.top());
 					activeStack.pop();
 					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}
 				else
 				{
 					while(!activeStack.empty())
 					{
-						program.addInstruction(Opcode::ARG, activeStack.top());
+						program.addInstruction(Opcode::SET, activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -459,13 +407,15 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}
 			}
 		}
-		
-		return Address(0);//callstack address
+		if(destAddress.id != 0)
+		{
+			program.addInstruction(Opcode::SET, destAddress, Address(0));
+		}
 	}
 	
 	std::vector<Token> FunctionParser::getRPN(const std::vector<Token>& input)

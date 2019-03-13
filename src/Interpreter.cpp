@@ -382,23 +382,28 @@ namespace Rosie{
 			{
 				if(token.type == TokenType::OPERATOR)
 				{
+					std::size_t nbOperands = 0;
 					if(token != "u-" && token != "u+")
 					{						
-						program.addInstruction(Opcode::SET, activeStack.top());
+						program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
+						nbOperands++;
 					}
-					program.addInstruction(Opcode::SET, activeStack.top());
+					program.addInstruction(Opcode::ARG, activeStack.top());
 					activeStack.pop();
+					nbOperands++;
 					
-					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token), Address(nbOperands));
 					activeStack.push(Address(0));
 				}
 				else
 				{
+					std::size_t nbOperands = 0;
 					while(!activeStack.empty())
 					{
-						program.addInstruction(Opcode::SET, activeStack.top());
+						program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
+						nbOperands++;
 					}
 					
 					if(!stack.empty())
@@ -407,14 +412,14 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token), Address(nbOperands));
 					activeStack.push(Address(0));
 				}
 			}
 		}
 		if(destAddress.id != 0)
 		{
-			program.addInstruction(Opcode::SET, destAddress, Address(0));
+			program.addInstruction(Opcode::SET, destAddress, activeStack.top());
 		}
 	}
 	

@@ -282,9 +282,9 @@ namespace Rosie{
 		
 		lexer++;//token = "2.21"
 		
-		functionParser.parse(lexer, program, destAddress);
+		Address destAddress = functionParser.parse(lexer, program, destAddress);
 		
-		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
+		program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	
@@ -347,7 +347,7 @@ namespace Rosie{
 	
 	
 	
-	void FunctionParser::parse(Lexer& lexer, Program& program, const Address& destAddress)
+	Address FunctionParser::parse(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
 		while(lexer.getToken() != ";")
@@ -382,28 +382,23 @@ namespace Rosie{
 			{
 				if(token.type == TokenType::OPERATOR)
 				{
-					std::size_t nbOperands = 0;
 					if(token != "u-" && token != "u+")
 					{						
 						program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
-						nbOperands++;
 					}
 					program.addInstruction(Opcode::ARG, activeStack.top());
 					activeStack.pop();
-					nbOperands++;
 					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token), Address(nbOperands));
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}
 				else
 				{
-					std::size_t nbOperands = 0;
 					while(!activeStack.empty())
 					{
 						program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
-						nbOperands++;
 					}
 					
 					if(!stack.empty())
@@ -412,14 +407,18 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token), Address(nbOperands));
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}
 			}
 		}
-		if(destAddress.id != 0)
+		if(!activeStack.empty())
 		{
-			program.addInstruction(Opcode::SET, destAddress, activeStack.top());
+			return activeStack.top();
+		}
+		else
+		{
+			return Address(0);
 		}
 	}
 	

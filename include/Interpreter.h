@@ -14,20 +14,24 @@ namespace Rosie{
 	
 	enum Opcode
 	{
-		SETK,		//set variable from constant: 	SETK	destAddress	cstSrcAddress
-		SETV,		//set variable from variable: 	SETV	destAddress	varSrcAddress
 		CALL,		//call function:				CALL	funcAddress	nbArguments		returnAddress
-		PRINT,		//print value to console		PRINT	srcAddress
 		SET,
-		ARG			//push argument for function	ARG		srcAddress
+		ARG,			//push argument for function	ARG		srcAddress
+		ADD,
+		SUB,
+		MULT,
+		DIV,
+		NEG
 	};
 	
-	const std::vector<std::string> OpcodeNames {"SETK", 
-												"SETV", 
-												"CALL",
-												"PRINT",
+	const std::vector<std::string> OpcodeNames {"CALL",
 												"SET",
-												"ARG"};
+												"ARG",
+												"ADD",
+												"SUB",
+												"MULT",
+												"DIV",
+												"NEG"};
 	
 	struct Memory //collection of addresses
 	{

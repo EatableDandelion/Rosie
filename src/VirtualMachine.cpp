@@ -11,7 +11,7 @@ namespace Rosie
 		for(const std::string command : commands)
 		{
 			std::vector<int> tokens = split(command);//setk setv call print
-			if(tokens[0] == 0)//set constant
+			/*if(tokens[0] == 0)//set constant
 			{
 				variables[tokens[1]] = constants[tokens[2]];
 			}
@@ -24,7 +24,7 @@ namespace Rosie
 			else if(tokens[0] == 3)
 			{
 				std::cout << variables[tokens[1]].f << std::endl;
-			}
+			}*/
 		}
 	}
 	

@@ -282,7 +282,7 @@ namespace Rosie{
 		
 		lexer++;//token = "2.21"
 		
-		Address destAddress = functionParser.parse(lexer, program, destAddress);
+		Address srcAddress = functionParser.parse(lexer, program);
 		
 		program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
@@ -292,29 +292,6 @@ namespace Rosie{
 	{
 		return program.getVarAddress(token);
 	}
-	
-	/*Address Parser::setAddress(Lexer& lexer, Program& program)
-	{
-
-		if(program.hasFunctionAddress(lexer.getToken()))
-		{
-			return parseFunction(lexer, program);
-		}
-		else
-		{
-			Token token = lexer.getToken();
-			lexer++;
-			if(token.type == TokenType::VARNAME)
-			{
-				return program.getVarAddress(token);
-			}
-			else
-			{
-				return program.newCstAddress(token);
-			}
-		}
-		
-	}*/
 	
 	bool Parser::isVariable(Lexer& lexer)
 	{
@@ -382,16 +359,38 @@ namespace Rosie{
 			{
 				if(token.type == TokenType::OPERATOR)
 				{
-					if(token != "u-" && token != "u+")
-					{						
-						program.addInstruction(Opcode::ARG, activeStack.top());
-						activeStack.pop();
+					if(token == "u-")
+					{												
+						program.addInstruction(Opcode::NEG, activeStack.top());
 					}
-					program.addInstruction(Opcode::ARG, activeStack.top());
+					else if(token == "u+")
+					{}
+					else
+					{
+						Address arg2 = activeStack.top();
+						activeStack.pop();
+						Address arg1 = activeStack.top();			
+						
+						if(token == "+")
+						{
+							program.addInstruction(Opcode::ADD, arg1, arg2);
+						}
+						else if(token == "-")
+						{
+							program.addInstruction(Opcode::SUB, arg1, arg2);
+						}
+						else if(token == "*")
+						{
+							program.addInstruction(Opcode::MULT, arg1, arg2);
+						}
+						else if(token == "/")
+						{
+							program.addInstruction(Opcode::DIV, arg1, arg2);
+						}	
+					}
 					activeStack.pop();
-					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
 					activeStack.push(Address(0));
+					
 				}
 				else
 				{
@@ -490,11 +489,6 @@ namespace Rosie{
 			output.push_back(stack.top());
 			stack.pop();
 		}
-		for(Token token : output)
-		{
-			std::cout << token.value << " ";
-		}
-		std::cout << std::endl;
 		return output;
 	}
 	

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <variant>
 
 namespace Rosie{
 	
@@ -27,19 +28,55 @@ namespace Rosie{
 	
 	struct Variable
 	{
-		Variable(const float& floatValue);
-		Variable(const int& integerValue);
-		Variable(const bool& booleanValue);
-		Variable();
+		public:
+			Variable(const float& floatValue);
+			Variable(const int& integerValue);
+			Variable(const bool& booleanValue);
+			Variable();
+
+			Variable operator+(const Variable& other);
 		
-		int type;
+			/*int type;
+
+			union
+			{
+				float f;
+				int i;
+				bool b;
+			};
+			*/
+
+
+		private:
+			std::size_t type;
+			std::variant<float, int, bool, std::string> value;
 		
-		union
-		{
-			float f;
-			int i;
-			bool b;
-		};
+			Variable performOperation(const Variable& other, const char c);
+			
+			template<typename T>
+			Variable performOperationOnType(const Variable& other, const char c)
+			{
+				if(c == '+')
+				{
+					return Variable(std::get<T>(value)+std::get<T>(other.value));			
+				}
+				else if(c == '-')
+				{
+					return Variable(std::get<T>(value)-std::get<T>(other.value));			
+				}
+				else if(c == '*')
+				{
+					return Variable(std::get<T>(value)*std::get<T>(other.value));			
+				}
+				else if(c == '/')
+				{
+					return Variable(std::get<T>(value)/std::get<T>(other.value));			
+				}
+				else
+				{
+					error
+				}
+			}
 	};
 	
 		

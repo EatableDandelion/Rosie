@@ -49,19 +49,51 @@ namespace Rosie
 	
 	Variable::Variable(const float& floatValue):type(0)
 	{
-		f = floatValue;
+		//f = floatValue;
+		value = floatValue;
+		type = 0;
 	}
 
 	Variable::Variable(const int& integerValue):type(1)
 	{
-		i = integerValue;
+		//i = integerValue;
+		value = integerValue;
+		type = 1;
 	}
 	
 	Variable::Variable(const bool& booleanValue):type(2)
 	{
-		b = booleanValue;
+		//b = booleanValue;
+		value = booleanValue;
+		type = 2;
 	}
 	
 	Variable::Variable()
 	{}
+	
+	Variable Variable::operator+(const Variable& other)
+	{
+		return performOperation(other, '+');
+	}
+	
+	Variable Variable::performOperation(const Variable& other, const char c)
+	{
+		if(type != other.type)error;
+		if(type == 0)
+		{
+			return performOperationOnType<float>(other, c);
+		}
+		else if(type == 1)
+		{
+			return performOperationOnType<int>(other, c);
+		}
+		else if(type == 2)
+		{
+			return performOperationOnType<bool>(other, c);
+		}
+		else(type == 3)
+		{
+			return performOperationOnType<std::string>(other, c);
+		}
+	}
 }

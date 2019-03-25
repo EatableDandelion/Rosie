@@ -284,7 +284,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction(Opcode::SET, destAddress, srcAddress);
+		program.addInstruction("SET", destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	
@@ -361,7 +361,7 @@ namespace Rosie{
 				{
 					if(token == "u-")
 					{												
-						program.addInstruction(Opcode::NEG, activeStack.top());
+						program.addInstruction("NEG", activeStack.top());
 					}
 					else if(token == "u+")
 					{}
@@ -373,19 +373,19 @@ namespace Rosie{
 						
 						if(token == "+")
 						{
-							program.addInstruction(Opcode::ADD, arg1, arg2);
+							program.addInstruction("ADD", arg1, arg2);
 						}
 						else if(token == "-")
 						{
-							program.addInstruction(Opcode::SUB, arg1, arg2);
+							program.addInstruction("SUB", arg1, arg2);
 						}
 						else if(token == "*")
 						{
-							program.addInstruction(Opcode::MULT, arg1, arg2);
+							program.addInstruction("MULT", arg1, arg2);
 						}
 						else if(token == "/")
 						{
-							program.addInstruction(Opcode::DIV, arg1, arg2);
+							program.addInstruction("DIV", arg1, arg2);
 						}	
 					}
 					activeStack.pop();
@@ -396,7 +396,7 @@ namespace Rosie{
 				{
 					while(!activeStack.empty())
 					{
-						program.addInstruction(Opcode::ARG, activeStack.top());
+						program.addInstruction("ARG", activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -406,7 +406,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token));
+					program.addInstruction("CALL", program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}
 			}

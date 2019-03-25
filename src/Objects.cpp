@@ -49,36 +49,59 @@ namespace Rosie
 	
 	Variable::Variable(const float& floatValue):type(0)
 	{
-		//f = floatValue;
-		value = floatValue;
-		type = 0;
+		set(floatValue);
 	}
 
 	Variable::Variable(const int& integerValue):type(1)
 	{
-		//i = integerValue;
-		value = integerValue;
-		type = 1;
+		set(integerValue);
 	}
 	
 	Variable::Variable(const bool& booleanValue):type(2)
 	{
-		//b = booleanValue;
-		value = booleanValue;
-		type = 2;
+		set(booleanValue);
+	}
+	
+	Variable::Variable(const std::string& stringValue):type(3)
+	{
+		set(stringValue);
 	}
 	
 	Variable::Variable()
 	{}
 	
-	Variable Variable::operator+(const Variable& other)
+	void Variable::set(const float& newValue)
+	{
+		value = newValue;
+		type = 0;
+	}
+	
+	void Variable::set(const int& newValue)
+	{
+		value = newValue;
+		type = 1;
+	}
+	
+	void Variable::set(const bool& newValue)
+	{
+		value = newValue;
+		type = 2;
+	}
+	
+	void Variable::set(const std::string& newValue)
+	{
+		value = newValue;
+		type = 3;
+	}
+	
+	/*Variable Variable::operator+(const Variable& other)
 	{
 		return performOperation(other, '+');
 	}
 	
 	Variable Variable::performOperation(const Variable& other, const char c)
 	{
-		if(type != other.type)error;
+		//if(type != other.type)error;
 		if(type == 0)
 		{
 			return performOperationOnType<float>(other, c);
@@ -91,9 +114,9 @@ namespace Rosie
 		{
 			return performOperationOnType<bool>(other, c);
 		}
-		else(type == 3)
+		else//(type == 3)
 		{
 			return performOperationOnType<std::string>(other, c);
 		}
-	}
+	}*/
 }

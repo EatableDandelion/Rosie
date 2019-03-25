@@ -32,26 +32,47 @@ namespace Rosie{
 			Variable(const float& floatValue);
 			Variable(const int& integerValue);
 			Variable(const bool& booleanValue);
+			Variable(const std::string& stringValue);
 			Variable();
 
-			Variable operator+(const Variable& other);
-		
-			/*int type;
-
-			union
+			
+			template<typename T>
+			T get() const
 			{
-				float f;
-				int i;
-				bool b;
-			};
-			*/
-
-
+				return std::get<T>(value);
+			}
+			
+			void set(const float& newValue);
+			void set(const int& newValue);
+			void set(const bool& newValue);
+			void set(const std::string& newValue);
+			
+			friend std::ostream& operator <<(std::ostream& os, const Variable& var)
+			{
+				if(var.type == 0)
+				{
+					os << std::to_string(var.get<float>())+ " (float)"; 
+				}
+				else if(var.type == 1)
+				{
+					os << std::to_string(var.get<int>())+ " (int)"; 
+				}
+				else if(var.type == 2)
+				{
+					os << std::to_string(var.get<bool>())+ " (boolean)"; 
+				}
+				else if(var.type == 3)
+				{
+					os << var.get<std::string>()+ " (string)"; 
+				}
+				return os;
+			}
+			
 		private:
 			std::size_t type;
 			std::variant<float, int, bool, std::string> value;
 		
-			Variable performOperation(const Variable& other, const char c);
+			/*Variable performOperation(const Variable& other, const char c);
 			
 			template<typename T>
 			Variable performOperationOnType(const Variable& other, const char c)
@@ -74,9 +95,9 @@ namespace Rosie{
 				}
 				else
 				{
-					error
+					//error
 				}
-			}
+			}*/
 	};
 	
 		

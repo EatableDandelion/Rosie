@@ -9,29 +9,9 @@
 #include <unordered_map>
 #include "Lexer.h"
 #include "Objects.h"
+#include "Syntax.h"
 
 namespace Rosie{
-	
-	enum Opcode
-	{
-		CALL,		//call function:				CALL	funcAddress	nbArguments		returnAddress
-		SET,
-		ARG,			//push argument for function	ARG		srcAddress
-		ADD,
-		SUB,
-		MULT,
-		DIV,
-		NEG
-	};
-	
-	const std::vector<std::string> OpcodeNames {"CALL",
-												"SET",
-												"ARG",
-												"ADD",
-												"SUB",
-												"MULT",
-												"DIV",
-												"NEG"};
 	
 	struct Memory //collection of addresses
 	{
@@ -69,12 +49,11 @@ namespace Rosie{
 			Program();
 			
 			template<typename... As>
-			void addInstruction(const Opcode& command, As... addresses)
-			{
-				
+			void addInstruction(const std::string& command, As... addresses)
+			{		
 				std::string instruction = translateInstruction(addresses...);
-				std::cout << OpcodeNames[command] << " " << instruction << std::endl;
-				instructions.push_back(std::to_string(command)+" "+instruction);
+				std::cout << command << " " << instruction << std::endl;
+				instructions.push_back(std::to_string(syntax.getOpcodeId(command))+" "+instruction);
 			}
 			
 			Address getAddress(const Token& token);
@@ -97,6 +76,7 @@ namespace Rosie{
 			std::vector<std::string> getCommands() const;
 			
 		private:
+			Syntax syntax;
 			std::vector<Variable> constants;
 			Memory variables;
 			Memory functions;
@@ -141,7 +121,6 @@ namespace Rosie{
 			void parseDeclaration(Lexer& lexer, Program& program);
 			Address getVariable(const Token& token, Program& program);
 			bool isVariable(Lexer& lexer);
-			//Address setAddress(Lexer& lexer, Program& program);
 			
 			void error(const std::string& text, const Lexer& lexer);
 			void checkToken(const std::string& expectedToken, const Lexer& lexer);

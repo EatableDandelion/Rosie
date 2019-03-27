@@ -2,7 +2,7 @@
 
 namespace Rosie{
 	
-	Memory::Memory(const int& startIndex):head(startIndex)
+	Memory::Memory(const std::size_t& type, const int& startIndex):type(type), head(startIndex)
 	{
 		scope.push(startIndex);
 	}
@@ -12,7 +12,7 @@ namespace Rosie{
 		std::size_t id = getId(name);
 
 		int index = head++;
-		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name)));
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name, type)));
 
 		return addresses[id];
 	}
@@ -44,7 +44,7 @@ namespace Rosie{
 	}
 	
 	
-	Program::Program()
+	Program::Program():variables(1), functions(2)
 	{
 		for(const auto& pair : syntax.getNativeMethods())
 		{

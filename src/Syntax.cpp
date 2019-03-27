@@ -8,7 +8,7 @@ namespace Rosie
 		addOpcode("SET", [&](std::vector<int>& args){variables.insert(std::pair<int, Variable>(args[0], variables[args[1]]));});
 		addOpcode("ARG", [&](std::vector<int>& args){callStack.push(args[0]);});
 		addOpcode("PRINT", [&](std::vector<int>& args){std::cout << variables[args[0]] << std::endl;});
-		//addOpcode("CALL", [&](std::vector<int>& args){execute(args[0]);});
+		addOpcode("CALL", [&](std::vector<int>& args){});//execute(args[0]);
 		addOpcode("ADD", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()+variables[args[2]].get<float>());});
 		addOpcode("NEG", [&](std::vector<int>& args){variables[args[0]].set(-variables[args[1]].get<float>());});
 		addOpcode("SUB", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()-variables[args[2]].get<float>());});
@@ -20,6 +20,7 @@ namespace Rosie
 	
 	int Syntax::getOpcodeId(const std::string& name) const
 	{
+		if(opcodes.find(name) == opcodes.end()) std::cout << "Opcode "+name+" unrecognized" << std::endl;
 		return opcodes.at(name).getId();
 	}
 	

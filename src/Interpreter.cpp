@@ -2,115 +2,49 @@
 
 namespace Rosie{
 	
-	Memory::Memory(const std::size_t& type, const int& startIndex):type(type), head(startIndex)
-	{}
+	Memory::Memory(const int& startIndex):head(startIndex)
+	{
+		scope.push(startIndex);
+	}
 	
 	Address Memory::newAddress(const std::string& name)
 	{
-		if(isLeaf())
-		{
-			return newAddressInScope(name);
-		}
-		else
-		{
-			return child->newAddress(name);
-		}
-	}
-	
-	Address Memory::newAddressInScope(const std::string& name)
-	{
 		std::size_t id = getId(name);
-		if(available.empty())
-		{
-			int index = head++;
-			addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name, type)));
-		}
-		else
-		{
-			Address address = available.top();
-			available.pop();
-			addresses.insert(std::pair<std::size_t, Address>(id, address));
-		}
+
+		int index = head++;
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name)));
+
 		return addresses[id];
-	}
-			
-	void Memory::destroy(const Address& address)
-	{
-		//TODO
 	}
 			
 	Address Memory::getAddress(const std::string& name)
 	{
-		if(hasAddressInScope(name))
-		{
-			return addresses[getId(name)];
-		}
-		else
-		{
-			return child->getAddress(name);
-		}
+		return addresses[getId(name)];
 	}
 	
 	bool Memory::hasAddress(const std::string& name)
 	{
-		if(hasAddressInScope(name))
-		{
-			return true;
-		}
-		else
-		{
-			if(!isLeaf())
-			{
-				return child->hasAddress(name);
-			}
-			else
-			{
-				return false;
-			}
-		}
+		return addresses.find(getId(name)) != addresses.end();
+	}
+
+	void Memory::startScope()
+	{
+		scope.push(head);
+	}
+			
+	void Memory::endScope()
+	{
+		head = scope.top();
+		scope.pop();
 	}
 	
 	std::size_t Memory::getId(const std::string& name)
 	{
 		return std::hash<std::string>{}(name);
 	}
-
-	void Memory::startScope()
-	{
-		if(child == nullptr)
-		{
-			child = std::make_shared<Memory>(type, head);
-		}
-		else
-		{
-			child->startScope();
-		}
-	}
-			
-	void Memory::endScope()
-	{
-		if(child->isLeaf())
-		{
-			child.reset();
-		}
-		else
-		{
-			child->endScope();
-		}
-	}
-
-	bool Memory::isLeaf() const
-	{
-		return child == nullptr;
-	}
-	
-	bool Memory::hasAddressInScope(const std::string& name)
-	{
-		return addresses.find(getId(name)) != addresses.end();
-	}
 	
 	
-	Program::Program():variables(2), functions(3)
+	Program::Program()
 	{
 		for(const auto& pair : syntax.getNativeMethods())
 		{
@@ -139,7 +73,7 @@ namespace Rosie{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), value, 1);
+		Address address(constants.size(), value);
 		
 		if(type == TokenType::CSTFLOAT)
 		{
@@ -289,7 +223,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction("SET", destAddress, srcAddress);
+		program.addInstruction("SET", Address(srcAddress.type), destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	

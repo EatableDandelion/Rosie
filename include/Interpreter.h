@@ -16,7 +16,7 @@ namespace Rosie{
 	struct Memory //collection of addresses
 	{
 		public:	
-			Memory(const int& startIndex = 1);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
+			Memory(const std::size_t& type, const int& startIndex = 1);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
 		
 			Address newAddress(const std::string& name);
 			
@@ -32,6 +32,7 @@ namespace Rosie{
 			std::unordered_map<std::size_t, Address> addresses;
 			int head;
 			std::stack<int> scope;
+			std::size_t type;
 			
 			std::size_t getId(const std::string& name);
 	};
@@ -78,13 +79,13 @@ namespace Rosie{
 			template<typename A>
 			std::string translateInstruction(A address)
 			{
-				return std::to_string(address.id);
+				return std::to_string(address);
 			}
 			
 			template<typename A, typename... As>
 			std::string translateInstruction(A address, As... addresses)
 			{
-				return std::to_string(address.id)+" "+translateInstruction(addresses...);
+				return std::to_string(address)+" "+translateInstruction(addresses...);
 			}
 	};
 	

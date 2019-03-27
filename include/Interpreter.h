@@ -79,13 +79,13 @@ namespace Rosie{
 			template<typename A>
 			std::string translateInstruction(A address)
 			{
-				return std::to_string(address);
+				return std::to_string(address.id);
 			}
 			
 			template<typename A, typename... As>
 			std::string translateInstruction(A address, As... addresses)
 			{
-				return std::to_string(address)+" "+translateInstruction(addresses...);
+				return std::to_string(address.id)+" "+translateInstruction(addresses...);
 			}
 	};
 	

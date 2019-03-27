@@ -99,7 +99,6 @@ namespace Rosie{
 				}
 			}*/
 	};
-	
 		
 	enum TokenType
 	{

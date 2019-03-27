@@ -111,7 +111,12 @@ namespace Rosie{
 	
 	
 	Program::Program():variables(2), functions(3)
-	{}
+	{
+		for(const auto& pair : syntax.getNativeMethods())
+		{
+			functions.newAddress(pair.first);
+		}
+	}
 	
 	Address Program::getAddress(const Token& token)
 	{
@@ -405,7 +410,6 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					
 					program.addInstruction("CALL", program.getFunctionAddress(token));
 					activeStack.push(Address(0));
 				}

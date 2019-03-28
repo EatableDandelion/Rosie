@@ -20,13 +20,13 @@ namespace Rosie
 	
 	int Syntax::getOpcodeId(const std::string& name) const
 	{
-		if(opcodes.find(name) == opcodes.end()) std::cout << "Opcode "+name+" unrecognized" << std::endl;
-		return opcodes.at(name).getId();
+		if(!opcodes.contains(name)) std::cout << "Opcode "+name+" unrecognized" << std::endl;
+		return opcodes[name].getId();
 	}
 	
 	void Syntax::addOpcode(const std::string& name, const std::function<void(std::vector<int>&)> func)
 	{
-		opcodes.insert(std::pair<std::string, Function<int>>(name, Function<int>(name, func, opcodes.size())));
+		opcodes.add(opcodes.size(), name, Function<int>(name, func, opcodes.size());
 	}
 	
 	void Syntax::addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func)
@@ -41,14 +41,8 @@ namespace Rosie
 	
 	void Syntax::execute(const std::vector<int>& args)
 	{
-		for(const auto& pair : opcodes)
-		{
-			if(pair.second.getId() == args[0])
-			{
-				std::vector<int> newArgs(args.begin()+1, args.end());
-				pair.second.execute(newArgs);
-			}
-		}
+		std::vector<int> newArgs(args.begin()+1, args.end());
+		opcodes[args[0]].execute(newArgs);
 	}
 	
 	void Syntax::execute(const std::string& name, std::vector<Variable>& arguments) const

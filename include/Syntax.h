@@ -13,15 +13,17 @@ namespace Rosie
 	struct Function
 	{
 		public:
-			Function(const std::string& name, const std::function<void(std::vector<T>&)> func, const int& id):name(name), func(func), id(id)
-			{}
+			Function(const std::string& name, const std::function<void(std::vector<T>&)> func, const int& id):name(name), id(id)
+			{
+				m_func = func;
+			}
 			
-			Function(const Function<T>& other):name(other.name), func(other.func), id(other.id)
+			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
 			{}
 		
 			void execute(std::vector<T>& arguments) const
 			{
-				func(arguments);
+				m_func(arguments);
 			}
 	
 			std::string getName() const
@@ -37,7 +39,7 @@ namespace Rosie
 		private:
 			std::string name;
 			int id;
-			std::function<void(std::vector<T>&)> func;
+			std::function<void(std::vector<T>&)> m_func;
 	};
 	
 	class Syntax
@@ -52,6 +54,8 @@ namespace Rosie
 			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func);
 			
 			bool hasMethod(const std::string& name) const;
+			
+			void execute(const std::vector<int>& args);
 			
 			void execute(const std::string& name, std::vector<Variable>& arguments) const;
 			

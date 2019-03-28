@@ -8,7 +8,7 @@ namespace Rosie
 		addOpcode("SET", [&](std::vector<int>& args){variables.insert(std::pair<int, Variable>(args[0], variables[args[1]]));});
 		addOpcode("ARG", [&](std::vector<int>& args){callStack.push(args[0]);});
 		addOpcode("PRINT", [&](std::vector<int>& args){std::cout << variables[args[0]] << std::endl;});
-		addOpcode("CALL", [&](std::vector<int>& args){});//execute(args[0]);
+		addOpcode("CALL", [&](std::vector<int>& args){execute(args[0]);});
 		addOpcode("ADD", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()+variables[args[2]].get<float>());});
 		addOpcode("NEG", [&](std::vector<int>& args){variables[args[0]].set(-variables[args[1]].get<float>());});
 		addOpcode("SUB", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()-variables[args[2]].get<float>());});
@@ -39,6 +39,18 @@ namespace Rosie
 		return methods.find(name) != methods.end();
 	}
 	
+	void Syntax::execute(const std::vector<int>& args)
+	{
+		for(const auto& pair : opcodes)
+		{
+			if(pair.second.getId() == args[0])
+			{
+				std::vector<int> newArgs(args.begin()+1, args.end());
+				pair.second.execute(newArgs);
+			}
+		}
+	}
+	
 	void Syntax::execute(const std::string& name, std::vector<Variable>& arguments) const
 	{
 		if(methods.find(name) != methods.end())
@@ -49,7 +61,7 @@ namespace Rosie
 	
 	void Syntax::execute(const int& id)
 	{
-		/*for(const auto& pair : methods)
+		for(const auto& pair : methods)
 		{
 			if(pair.second.getId() == id)
 			{
@@ -61,7 +73,7 @@ namespace Rosie
 				}
 				pair.second.execute(args);
 			}
-		}*/
+		}
 	}
 	
 	std::unordered_map<std::string, Function<Variable>> Syntax::getNativeMethods() const

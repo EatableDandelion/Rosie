@@ -16,7 +16,7 @@ namespace Rosie{
 	struct Memory //collection of addresses
 	{
 		public:	
-			Memory(const std::size_t& type, const int& startIndex = 1);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
+			Memory(const std::size_t& type, const int& startIndex = 0);//address 0 is reserved for default, dummy address (ex: return address of function returning nothing)
 		
 			Address newAddress(const std::string& name);
 			

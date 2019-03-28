@@ -65,39 +65,16 @@ namespace Rosie{
 				{
 					os << var.get<std::string>()+ " (string)"; 
 				}
+				else
+				{
+					os << "Error: undefined variable type: type id = "+std::to_string(var.type);
+				}
 				return os;
 			}
 			
 		private:
 			std::size_t type;
 			std::variant<float, int, bool, std::string> value;
-		
-			/*Variable performOperation(const Variable& other, const char c);
-			
-			template<typename T>
-			Variable performOperationOnType(const Variable& other, const char c)
-			{
-				if(c == '+')
-				{
-					return Variable(std::get<T>(value)+std::get<T>(other.value));			
-				}
-				else if(c == '-')
-				{
-					return Variable(std::get<T>(value)-std::get<T>(other.value));			
-				}
-				else if(c == '*')
-				{
-					return Variable(std::get<T>(value)*std::get<T>(other.value));			
-				}
-				else if(c == '/')
-				{
-					return Variable(std::get<T>(value)/std::get<T>(other.value));			
-				}
-				else
-				{
-					//error
-				}
-			}*/
 	};
 		
 	enum TokenType

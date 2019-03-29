@@ -117,43 +117,38 @@ namespace Rosie
 		rules.push_back(std::make_shared<CommentLex>());
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
 		m_hasNext = true;
-		//loadNextLine();
-		next();
+		loadNextLine();
 	}
 	
-	bool Lexer::next()
+	bool Lexer::next() //returns true if has next line, false otherwise.
 	{
 		tokens.pop_front();
 		if(tokens.empty())
 		{	
-			if(!lineStream.nextLine())return false;
-			while(!loadNextLine())
-			{
-				if(!lineStream.nextLine())return false;
-			}
+			return loadNextLine();
 		}
 		
 		return true;
 	}
 	
-	bool Lexer::loadNextLine()
+	bool Lexer::loadNextLine() //returns false if eof, true otherwise
 	{
-		//if(!lineStream.nextLine())return false;
-		
-		InputStream charStream(lineStream.getLine());
-		
-		Token token;
-
-		while(charStream.hasNext())
+		while(tokens.empty())
 		{
-			if(nextToken(charStream, token))
+			if(!lineStream.nextLine())return false;
+			InputStream charStream(lineStream.getLine());
+
+			Token token;
+			while(charStream.hasNext())
 			{
-				tokens.push_back(token);
-				token.clear();				
+				if(nextToken(charStream, token))
+				{
+					tokens.push_back(token);
+					token.clear();				
+				}
 			}
 		}
-
-		return !tokens.empty();
+		return true;
 	}
 	
 	bool Lexer::nextToken(InputStream& charStream, Token& token)

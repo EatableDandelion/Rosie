@@ -12,15 +12,15 @@ namespace Rosie
 			}
 			else if(args[0] == 1)
 			{
-				variables.insert(std::pair<int, Variable>(args[1], variables[args[2]]));
+				variables.insert(std::pair<int, Variable>(args[1], getVariable(args[2])));
 			}
 			});
 		addOpcode("ARG", [&](std::vector<int>& args){callStack.push(args[0]);});
-		addOpcode("PRINT", [&](std::vector<int>& args){std::cout << variables[args[0]] << std::endl;});
+		addOpcode("PRINT", [&](std::vector<int>& args){std::cout << getVariable(args[0]) << std::endl;});
 		addOpcode("CALL", [&](std::vector<int>& args){execute(args[0]);});
-		addOpcode("ADD", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()+variables[args[2]].get<float>());});
-		addOpcode("NEG", [&](std::vector<int>& args){variables[args[0]].set(-variables[args[1]].get<float>());});
-		addOpcode("SUB", [&](std::vector<int>& args){variables[args[0]].set(variables[args[1]].get<float>()-variables[args[2]].get<float>());});
+		addOpcode("ADD", [&](std::vector<int>& args){callStack.push(Variable(getVariable(args[0]).get<float>()+getVariable(args[1]).get<float>());});
+		addOpcode("NEG", [&](std::vector<int>& args){callStack.push(Variable(-getVariable(args[0]).get<float>());});
+		addOpcode("SUB", [&](std::vector<int>& args){callStack.push(Variable(getVariable(args[0]).get<float>()-getVariable(args[1]).get<float>());});
 		addOpcode("MULT", [&](std::vector<int>& args){});
 		addOpcode("DIV", [&](std::vector<int>& args){});
 		
@@ -62,10 +62,9 @@ namespace Rosie
 	void Syntax::execute(const int& id)
 	{
 		std::vector<Variable> args;
-		std::cout << callStack.top() << " aa" <<std::endl;
 		while(!callStack.empty())
 		{
-			args.push_back(variables[callStack.top()]);
+			args.push_back(getVariable([callStack.top()]));
 			callStack.pop();
 		}
 		methods[id].execute(args);
@@ -79,6 +78,20 @@ namespace Rosie
 	void Syntax::setConstants(const std::vector<Variable>& csts)
 	{
 		constants = csts;
+	}
+	
+	Variable Syntax::getVariable(const int& id)
+	{
+		if(id == 0)
+		{
+			Variable result = callStack.top();
+			callStack.pop();
+			return result;
+		}
+		else
+		{
+			return variables[id];
+		}
 	}
 
 }

@@ -44,7 +44,7 @@ namespace Rosie{
 	}
 	
 	
-	Program::Program():variables(1), functions(2)
+	Program::Program():variables(1,1), functions(2)
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{

@@ -46,35 +46,40 @@ namespace Rosie
 	class DualMap //map that can be searched for either K1 OR K2
 	{
 		public:
-			void add(const K1&, key1 const K2& key2, const V& value)
+			void add(const K1& key1, const K2& key2, const V& value)
 			{
 				values.insert(std::pair<K2,V>(key2, value));
 				keymap.insert(std::pair<K1,K2>(key1, key2));
 			}
 		
-			bool contains(const K1& key1)
+			bool contains(const K1& key1) const
 			{
 				return keymap.find(key1) != keymap.end();
 			}
 		
-			bool contains(const K2& key2)
+			bool contains(const K2& key2) const
 			{
 				return values.find(key2) != values.end();
 			}
 		
 			V operator[](const K1& key1) const
 			{
-				return values[keymap[key1]];
+				return values.at(keymap.at(key1));
 			}
 		
 			V operator[](const K2& key2) const
 			{
-				return values[key2];
+				return values.at(key2);
+			}
+			
+			int size() const
+			{
+				return values.size();
 			}
 		
 			void erase(const K1& key1)
 			{
-				values.erase(keymap[key1]);
+				values.erase(keymap.at(key1));
 				keymap.erase(key1);
 			}
 		
@@ -88,6 +93,16 @@ namespace Rosie
 						keymap.erase(it.first);
 					}
 				}
+			}
+			
+			std::vector<V> getValues() const
+			{
+				std::vector<V> res;
+				for(const auto& pair : values)
+				{
+					res.push_back(pair.second);
+				}
+				return res;
 			}
 		
 		private:
@@ -114,13 +129,15 @@ namespace Rosie
 			
 			void execute(const int& id);
 			
-			std::unordered_map<std::string, Function<Variable>> getNativeMethods() const;
+			std::vector<Function<Variable>> getNativeMethods() const;
+			
+			void setConstants(const std::vector<Variable>& csts);
 			
 		private:
 			DualMap<int, std::string, Function<int>> opcodes;
-			std::unordered_map<std::string, Function<Variable>> methods;
+			DualMap<int, std::string, Function<Variable>> methods;
 			std::unordered_map<int, Variable> variables;
-			std::unordered_map<int, Variable> constants;
+			std::vector<Variable> constants;
 			std::stack<int> callStack;
 	};
 	

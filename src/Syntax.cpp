@@ -5,7 +5,16 @@ namespace Rosie
 
 	Syntax::Syntax()
 	{	
-		addOpcode("SET", [&](std::vector<int>& args){variables.insert(std::pair<int, Variable>(args[0], variables[args[1]]));});
+		addOpcode("SET", [&](std::vector<int>& args){
+			if(args[0] == 0)
+			{
+				variables.insert(std::pair<int, Variable>(args[1], constants[args[2]]));
+			}
+			else if(args[0] == 1)
+			{
+				variables.insert(std::pair<int, Variable>(args[1], variables[args[2]]));
+			}
+			});
 		addOpcode("ARG", [&](std::vector<int>& args){callStack.push(args[0]);});
 		addOpcode("PRINT", [&](std::vector<int>& args){std::cout << variables[args[0]] << std::endl;});
 		addOpcode("CALL", [&](std::vector<int>& args){execute(args[0]);});
@@ -26,17 +35,17 @@ namespace Rosie
 	
 	void Syntax::addOpcode(const std::string& name, const std::function<void(std::vector<int>&)> func)
 	{
-		opcodes.add(opcodes.size(), name, Function<int>(name, func, opcodes.size());
+		opcodes.add(opcodes.size(), name, Function<int>(name, func, opcodes.size()));
 	}
 	
 	void Syntax::addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func)
 	{
-		methods.insert(std::pair<std::string, Function<Variable>>(name, Function<Variable>(name, func, methods.size())));
+		methods.add(methods.size(), name, Function<Variable>(name, func, methods.size()));
 	}
 	
 	bool Syntax::hasMethod(const std::string& name) const
 	{
-		return methods.find(name) != methods.end();
+		return methods.contains(name);
 	}
 	
 	void Syntax::execute(const std::vector<int>& args)
@@ -47,32 +56,29 @@ namespace Rosie
 	
 	void Syntax::execute(const std::string& name, std::vector<Variable>& arguments) const
 	{
-		if(methods.find(name) != methods.end())
-		{
-			methods.at(name).execute(arguments);
-		}
+		methods[name].execute(arguments);
 	}
 	
 	void Syntax::execute(const int& id)
 	{
-		for(const auto& pair : methods)
+		std::vector<Variable> args;
+		std::cout << callStack.top() << " aa" <<std::endl;
+		while(!callStack.empty())
 		{
-			if(pair.second.getId() == id)
-			{
-				std::vector<Variable> args;
-				while(!callStack.empty())
-				{
-					args.push_back(variables[callStack.top()]);
-					callStack.pop();
-				}
-				pair.second.execute(args);
-			}
+			args.push_back(variables[callStack.top()]);
+			callStack.pop();
 		}
+		methods[id].execute(args);
 	}
 	
-	std::unordered_map<std::string, Function<Variable>> Syntax::getNativeMethods() const
+	std::vector<Function<Variable>> Syntax::getNativeMethods() const
 	{
-		return methods;
+		return methods.getValues();
+	}
+	
+	void Syntax::setConstants(const std::vector<Variable>& csts)
+	{
+		constants = csts;
 	}
 
 }

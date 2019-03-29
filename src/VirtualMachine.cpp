@@ -8,6 +8,7 @@ namespace Rosie
 	void VirtualMachine::execute(const std::vector<Variable>& constants, const std::vector<std::string>& commands)
 	{
 		std::map<int, Variable> variables;
+		syntax.setConstants(constants);
 		for(const std::string command : commands)
 		{
 			std::vector<int> tokens = split(command);

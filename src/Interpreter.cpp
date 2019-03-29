@@ -46,9 +46,9 @@ namespace Rosie{
 	
 	Program::Program():variables(1), functions(2)
 	{
-		for(const auto& pair : syntax.getNativeMethods())
+		for(const auto& func : syntax.getNativeMethods())
 		{
-			functions.newAddress(pair.first);
+			functions.newAddress(func.getName());
 		}
 	}
 	

@@ -132,6 +132,8 @@ namespace Rosie
 			std::vector<Function<Variable>> getNativeMethods() const;
 			
 			void setConstants(const std::vector<Variable>& csts);
+		
+			Variable getVariable(const int& id);
 			
 		private:
 			DualMap<int, std::string, Function<int>> opcodes;

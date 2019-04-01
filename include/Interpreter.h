@@ -69,6 +69,8 @@ namespace Rosie{
 			std::vector<Variable> getConstants() const;
 			std::vector<std::string> getCommands() const;
 			
+			Address getStackAddress() const;
+			
 		private:
 			Syntax syntax;
 			std::vector<Variable> constants;
@@ -79,13 +81,13 @@ namespace Rosie{
 			template<typename A>
 			std::string translateInstruction(A address)
 			{
-				return std::to_string(address.id);
+				return std::to_string(address.id)+"/"+std::to_string(address.type);
 			}
 			
 			template<typename A, typename... As>
 			std::string translateInstruction(A address, As... addresses)
 			{
-				return std::to_string(address.id)+" "+translateInstruction(addresses...);
+				return std::to_string(address.id)+"/"+std::to_string(address.type)+" "+translateInstruction(addresses...);
 			}
 	};
 	

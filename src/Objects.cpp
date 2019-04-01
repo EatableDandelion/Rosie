@@ -94,29 +94,73 @@ namespace Rosie
 		type = 3;
 	}
 	
-	/*Variable Variable::operator+(const Variable& other)
+	void Variable::set(const Variable& other)
 	{
-		return performOperation(other, '+');
+		value = other.value;
+		type = other.type;
 	}
 	
-	Variable Variable::performOperation(const Variable& other, const char c)
+	void State::addVariable(const int& id)
 	{
-		//if(type != other.type)error;
-		if(type == 0)
+		variables.insert(std::pair<int, Variable>(id, Variable()));
+	}
+	
+	void State::addConstants(const std::vector<Variable>& csts)
+	{
+		constants = csts;
+	}
+	
+	void State::push(const Variable& variable)
+	{
+		callStack.push(variable);
+	}
+	
+	void State::push(const Address& address)
+	{
+		push(getVariable(address));
+	}
+	
+	Variable State::pop()
+	{
+		Variable res = callStack.top();
+		callStack.pop();
+		return res;
+	}
+	
+	bool State::empty() const
+	{
+		return callStack.empty();
+	}
+	
+	void State::copyVariable(Address& dest, const Address& src)
+	{
+		variables[dest.id] = getVariable(src);
+	}
+	
+	Variable State::getVariable(const Address& address)
+	{
+		if(address.type == 0)
 		{
-			return performOperationOnType<float>(other, c);
+			return constants[address.id];			
 		}
-		else if(type == 1)
+		else if(address.type == 1)
 		{
-			return performOperationOnType<int>(other, c);
+			if(address.id == 0)
+			{
+				return pop();
+			}
+			else
+			{
+				if(variables.find(address.id) == variables.end())
+				{
+					variables.insert(std::pair<int, Variable>(address.id, Variable()));
+				}
+				return variables[address.id];				
+			}
 		}
-		else if(type == 2)
+		else //type = 2
 		{
-			return performOperationOnType<bool>(other, c);
+			return Variable(static_cast<int>(address.id));
 		}
-		else//(type == 3)
-		{
-			return performOperationOnType<std::string>(other, c);
-		}
-	}*/
+	}
 }

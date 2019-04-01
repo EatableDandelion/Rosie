@@ -13,7 +13,7 @@ namespace Rosie
 	struct Function
 	{
 		public:
-			Function(const std::string& name, const std::function<void(std::vector<T>&)> func, const int& id):name(name), id(id)
+			Function(const std::string& name, const std::function<void(std::vector<T>&, State&)> func, const int& id):name(name), id(id)
 			{
 				m_func = func;
 			}
@@ -21,9 +21,9 @@ namespace Rosie
 			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
 			{}
 		
-			void execute(std::vector<T>& arguments) const
+			void execute(std::vector<T>& arguments, State& resultStack) const
 			{
-				m_func(arguments);
+				m_func(arguments, resultStack);
 			}
 	
 			std::string getName() const
@@ -35,11 +35,11 @@ namespace Rosie
 			{
 				return id;
 			}
-		
+			
 		private:
 			std::string name;
 			int id;
-			std::function<void(std::vector<T>&)> m_func;
+			std::function<void(std::vector<T>&, State&)> m_func;
 	};
 	
 	template<typename K1, typename K2, typename V>
@@ -117,30 +117,23 @@ namespace Rosie
 			
 			int getOpcodeId(const std::string& name) const;
 			
-			void addOpcode(const std::string& name, const std::function<void(std::vector<int>&)> func);
-
-			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func);
+			void addOpcode(const std::string& name, const std::function<void(std::vector<Address>&, State&)> func);
+			
+			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&, State&)> func);
 			
 			bool hasMethod(const std::string& name) const;
 			
-			void execute(const std::vector<int>& args);
+			void runOpcode(const int& id, std::vector<Address>& args, State& state);
 			
-			void execute(const std::string& name, std::vector<Variable>& arguments) const;
+			void execute(const std::string& name, std::vector<Variable>& arguments, State& state) const;
 			
-			void execute(const int& id);
+			void execute(const int& id, State& state);
 			
 			std::vector<Function<Variable>> getNativeMethods() const;
 			
-			void setConstants(const std::vector<Variable>& csts);
-		
-			Variable getVariable(const int& id);
-			
 		private:
-			DualMap<int, std::string, Function<int>> opcodes;
+			DualMap<int, std::string, Function<Address>> opcodes;
 			DualMap<int, std::string, Function<Variable>> methods;
-			std::unordered_map<int, Variable> variables;
-			std::vector<Variable> constants;
-			std::stack<int> callStack;
 	};
 	
 	

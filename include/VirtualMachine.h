@@ -9,16 +9,18 @@
 
 namespace Rosie
 {
+	
 	class VirtualMachine
 	{
 		public:
 			VirtualMachine();
 			
 			void execute(const std::vector<Variable>& constants, const std::vector<std::string>& commands);
-	
-			std::vector<int> split(const std::string& line);
+			
+			Variable newVariable(const int& id);
 		
 		private:
 			Syntax syntax;
+			State state;
 	};
 }

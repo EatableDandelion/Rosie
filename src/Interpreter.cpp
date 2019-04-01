@@ -166,6 +166,11 @@ namespace Rosie{
 		return instructions;
 	}
 	
+	Address Program::getStackAddress() const
+	{
+		return Address(0, "", 1);
+	}
+	
 	
 	
 	
@@ -200,9 +205,13 @@ namespace Rosie{
 			returnAddress = program.newFunctionAddress(lexer.getToken().value);
 		}
 		else
-		{
+		{		
+			//int typeId;
+			//if(lexer.getToken())
+	
 			lexer++;
 			returnAddress = program.newVarAddress(lexer.getToken());
+			program.addInstruction("NEW", returnAddress);
 		}
 		
 		Token nextToken;
@@ -223,7 +232,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction("SET", Address(srcAddress.type), destAddress, srcAddress);
+		program.addInstruction("SET", srcAddress, destAddress);
 		checkToken(";", lexer);
 	}
 	
@@ -328,7 +337,7 @@ namespace Rosie{
 						}	
 					}
 					activeStack.pop();
-					activeStack.push(Address(0));
+					activeStack.push(program.getStackAddress());
 					
 				}
 				else
@@ -345,7 +354,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					program.addInstruction("CALL", program.getFunctionAddress(token));
-					activeStack.push(Address(0));
+					activeStack.push(program.getStackAddress());
 				}
 			}
 		}
@@ -355,7 +364,7 @@ namespace Rosie{
 		}
 		else
 		{
-			return Address(0);
+			return program.getStackAddress();
 		}
 	}
 	

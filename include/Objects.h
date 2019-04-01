@@ -5,26 +5,10 @@
 #include <string>
 #include <iostream>
 #include <variant>
+#include <stack>
+#include <unordered_map>
 
 namespace Rosie{
-	
-	enum AddressType
-	{
-		INTEGER,
-		VARIABLE,
-		CONSTANT,
-		FUNCTION,
-	};
-	
-	struct Address
-	{
-		Address(const std::size_t& location, const std::string& name = "", const std::size_t& type = 0);
-		Address(const Address& address);
-		Address();
-		std::size_t id;
-		std::string name;
-		std::size_t type;
-	};
 	
 	struct Variable
 	{
@@ -46,6 +30,7 @@ namespace Rosie{
 			void set(const int& newValue);
 			void set(const bool& newValue);
 			void set(const std::string& newValue);
+			void set(const Variable& other);
 			
 			friend std::ostream& operator <<(std::ostream& os, const Variable& var)
 			{
@@ -76,6 +61,44 @@ namespace Rosie{
 			std::size_t type;
 			std::variant<float, int, bool, std::string> value;
 	};
+	
+	enum AddressType
+	{
+		INTEGER,
+		VARIABLE,
+		CONSTANT,
+		FUNCTION,
+	};
+	
+	struct Address
+	{
+		public:
+			Address(const std::size_t& location, const std::string& name = "", const std::size_t& type = 0);
+			Address(const Address& address);
+			Address();
+			std::size_t id;
+			std::string name;
+			std::size_t type;
+	};
+	
+	struct State
+	{
+		public:
+			void addVariable(const int& id);
+			void addConstants(const std::vector<Variable>& csts);
+			void push(const Variable& variable);
+			void push(const Address& address);
+			Variable pop();
+			bool empty() const;
+			void copyVariable(Address& dest, const Address& src);
+			Variable getVariable(const Address& address);
+			
+		private:
+			std::unordered_map<int, Variable> variables;
+			std::vector<Variable> constants;
+			std::stack<Variable> callStack;
+	};
+	
 		
 	enum TokenType
 	{

@@ -78,7 +78,9 @@ namespace Rosie{
 				types.insert(std::pair<std::size_t, Type>(std::hash<std::string>(name), Type(name, calcTypeSize(members...), allTypeIds++)));
 			}
 			
-			std::size_t getTypeSize(const std::string& name);
+			Type getType(const std::string& name);
+			
+			Type getType(const Token& token);
 			
 		private:
 			Syntax syntax;

@@ -3,8 +3,18 @@
 namespace Rosie
 {
 	
-	Type::Type(const std::string& name, const std::size_t& size, const int& id):name(name), size(size), id(id)
+	Type::Type(const std::string& name):name(name)
 	{}
+	
+	void Type::setId(const std::size_t& typeId)
+	{
+		id = typeId;
+	}
+	
+	void Type::addMember(const std::size_t& id, const std::string& name)
+	{
+		members.insert(std::pair<std::size_t, std::size_t>(id, Rosie::getId(name)));
+	}
 	
 	void Token::setAddress(const Address& address)
 	{

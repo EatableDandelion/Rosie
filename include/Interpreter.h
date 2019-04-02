@@ -71,23 +71,45 @@ namespace Rosie{
 			
 			Address getStackAddress() const;
 			
+			template<typename... Ts>
+			void addType(const std::string& name, Ts... members)
+			{
+				types[std::hash<std::string>{}(name)] = Type(name, calcTypeSize(members...), allTypeIds++);
+			}
+			
+			std::size_t getTypeSize(const std::string& name);
+			
 		private:
 			Syntax syntax;
 			std::vector<Variable> constants;
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;
+			int allTypeIds;
+			std::unordered_map<std::size_t, Type> types;
 			
 			template<typename A>
-			std::string translateInstruction(A address)
+			std::string translateInstruction(A& address)
 			{
 				return std::to_string(address.id)+"/"+std::to_string(address.type);
 			}
 			
 			template<typename A, typename... As>
-			std::string translateInstruction(A address, As... addresses)
+			std::string translateInstruction(A& address, As&... addresses)
 			{
 				return std::to_string(address.id)+"/"+std::to_string(address.type)+" "+translateInstruction(addresses...);
+			}
+			
+			template<typename T>
+			std::size_t calcTypeSize(T& t)
+			{
+				return getTypeSize(t);
+			}
+			
+			template<typename T, typename... Ts>
+			std::size_t calcTypeSize(T& t, Ts&... ts)
+			{
+				return calcTypeSize(t)+calcTypeSize(ts...);
 			}
 	};
 	

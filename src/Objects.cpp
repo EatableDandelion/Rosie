@@ -2,6 +2,10 @@
 
 namespace Rosie
 {
+	
+	Type::Type(const std::string& name, const std::size_t& size, const int& id):name(name), size(size), id(id)
+	{}
+	
 	void Token::setAddress(const Address& address)
 	{
 		m_address = address;

@@ -10,6 +10,14 @@
 
 namespace Rosie{
 	
+	struct Type
+	{
+		Type(const std::string& name, const std::size_t& size, const int& id);
+		std::string name;
+		std::size_t size;
+		int id;
+	};
+	
 	struct Variable
 	{
 		public:

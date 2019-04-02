@@ -50,6 +50,10 @@ namespace Rosie{
 		{
 			functions.newAddress(func.getName());
 		}
+		addType("float");
+		addType("int");
+		addType("boolean");
+		addType("string");
 	}
 	
 	Address Program::getAddress(const Token& token)
@@ -171,6 +175,10 @@ namespace Rosie{
 		return Address(0, "", 1);
 	}
 	
+	std::size_t Program::getTypeSize(const std::string& name)
+	{
+		return types[std::hash<std::string>{}(name)];
+	}
 	
 	
 	

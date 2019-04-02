@@ -12,10 +12,19 @@ namespace Rosie{
 	
 	struct Type
 	{
-		Type(const std::string& name, const std::size_t& size, const int& id);
-		std::string name;
-		std::size_t size;
-		int id;
+		public:
+			Type(const std::string& name);
+	
+			void setId(const std::size_t& typeId);
+			void addMember(const Type& memberType, const std::string& name);
+		
+			std::string name;
+			std::size_t size;
+			int id;
+		
+		private:
+			std::unordered_map<std::size_t, memberType> members;
+			int offset;
 	};
 	
 	struct Variable

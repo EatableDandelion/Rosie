@@ -175,9 +175,14 @@ namespace Rosie{
 		return Address(0, "", 1);
 	}
 	
-	std::size_t Program::getTypeSize(const std::string& name)
+	Type Program::getType(const std::string& name)
 	{
 		return types[std::hash<std::string>{}(name)];
+	}
+	
+	Type Program::getType(const Token& token)
+	{
+		return getType(token.value);
 	}
 	
 	
@@ -216,9 +221,10 @@ namespace Rosie{
 		{		
 			//int typeId;
 			//if(lexer.getToken())
-	
+			Type tokenType = program.getType(lexer.getToken());
+			
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken());
+			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
 			program.addInstruction("NEW", returnAddress);
 		}
 		

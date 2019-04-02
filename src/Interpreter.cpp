@@ -196,6 +196,10 @@ namespace Rosie{
 			{		
 				parseDeclaration(lexer, program); 					//float a = 2.1;
 			}
+			else if(lexer.getToken().type == TokenType::KEYWORD)
+			{
+				parseKeyword(lexer, program);
+			}
 			else if(program.hasFunctionAddress(lexer.getToken()))	//If it's a function
 			{
 				functionParser.parse(lexer, program);				//add(a, b);
@@ -232,6 +236,24 @@ namespace Rosie{
 		if(lexer.peekToken(nextToken, 1) && nextToken == "=")
 		{
 			parseAssignment(lexer, program);
+		}
+	}
+	
+	void Parser::parseKeyword(Lexer& lexer, Program& program)
+	{
+		if(lexer.getToken() == "define")
+		{
+			lexer++; 
+			Type newType = Type(lexer.getToken().value);
+			lexer+=2; //"("
+			while(lexer.getToken() != ")")
+			{
+				std::size_t memberTypeId = program.getType(lexer.getToken()).id;
+				lexer++;
+				newType.addMember(memberTypeId, lexer.getToken().value);
+				lexer++;//"," or ")"
+			}
+			program.addType(newType);			
 		}
 	}
 	

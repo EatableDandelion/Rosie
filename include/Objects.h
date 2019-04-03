@@ -74,6 +74,11 @@ namespace Rosie{
 				return res;
 			}
 		
+			int getSize() const
+			{
+				return values.size();
+			}
+		
 		private:
 			std::unordered_map<K2, V> values;
 			std::unordered_map<K1, K2> keymap;
@@ -165,9 +170,17 @@ namespace Rosie{
 			std::size_t id;
 			std::string name;
 			std::size_t type;
+			
+			std::size_t addMember(const std::size_t& location, const std::string& name); //add a member, returns the size of the member added
+		
+			Address getMemberAddress(const std::string& name) const;
+		
+			Address getMemberAddress(const int& offset) const;
+		
+			std::size_t getSize();
 		
 		private:
-			
+			DualMap<int, std::size_t, Address> members;
 	};
 	
 	struct State

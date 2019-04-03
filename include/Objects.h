@@ -167,7 +167,7 @@ namespace Rosie{
 			std::string name;
 			std::size_t type;
 			
-			std::size_t addMember(const std::size_t& location, const std::string& name, const std::size_t& type); //add a member, returns the size of the member added
+			std::size_t addMember(const std::size_t& location, const std::string& name, const Type& type); //add a member, returns the size of the member added
 		
 			Address getMemberAddress(const std::string& name) const;
 		

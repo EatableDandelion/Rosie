@@ -393,7 +393,7 @@ namespace Rosie{
 					activeStack.push(program.getStackAddress());
 					
 				}
-				else //function or constructor
+				else if(token.type == TokenType::FUNCNAME)//function
 				{
 					while(!activeStack.empty())
 					{
@@ -408,6 +408,31 @@ namespace Rosie{
 					}
 					program.addInstruction("CALL", program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
+				}
+				else if(token.type == TokenType::CONSTRUCTOR)
+				{
+					std::vector<Address> ctorParameters;
+					while(!activeStack.empty())
+					{
+						ctorParameters.push_back(activeStack.top());
+						activeStack.pop();
+					}
+					
+					if(!stack.empty())
+					{
+						activeStack = stack.top();
+						stack.pop();
+					}
+					//TODO check that the address sent is correct.
+					activeStack.push(program.getStackAddress());
+					
+					
+					//program.addInstruction("SET", );
+					//activeStack.push(program.getStackAddress());
+				}
+				else
+				{	
+					Rosie::error("Unexpected token "+token.getString(), lexer);
 				}
 			}
 		}

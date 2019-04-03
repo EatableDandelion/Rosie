@@ -23,56 +23,6 @@ namespace Rosie
 		members.insert(std::pair<std::size_t, int>(Rosie::getId(name), id));
 	}
 	
-	void Token::setAddress(const Address& address)
-	{
-		m_address = address;
-	}
-	
-	Address Token::getAddress() const
-	{
-		return m_address;
-	}
-	
-	int Token::length() const
-	{
-		return value.length();
-	} 
-	
-	void Token::operator+=(const char c)
-	{
-		value.push_back(c);
-	}
-	
-	bool Token::operator==(const std::string& stringValue)
-	{
-		return value == stringValue;
-	}
-	
-	bool Token::operator!=(const std::string& stringValue)
-	{
-		return value != stringValue;
-	}
-	
-	void Token::clear()
-	{
-		type = UNDEFINED;
-		value = "";
-	}
-	
-	std::string Token::getString() const
-	{
-		return value+" ("+Rosie::typeNames[type]+")";
-	}
-	
-	Address::Address(const std::size_t& location, const std::string& name, const std::size_t& type):id(location), name(name), type(type)
-	{}
-	
-	Address::Address(const Address& address):id(address.id), name(address.name), type(address.type)
-	{}
-	
-	Address::Address():id(0), name(""), type(0)
-	{}
-	
 	Variable::Variable(const float& floatValue):type(0)
 	{
 		set(floatValue);
@@ -125,6 +75,43 @@ namespace Rosie
 		value = other.value;
 		type = other.type;
 	}
+	
+	
+	Address::Address(const std::size_t& location, const std::string& name, const std::size_t& type):id(location), name(name), type(type)
+	{}
+	
+	Address::Address(const Address& address):id(address.id), name(address.name), type(address.type)
+	{}
+	
+	Address::Address():id(0), name(""), type(0)
+	{}
+	
+	std::size_t Address::addMember(const std::size_t& location, const std::string& name, const Type& type)
+	{//TODO correct type here, not the same.
+		members.add(members.size(), Rosie::getId(name), Address(location, name, type.id));
+		return type.size();
+	}
+		
+	Address Address::getMemberAddress(const std::string& name) const
+	{
+		return members[Rosie::getId(name)];
+	}
+		
+	Address Address::getMemberAddress(const int& offset) const
+	{
+		return members[offset];
+	}
+		
+	std::size_t Address::size()
+	{
+		std::size_t result = type.size;
+		for(Address member : members.values)
+		{
+			result+=member.size();
+		}
+		return result;
+	}
+	
 	
 	void State::addVariable(const int& id)
 	{
@@ -188,5 +175,46 @@ namespace Rosie
 		{
 			return Variable(static_cast<int>(address.id));
 		}
+	}
+	
+	void Token::setAddress(const Address& address)
+	{
+		m_address = address;
+	}
+	
+	Address Token::getAddress() const
+	{
+		return m_address;
+	}
+	
+	int Token::length() const
+	{
+		return value.length();
+	} 
+	
+	void Token::operator+=(const char c)
+	{
+		value.push_back(c);
+	}
+	
+	bool Token::operator==(const std::string& stringValue)
+	{
+		return value == stringValue;
+	}
+	
+	bool Token::operator!=(const std::string& stringValue)
+	{
+		return value != stringValue;
+	}
+	
+	void Token::clear()
+	{
+		type = UNDEFINED;
+		value = "";
+	}
+	
+	std::string Token::getString() const
+	{
+		return value+" ("+Rosie::typeNames[type]+")";
 	}
 }

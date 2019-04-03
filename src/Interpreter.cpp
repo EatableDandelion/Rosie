@@ -2,6 +2,16 @@
 
 namespace Rosie{
 	
+	void error(const std::string& text, const Lexer& lexer)
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, 12);
+		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
+		std::cout << lexer.getLine() << std::endl;
+		std::cout << text << std::endl;
+		SetConsoleTextAttribute(hConsole, 7);
+	}
+	
 	Memory::Memory(const std::size_t& type, const int& startIndex):type(type), head(startIndex)
 	{
 		scope.push(startIndex);
@@ -9,7 +19,7 @@ namespace Rosie{
 	
 	Address Memory::newAddress(const std::string& name)
 	{
-		std::size_t id = getId(name);
+		std::size_t id = Rosie::getId(name);
 
 		int index = head++;
 		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name, type)));
@@ -19,12 +29,12 @@ namespace Rosie{
 			
 	Address Memory::getAddress(const std::string& name)
 	{
-		return addresses[getId(name)];
+		return addresses[Rosie::getId(name)];
 	}
 	
 	bool Memory::hasAddress(const std::string& name)
 	{
-		return addresses.find(getId(name)) != addresses.end();
+		return addresses.find(Rosie::getId(name)) != addresses.end();
 	}
 
 	void Memory::startScope()
@@ -38,11 +48,6 @@ namespace Rosie{
 		scope.pop();
 	}
 	
-	std::size_t Memory::getId(const std::string& name)
-	{
-		return std::hash<std::string>{}(name);
-	}
-	
 	
 	Program::Program():variables(1,1), functions(2)
 	{
@@ -50,17 +55,17 @@ namespace Rosie{
 		{
 			functions.newAddress(func.getName());
 		}
-		addType("float");
-		addType("int");
-		addType("boolean");
-		addType("string");
+		addType(Type("float"));
+		addType(Type("int"));
+		addType(Type("boolean"));
+		addType(Type("string"));
 	}
 	
-	Address Program::getAddress(const Token& token)
+	Address Program::getAddress(const Token& token, const Lexer& lexer)
 	{
 		if(hasFunctionAddress(token))
 		{
-			return getFunctionAddress(token);
+			return getFunctionAddress(token, lexer);
 		}
 		else if(hasVarAddress(token))
 		{
@@ -119,7 +124,8 @@ namespace Rosie{
 	{
 		if(!hasVarAddress(token))
 		{
-			std::cout << "Error, variable " << token << " undefined." <<std::endl;
+			newVarAddress(token);
+			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
 	}
@@ -134,11 +140,11 @@ namespace Rosie{
 		return functions.newAddress(name);
 	}
 	
-	Address Program::getFunctionAddress(const Token& token)
+	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
 	{
 		if(!hasFunctionAddress(token))
 		{
-			std::cout << "Error, function " << token << " undefined." <<std::endl;
+			Rosie::error("Error, function " + token.getString() + " undefined.", lexer);
 		}
 		return functions.getAddress(token.value);
 	}
@@ -146,6 +152,11 @@ namespace Rosie{
 	bool Program::hasFunctionAddress(const Token& token)
 	{
 		return functions.hasAddress(token.value);
+	}
+	
+	bool Program::isConstructor(const Token& token)
+	{
+		return hasTypeName(token);
 	}
 	
 	void Program::startScope()
@@ -175,14 +186,26 @@ namespace Rosie{
 		return Address(0, "", 1);
 	}
 	
-	Type Program::getType(const std::string& name)
+	void Program::addType(const Type& type)
 	{
-		return types[std::hash<std::string>{}(name)];
+		
+		types.insert(std::pair<std::size_t, Type>(Rosie::getId(type.name), type));
+		types[Rosie::getId(type.name)].setId(allTypeIds++);
 	}
 	
-	Type Program::getType(const Token& token)
+	Type Program::getType(const std::string& name) const
+	{
+		return types.at(Rosie::getId(name));
+	}
+	
+	Type Program::getType(const Token& token) const
 	{
 		return getType(token.value);
+	}
+	
+	bool Program::hasTypeName(const Token& token) const
+	{
+		return types.find(Rosie::getId(token.value)) != types.end();
 	}
 	
 	
@@ -192,7 +215,8 @@ namespace Rosie{
 	{
 		while(lexer.hasNext())
 		{
-			if(lexer.getToken().type == TokenType::VARTYPE) 		//If it's a type such as float, int
+			//if(lexer.getToken().type == TokenType::VARTYPE) 		//If it's a type such as float, int
+			if(program.hasTypeName(lexer.getToken()))
 			{		
 				parseDeclaration(lexer, program); 					//float a = 2.1;
 			}
@@ -200,7 +224,8 @@ namespace Rosie{
 			{
 				parseKeyword(lexer, program);
 			}
-			else if(program.hasFunctionAddress(lexer.getToken()))	//If it's a function
+			else if(program.hasFunctionAddress(lexer.getToken())
+				 || program.isConstructor(lexer.getToken()))		//If it's a function or a ctor
 			{
 				functionParser.parse(lexer, program);				//add(a, b);
 			}
@@ -222,13 +247,11 @@ namespace Rosie{
 			returnAddress = program.newFunctionAddress(lexer.getToken().value);
 		}
 		else
-		{		
-			//int typeId;
-			//if(lexer.getToken())
+		{
 			Type tokenType = program.getType(lexer.getToken());
 			
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
+			returnAddress = program.newVarAddress(lexer.getToken());
 			program.addInstruction("NEW", returnAddress);
 		}
 		
@@ -245,15 +268,16 @@ namespace Rosie{
 		{
 			lexer++; 
 			Type newType = Type(lexer.getToken().value);
-			lexer+=2; //"("
+			lexer++; //"("
 			while(lexer.getToken() != ")")
 			{
-				std::size_t memberTypeId = program.getType(lexer.getToken()).id;
+				lexer++;
+				int memberTypeId = program.getType(lexer.getToken()).id;
 				lexer++;
 				newType.addMember(memberTypeId, lexer.getToken().value);
 				lexer++;//"," or ")"
 			}
-			program.addType(newType);			
+			program.addType(newType);
 		}
 	}
 	
@@ -287,21 +311,11 @@ namespace Rosie{
 		return false;
 	}
 	
-	void Parser::error(const std::string& text, const Lexer& lexer)
-	{
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, 12);
-		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
-		std::cout << lexer.getLine() << std::endl;
-		std::cout << text << std::endl;
-		SetConsoleTextAttribute(hConsole, 7);
-	}
-	
 	void Parser::checkToken(const std::string& expectedToken, const Lexer& lexer)
 	{
 		if(lexer.getToken() != expectedToken)
 		{
-			error("Expected token: "+expectedToken, lexer);
+			Rosie::error("Expected token: "+expectedToken, lexer);
 		}
 	}
 	
@@ -317,6 +331,9 @@ namespace Rosie{
 			if(program.hasFunctionAddress(token))
 			{
 				token.type = TokenType::FUNCNAME;
+			}else if(program.isConstructor(token))
+			{
+				token.type = TokenType::CONSTRUCTOR;
 			}
 			infixInput.push_back(token);
 			lexer++;
@@ -331,7 +348,7 @@ namespace Rosie{
 		{
 			if(isNumber(token) || token.type == TokenType::VARNAME)
 			{
-				activeStack.push(program.getAddress(token));
+				activeStack.push(program.getAddress(token, lexer));
 			}
 			else if(token == "|")
 			{
@@ -376,7 +393,7 @@ namespace Rosie{
 					activeStack.push(program.getStackAddress());
 					
 				}
-				else
+				else //function or constructor
 				{
 					while(!activeStack.empty())
 					{
@@ -389,7 +406,7 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					program.addInstruction("CALL", program.getFunctionAddress(token));
+					program.addInstruction("CALL", program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 			}
@@ -416,7 +433,7 @@ namespace Rosie{
 			{
 				output.push_back(token);
 			}
-			else if(token.type == TokenType::FUNCNAME)
+			else if(token.type == TokenType::FUNCNAME || token.type == TokenType::CONSTRUCTOR)
 			{
 				stack.push(token);
 			}
@@ -429,7 +446,8 @@ namespace Rosie{
 			{			
 				while(
 					!stack.empty() && stack.top() != "(" &&
-					(stack.top().type == TokenType::FUNCNAME ||
+					(stack.top().type == TokenType::FUNCNAME || 
+					stack.top().type == TokenType::CONSTRUCTOR ||
 					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
 					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
 					)

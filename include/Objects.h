@@ -9,22 +9,23 @@
 #include <unordered_map>
 
 namespace Rosie{
+	std::size_t getId(const std::string& name);
 	
 	struct Type
 	{
 		public:
 			Type(const std::string& name);
+			Type();
 	
 			void setId(const std::size_t& typeId);
-			void addMember(const Type& memberType, const std::string& name);
+			void addMember(const int& memberTypeId, const std::string& name);
 		
 			std::string name;
 			std::size_t size;
 			int id;
 		
 		private:
-			std::unordered_map<std::size_t, memberType> members;
-			int offset;
+			std::unordered_map<std::size_t, int> members;
 	};
 	
 	struct Variable
@@ -130,7 +131,8 @@ namespace Rosie{
 	/*8*/	CSTINT,		//5
 	/*9*/	CSTBOOLEAN,	//true, false
 	/*10*/	FUNCNAME,	//any function
-	/*11*/	UNDEFINED	//base value
+	/*11*/	CONSTRUCTOR,//class constructors
+	/*12*/	UNDEFINED	//base value
 	};
 	
 	const std::vector<std::string> typeNames {	"Keyword", 
@@ -144,6 +146,7 @@ namespace Rosie{
 												"Integer constant",
 												"Boolean constant",
 												"Function name",
+												"Constructor",
 												"Undefined"};
 	
 	struct Token
@@ -163,13 +166,15 @@ namespace Rosie{
 		
 		friend std::ostream& operator <<(std::ostream& os, const Token& token)
 		{
-			os << token.value+" ("+Rosie::typeNames[token.type]+")"  ;
+			os << token.getString();
 			return os;
 		}
 		
 		void setAddress(const Address& address);
 		
 		Address getAddress() const;
+		
+		std::string getString() const;
 		
 		private:
 			Address m_address;

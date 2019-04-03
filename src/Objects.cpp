@@ -2,8 +2,15 @@
 
 namespace Rosie
 {
+	std::size_t getId(const std::string& name)
+	{
+		return std::hash<std::string>{}(name);
+	}
 	
 	Type::Type(const std::string& name):name(name)
+	{}
+	
+	Type::Type()
 	{}
 	
 	void Type::setId(const std::size_t& typeId)
@@ -11,9 +18,9 @@ namespace Rosie
 		id = typeId;
 	}
 	
-	void Type::addMember(const std::size_t& id, const std::string& name)
+	void Type::addMember(const int& id, const std::string& name)
 	{
-		members.insert(std::pair<std::size_t, std::size_t>(id, Rosie::getId(name)));
+		members.insert(std::pair<std::size_t, int>(Rosie::getId(name), id));
 	}
 	
 	void Token::setAddress(const Address& address)
@@ -50,6 +57,11 @@ namespace Rosie
 	{
 		type = UNDEFINED;
 		value = "";
+	}
+	
+	std::string Token::getString() const
+	{
+		return value+" ("+Rosie::typeNames[type]+")";
 	}
 	
 	Address::Address(const std::size_t& location, const std::string& name, const std::size_t& type):id(location), name(name), type(type)

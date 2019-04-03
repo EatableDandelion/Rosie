@@ -13,6 +13,8 @@
 
 namespace Rosie{
 	
+	void error(const std::string& text, const Lexer& lexer);
+	
 	struct Memory //collection of addresses
 	{
 		public:	
@@ -33,8 +35,6 @@ namespace Rosie{
 			int head;
 			std::stack<int> scope;
 			std::size_t type;
-			
-			std::size_t getId(const std::string& name);
 	};
 	
 	class Program
@@ -50,7 +50,7 @@ namespace Rosie{
 				instructions.push_back(std::to_string(syntax.getOpcodeId(command))+" "+instruction);
 			}
 			
-			Address getAddress(const Token& token);
+			Address getAddress(const Token& token, const Lexer& lexer);
 			
 			Address newCstAddress(const Token& token);
 			
@@ -60,8 +60,9 @@ namespace Rosie{
 			bool hasVarAddress(const Token& token);
 			
 			Address newFunctionAddress(const std::string& name);
-			Address getFunctionAddress(const Token& token);
+			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
+			bool isConstructor(const Token& token);
 
 			void startScope();
 			void endScope();
@@ -71,16 +72,13 @@ namespace Rosie{
 			
 			Address getStackAddress() const;
 			
-			template<typename... Ts>
-			void addType(const std::string& name, Ts... members)
-			{
-				//types[std::hash<std::string>{}(name)] = Type(name, calcTypeSize(members...), allTypeIds++);
-				types.insert(std::pair<std::size_t, Type>(std::hash<std::string>(name), Type(name, calcTypeSize(members...), allTypeIds++)));
-			}
+			void addType(const Type& type);
 			
-			Type getType(const std::string& name);
+			Type getType(const std::string& name) const;
 			
-			Type getType(const Token& token);
+			Type getType(const Token& token) const;
+	
+			bool hasTypeName(const Token& token) const;
 			
 		private:
 			Syntax syntax;
@@ -88,7 +86,7 @@ namespace Rosie{
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;
-			int allTypeIds;
+			int allTypeIds = 0;
 			std::unordered_map<std::size_t, Type> types;
 			
 			template<typename A>
@@ -101,18 +99,6 @@ namespace Rosie{
 			std::string translateInstruction(A& address, As&... addresses)
 			{
 				return std::to_string(address.id)+"/"+std::to_string(address.type)+" "+translateInstruction(addresses...);
-			}
-			
-			template<typename T>
-			std::size_t calcTypeSize(T& t)
-			{
-				return getTypeSize(t);
-			}
-			
-			template<typename T, typename... Ts>
-			std::size_t calcTypeSize(T& t, Ts&... ts)
-			{
-				return calcTypeSize(t)+calcTypeSize(ts...);
 			}
 	};
 	
@@ -144,7 +130,6 @@ namespace Rosie{
 			Address getVariable(const Token& token, Program& program);
 			bool isVariable(Lexer& lexer);
 			
-			void error(const std::string& text, const Lexer& lexer);
 			void checkToken(const std::string& expectedToken, const Lexer& lexer);
 			
 	};

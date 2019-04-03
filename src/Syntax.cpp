@@ -20,7 +20,7 @@ namespace Rosie
 		addOpcode("DIV", [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()/state.getVariable(args[1]).get<float>()));});
 		
 		addMethod("print", [&](std::vector<Variable>& args, State& state){std::cout << args[0] << std::endl;});
-		//addMethod("new", [&](std::vector<Variable>& args, State& state){state.newInstance(args);});
+		//addMethod("Position", [&](std::vector<Variable>& args, State& state){});
 	}
 	
 	int Syntax::getOpcodeId(const std::string& name) const

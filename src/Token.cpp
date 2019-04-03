@@ -83,7 +83,7 @@ namespace Rosie
 	{
 		return
 		name == "if" || name == "while" || name == "for" || 
-		name == "return";
+		name == "return" || name == "define";
 	}
 	
 	bool LiteralCaster::isType(const std::string& name)

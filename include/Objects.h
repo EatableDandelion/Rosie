@@ -74,10 +74,6 @@ namespace Rosie{
 				return res;
 			}
 		
-			int getSize() const
-			{
-				return values.size();
-			}
 		
 		private:
 			std::unordered_map<K2, V> values;
@@ -177,7 +173,7 @@ namespace Rosie{
 		
 			Address getMemberAddress(const int& offset) const;
 		
-			std::size_t getSize();
+			std::size_t size() const;
 		
 		private:
 			DualMap<int, std::size_t, Address> members;

@@ -424,7 +424,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					//TODO check that the address sent is correct.
-					Address instanceAddress = program.getStackAddress();
+					Address instanceAddress = program.getStackAddress(lexer.getToken());//get the type and allocate the slots
 					activeStack.push(instanceAddress);
 					
 					int i = 0;

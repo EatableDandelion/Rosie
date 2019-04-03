@@ -424,11 +424,15 @@ namespace Rosie{
 						stack.pop();
 					}
 					//TODO check that the address sent is correct.
-					activeStack.push(program.getStackAddress());
+					Address instanceAddress = program.getStackAddress();
+					activeStack.push(instanceAddress);
 					
-					
-					//program.addInstruction("SET", );
-					//activeStack.push(program.getStackAddress());
+					int i = 0;
+					for(Address parameter : ctorParameters)
+					{
+						program.addInstruction("SET", parameter, instanceAddress.getMemberAddress(i));
+						i++;
+					}
 				}
 				else
 				{	

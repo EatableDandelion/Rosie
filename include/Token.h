@@ -14,7 +14,7 @@ namespace Rosie
 
 	};
 	
-	class SpecialCharCaster : public TypeCaster//Separator or  operator
+	class SpecialCharCaster : public TypeCaster//Separator or operator
 	{
 		public:
 			virtual void assign(Token& token);

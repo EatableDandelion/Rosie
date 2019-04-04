@@ -82,7 +82,7 @@ namespace Rosie
 	}
 	
 	
-	Address::Address(const std::size_t& id, const std::size_t& category, const std::string& name):id(id), category(category), name(name)
+	Address::Address(const int& id, const int& category, const std::string& name):id(id), category(category), name(name)
 	{}
 	
 	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)
@@ -91,7 +91,7 @@ namespace Rosie
 	Address::Address():id(0), name(""), category(0)
 	{}
 	
-	std::size_t Address::getId() const
+	int Address::getId() const
 	{
 		return id;
 	}
@@ -101,7 +101,7 @@ namespace Rosie
 		return name;
 	}
 	
-	std::size_t Address::getCategory() const
+	int Address::getCategory() const
 	{
 		return category;
 	}
@@ -196,14 +196,14 @@ namespace Rosie
 			{
 				if(variables.find(address.getId()) == variables.end())
 				{
-					variables.insert(std::pair<std::size_t, Variable>(address.getId(), Variable()));
+					variables.insert(std::pair<int, Variable>(address.getId(), Variable()));
 				}
 				return variables[address.getId()];				
 			}
 		}
 		else //type = 2
 		{
-			return Variable(static_cast<int>(address.getId()));
+			return Variable(address.getId());
 		}
 	}
 	

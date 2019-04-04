@@ -18,7 +18,7 @@ namespace Rosie{
 	struct Memory //collection of addresses
 	{
 		public:	
-			Memory(const std::size_t& category, const int& startIndex = 0);
+			Memory(const int& category, const int& startIndex = 0);
 		
 			Address newAddress(const std::string& name);
 			
@@ -34,7 +34,7 @@ namespace Rosie{
 			std::unordered_map<std::size_t, Address> addresses;
 			int head;
 			std::stack<int> scope;
-			std::size_t category; //category can be register, stack, temp address...
+			int category; //category can be register, stack, temp address...
 	};
 	
 	class Program

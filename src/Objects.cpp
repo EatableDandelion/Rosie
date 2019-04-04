@@ -196,7 +196,7 @@ namespace Rosie
 			{
 				if(variables.find(address.getId()) == variables.end())
 				{
-					variables.insert(std::pair<int, Variable>(address.getId(), Variable()));
+					variables.insert(std::pair<std::size_t, Variable>(address.getId(), Variable()));
 				}
 				return variables[address.getId()];				
 			}

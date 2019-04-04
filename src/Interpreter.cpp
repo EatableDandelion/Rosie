@@ -12,7 +12,7 @@ namespace Rosie{
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 	
-	Memory::Memory(const std::size_t& category, const int& startIndex):category(category), head(startIndex)
+	Memory::Memory(const int& category, const int& startIndex):category(category), head(startIndex)
 	{
 		scope.push(startIndex);
 	}

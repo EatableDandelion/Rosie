@@ -161,13 +161,13 @@ namespace Rosie{
 	struct Address
 	{
 		public:
-			Address(const std::size_t& id, const int& category = 0, const std::string& name = "");
+			Address(const std::size_t& id, const std::size_t& category = 0, const std::string& name = "");
 			Address(const Address& address);
 			Address();
 			
 			std::size_t getId() const;
 			std::string getName() const;
-			int getCategory() const;
+			std::size_t getCategory() const;
 			Type getType() const;
 			std::string getString() const;
 			
@@ -182,7 +182,7 @@ namespace Rosie{
 		private:
 			std::size_t id;
 			std::string name;
-			int category;
+			std::size_t category;
 			Type type;
 			DualMap<int, std::size_t, std::shared_ptr<Address>> members;
 	};

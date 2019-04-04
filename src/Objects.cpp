@@ -82,7 +82,7 @@ namespace Rosie
 	}
 	
 	
-	Address::Address(const std::size_t& id, const std::size_t& category, const std::string& name):id(id), category(category), name(name)
+	Address::Address(const std::size_t& id, const int& category, const std::string& name):id(id), category(category), name(name)
 	{}
 	
 	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)
@@ -101,7 +101,7 @@ namespace Rosie
 		return name;
 	}
 	
-	std::size_t Address::getCategory() const
+	int Address::getCategory() const
 	{
 		return category;
 	}

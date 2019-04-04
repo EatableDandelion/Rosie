@@ -12,7 +12,7 @@ namespace Rosie{
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 	
-	Memory::Memory(const std::size_t& type, const int& startIndex):type(type), head(startIndex)
+	Memory::Memory(const std::size_t& category, const int& startIndex):category(category), head(startIndex)
 	{
 		scope.push(startIndex);
 	}
@@ -22,7 +22,7 @@ namespace Rosie{
 		std::size_t id = Rosie::getId(name);
 
 		int index = head++;
-		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, name, type)));
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
 
 		return addresses[id];
 	}
@@ -82,7 +82,7 @@ namespace Rosie{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), value);
+		Address address(constants.size(), 3, value);
 		
 		if(type == TokenType::CSTFLOAT)
 		{
@@ -183,7 +183,7 @@ namespace Rosie{
 	
 	Address Program::getStackAddress() const
 	{
-		return Address(0, "", 1);
+		return Address(0, 1);
 	}
 	
 	void Program::addType(const Type& type)
@@ -424,13 +424,13 @@ namespace Rosie{
 						stack.pop();
 					}
 					//TODO check that the address sent is correct.
-					Address instanceAddress = program.getStackAddress(lexer.getToken());//get the type and allocate the slots
+					Address instanceAddress = program.getStackAddress();
 					activeStack.push(instanceAddress);
 					
 					int i = 0;
 					for(Address parameter : ctorParameters)
 					{
-						program.addInstruction("SET", parameter, instanceAddress.getMemberAddress(i));
+						//program.addInstruction("SET", parameter, instanceAddress.getMemberAddress(i));
 						i++;
 					}
 				}

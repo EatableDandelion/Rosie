@@ -23,6 +23,11 @@ namespace Rosie
 		members.insert(std::pair<std::size_t, int>(Rosie::getId(name), id));
 	}
 	
+	std::size_t Type::getSize() const
+	{
+		return size;
+	}
+	
 	Variable::Variable(const float& floatValue):type(0)
 	{
 		set(floatValue);
@@ -77,40 +82,65 @@ namespace Rosie
 	}
 	
 	
-	Address::Address(const std::size_t& location, const std::string& name, const std::size_t& type):id(location), name(name), type(type)
+	Address::Address(const std::size_t& id, const std::size_t& category, const std::string& name):id(id), category(category), name(name)
 	{}
 	
-	Address::Address(const Address& address):id(address.id), name(address.name), type(address.type)
+	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)
 	{}
 	
-	Address::Address():id(0), name(""), type(0)
+	Address::Address():id(0), name(""), category(0)
 	{}
 	
-	std::size_t Address::addMember(const std::size_t& location, const std::string& name, const Type& type)
+	std::size_t Address::getId() const
+	{
+		return id;
+	}
+	
+	std::string Address::getName() const
+	{
+		return name;
+	}
+	
+	std::size_t Address::getCategory() const
+	{
+		return category;
+	}
+	
+	Type Address::getType() const
+	{
+		return type;
+	}
+	
+	std::string Address::getString() const
+	{
+		return std::to_string(id)+"/"+std::to_string(category);
+	}
+	
+	/*std::size_t Address::addMember(const std::size_t& location, const std::string& name, const Type& type)
 	{//TODO correct type here, not the same.
-		members.add(members.size(), Rosie::getId(name), Address(location, name, type.id));
-		return type.size();
+		members.add(members.size(), Rosie::getId(name), std::make_shared<Address>(location, name, type.id));
+		return type.getSize();
 	}
 		
 	Address Address::getMemberAddress(const std::string& name) const
 	{
-		return members[Rosie::getId(name)];
+		return *members[Rosie::getId(name)];
 	}
 		
 	Address Address::getMemberAddress(const int& offset) const
 	{
-		return members[offset];
+		return *members[offset];
 	}
 		
-	std::size_t Address::size()
+	std::size_t Address::size() const
 	{
 		std::size_t result = type.size;
-		for(Address member : members.values)
+		for(std::shared_ptr<Address> member : members.values)
 		{
-			result+=member.size();
+			result+=member->size();
 		}
 		return result;
-	}
+	}*/
 	
 	
 	void State::addVariable(const int& id)
@@ -147,33 +177,33 @@ namespace Rosie
 	
 	void State::copyVariable(Address& dest, const Address& src)
 	{
-		variables[dest.id] = getVariable(src);
+		variables[dest.getId()] = getVariable(src);
 	}
 	
 	Variable State::getVariable(const Address& address)
 	{
-		if(address.type == 0)
+		if(address.getCategory() == 0)
 		{
-			return constants[address.id];			
+			return constants[address.getId()];			
 		}
-		else if(address.type == 1)
+		else if(address.getCategory() == 1)
 		{
-			if(address.id == 0)
+			if(address.getId() == 0)
 			{
 				return pop();
 			}
 			else
 			{
-				if(variables.find(address.id) == variables.end())
+				if(variables.find(address.getId()) == variables.end())
 				{
-					variables.insert(std::pair<int, Variable>(address.id, Variable()));
+					variables.insert(std::pair<int, Variable>(address.getId(), Variable()));
 				}
-				return variables[address.id];				
+				return variables[address.getId()];				
 			}
 		}
 		else //type = 2
 		{
-			return Variable(static_cast<int>(address.id));
+			return Variable(static_cast<int>(address.getId()));
 		}
 	}
 	

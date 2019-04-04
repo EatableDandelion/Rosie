@@ -88,13 +88,14 @@ namespace Rosie{
 	
 			void setId(const std::size_t& typeId);
 			void addMember(const int& memberTypeId, const std::string& name);
-		
+			std::size_t getSize() const;
+			
 			std::string name;
-			std::size_t size;
 			int id;
 		
 		private:
 			std::unordered_map<std::size_t, int> members;
+			std::size_t size;
 	};
 	
 	struct Variable
@@ -160,23 +161,30 @@ namespace Rosie{
 	struct Address
 	{
 		public:
-			Address(const std::size_t& location, const std::string& name = "", const std::size_t& type = 0);
+			Address(const std::size_t& id, const std::size_t& category = 0, const std::string& name = "");
 			Address(const Address& address);
 			Address();
-			std::size_t id;
-			std::string name;
-			std::size_t type;
 			
-			std::size_t addMember(const std::size_t& location, const std::string& name, const Type& type); //add a member, returns the size of the member added
+			std::size_t getId() const;
+			std::string getName() const;
+			std::size_t getCategory() const;
+			Type getType() const;
+			std::string getString() const;
+			
+			/*std::size_t addMember(const std::size_t& category, const std::string& name, const Type& type); //add a member, returns the size of the member added
 		
 			Address getMemberAddress(const std::string& name) const;
 		
-			Address getMemberAddress(const int& offset) const;
+			Address getMemberAddress(const int& offset) const;*/
 		
 			std::size_t size() const;
 		
 		private:
-			DualMap<int, std::size_t, Address> members;
+			std::size_t id;
+			std::string name;
+			std::size_t category;
+			Type type;
+			DualMap<int, std::size_t, std::shared_ptr<Address>> members;
 	};
 	
 	struct State

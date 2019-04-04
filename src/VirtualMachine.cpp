@@ -22,23 +22,23 @@ namespace Rosie
 			startPos = endPos+1;
 			std::size_t sepPos = 0;
 			int addressId;
-			int typeId;
+			int category;
 			while((endPos = line.find(" ", startPos)) != std::string::npos)
 			{
 				sepPos = line.find("/", startPos);
 				addressId = std::stoi(line.substr(startPos, sepPos-startPos));
 				sepPos++;
-				typeId = std::stoi(line.substr(sepPos, endPos-sepPos));
+				category = std::stoi(line.substr(sepPos, endPos-sepPos));
 				
-				tokens.push_back(Address(addressId, "", typeId));
+				tokens.push_back(Address(addressId, category));
 				startPos = endPos+1;
 			}
 			sepPos = line.find("/", startPos);
 			addressId = std::stoi(line.substr(startPos, sepPos-startPos));
 			sepPos++;
-			typeId = std::stoi(line.substr(sepPos, line.length()-sepPos));
+			category = std::stoi(line.substr(sepPos, line.length()-sepPos));
 			
-			tokens.push_back(Address(addressId, "", typeId));
+			tokens.push_back(Address(addressId, category));
 			syntax.runOpcode(opcodeId, tokens, state);
 		}
 	}

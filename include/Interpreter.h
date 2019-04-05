@@ -20,7 +20,7 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name);
+			Address newAddress(const std::string& name, const Type& type);
 			
 			Address getAddress(const std::string& name);
 			
@@ -54,8 +54,8 @@ namespace Rosie{
 			
 			Address newCstAddress(const Token& token);
 			
-			Address newVarAddress(const std::string& name);
-			Address newVarAddress(const Token& token);
+			Address newVarAddress(const std::string& name, const Type& type);
+			Address newVarAddress(const Token& token, const Type& type);
 			Address getVarAddress(const Token& token);
 			bool hasVarAddress(const Token& token);
 			

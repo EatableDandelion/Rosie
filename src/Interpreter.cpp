@@ -17,11 +17,12 @@ namespace Rosie{
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name)
+	Address Memory::newAddress(const std::string& name, const Type& type)
 	{
 		std::size_t id = Rosie::getId(name);
-
-		int index = head++;
+		
+		int index = head;
+		head+=type.size();
 		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
 
 		return addresses[id];
@@ -110,14 +111,14 @@ namespace Rosie{
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
-	Address Program::newVarAddress(const std::string& name)
+	Address Program::newVarAddress(const std::string& name, const Type& type)
 	{
-		return variables.newAddress(name);
+		return variables.newAddress(name, type);
 	}
 	
-	Address Program::newVarAddress(const Token& token)
+	Address Program::newVarAddress(const Token& token, const Type& type)
 	{
-		return newVarAddress(token.value);
+		return newVarAddress(token.value, type);
 	}
 	
 	Address Program::getVarAddress(const Token& token)
@@ -431,7 +432,7 @@ namespace Rosie{
 					int i = 0;
 					for(Address parameter : ctorParameters)
 					{
-						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
+						program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
 						i++;
 					}
 				}

@@ -40,15 +40,26 @@ namespace Rosie
 			std::function<void(std::vector<T>&, State&)> m_func;
 	};
 	
+	enum Opcode
+	{
+		SET,
+		ARG,
+		CALL,
+		ADD,
+		NEG,
+		SUB,
+		MULT,
+		DIV
+	};
 	
 	class Syntax
 	{
 		public:
 			Syntax();
 			
-			int getOpcodeId(const std::string& name) const;
+			int getOpcodeId(const Opcode& name) const;
 			
-			void addOpcode(const std::string& name, const std::function<void(std::vector<Address>&, State&)> func);
+			void addOpcode(const Opcode& name, const std::function<void(std::vector<Address>&, State&)> func);
 			
 			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&, State&)> func);
 			
@@ -63,7 +74,7 @@ namespace Rosie
 			std::vector<Function<Variable>> getNativeMethods() const;
 			
 		private:
-			DualMap<int, std::string, Function<Address>> opcodes;
+			DualMap<int, Opcode, Function<Address>> opcodes;
 			DualMap<int, std::string, Function<Variable>> methods;
 	};
 	

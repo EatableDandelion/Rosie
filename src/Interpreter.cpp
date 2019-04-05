@@ -252,7 +252,7 @@ namespace Rosie{
 			
 			lexer++;
 			returnAddress = program.newVarAddress(lexer.getToken());
-			program.addInstruction("NEW", returnAddress);
+			//program.addInstruction("NEW", returnAddress);
 		}
 		
 		Token nextToken;
@@ -292,7 +292,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction("SET", srcAddress, destAddress);
+		program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	
@@ -362,7 +362,7 @@ namespace Rosie{
 				{
 					if(token == "u-")
 					{												
-						program.addInstruction("NEG", activeStack.top());
+						program.addInstruction(Opcode::NEG, activeStack.top());
 					}
 					else if(token == "u+")
 					{}
@@ -374,19 +374,19 @@ namespace Rosie{
 						
 						if(token == "+")
 						{
-							program.addInstruction("ADD", arg1, arg2);
+							program.addInstruction(Opcode::ADD, arg1, arg2);
 						}
 						else if(token == "-")
 						{
-							program.addInstruction("SUB", arg1, arg2);
+							program.addInstruction(Opcode::SUB, arg1, arg2);
 						}
 						else if(token == "*")
 						{
-							program.addInstruction("MULT", arg1, arg2);
+							program.addInstruction(Opcode::MULT, arg1, arg2);
 						}
 						else if(token == "/")
 						{
-							program.addInstruction("DIV", arg1, arg2);
+							program.addInstruction(Opcode::DIV, arg1, arg2);
 						}	
 					}
 					activeStack.pop();
@@ -397,7 +397,7 @@ namespace Rosie{
 				{
 					while(!activeStack.empty())
 					{
-						program.addInstruction("ARG", activeStack.top());
+						program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -406,7 +406,7 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					program.addInstruction("CALL", program.getFunctionAddress(token, lexer));
+					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)
@@ -426,11 +426,12 @@ namespace Rosie{
 					//TODO check that the address sent is correct.
 					Address instanceAddress = program.getStackAddress();
 					activeStack.push(instanceAddress);
+					program.addInstruction(Opcode::ARG, instanceAddress);
 					
 					int i = 0;
 					for(Address parameter : ctorParameters)
 					{
-						//program.addInstruction("SET", parameter, instanceAddress.getMemberAddress(i));
+						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
 						i++;
 					}
 				}

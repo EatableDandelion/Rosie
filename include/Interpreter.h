@@ -43,11 +43,11 @@ namespace Rosie{
 			Program();
 			
 			template<typename... As>
-			void addInstruction(const std::string& command, As... addresses)
+			void addInstruction(const Opcode& command, As... addresses)
 			{		
 				std::string instruction = translateInstruction(addresses...);
 				std::cout << command << " " << instruction << std::endl;
-				instructions.push_back(std::to_string(syntax.getOpcodeId(command))+" "+instruction);
+				instructions.push_back(std::to_string(command)+" "+instruction);
 			}
 			
 			Address getAddress(const Token& token, const Lexer& lexer);

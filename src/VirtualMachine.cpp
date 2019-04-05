@@ -39,7 +39,6 @@ namespace Rosie
 			category = std::stoi(line.substr(sepPos, line.length()-sepPos));
 			
 			tokens.push_back(Address(addressId, Category(category)));
-			std::cout << addressId << " " << category << std::endl;
 			syntax.runOpcode(opcodeId, tokens, state);
 		}
 	}

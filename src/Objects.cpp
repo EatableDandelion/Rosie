@@ -82,13 +82,13 @@ namespace Rosie
 	}
 	
 	
-	Address::Address(const int& id, const int& category, const std::string& name):id(id), category(category), name(name)
+	Address::Address(const int& id, const Category& category, const std::string& name):id(id), category(category), name(name)
 	{}
 	
 	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)
 	{}
 	
-	Address::Address():id(0), name(""), category(0)
+	Address::Address():id(0), name(""), category(Category::CONSTANT)
 	{}
 	
 	int Address::getId() const
@@ -101,7 +101,7 @@ namespace Rosie
 		return name;
 	}
 	
-	int Address::getCategory() const
+	Category Address::getCategory() const
 	{
 		return category;
 	}
@@ -182,11 +182,11 @@ namespace Rosie
 	
 	Variable State::getVariable(const Address& address)
 	{
-		if(address.getCategory() == 0)
+		if(address.getCategory() == Category::CONSTANT)
 		{
 			return constants[address.getId()];			
 		}
-		else if(address.getCategory() == 1)
+		else if(address.getCategory() == Category::VARIABLE)
 		{
 			if(address.getId() == 0)
 			{
@@ -201,7 +201,11 @@ namespace Rosie
 				return variables[address.getId()];				
 			}
 		}
-		else //type = 2
+		else if(address.getCategory() == Category::INTEGER)
+		{
+			return Variable(address.getId());
+		}
+		else //to be implemented
 		{
 			return Variable(address.getId());
 		}

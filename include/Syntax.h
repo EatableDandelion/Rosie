@@ -1,10 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 #include <iostream>
 #include <functional>
-#include <stack>
 #include "Objects.h"
 
 namespace Rosie

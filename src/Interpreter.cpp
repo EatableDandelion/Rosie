@@ -12,7 +12,7 @@ namespace Rosie{
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 	
-	Memory::Memory(const int& category, const int& startIndex):category(category), head(startIndex)
+	Memory::Memory(const Category& category, const int& startIndex):category(category), head(startIndex)
 	{
 		scope.push(startIndex);
 	}
@@ -49,7 +49,7 @@ namespace Rosie{
 	}
 	
 	
-	Program::Program():variables(1,1), functions(2)
+	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{
@@ -82,7 +82,7 @@ namespace Rosie{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), 3, value);
+		Address address(constants.size(), Category::CONSTANT, value);
 		
 		if(type == TokenType::CSTFLOAT)
 		{
@@ -183,7 +183,7 @@ namespace Rosie{
 	
 	Address Program::getStackAddress() const
 	{
-		return Address(0, 1);
+		return Address(0, Category::VARIABLE);
 	}
 	
 	void Program::addType(const Type& type)

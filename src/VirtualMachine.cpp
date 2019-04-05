@@ -30,7 +30,7 @@ namespace Rosie
 				sepPos++;
 				category = std::stoi(line.substr(sepPos, endPos-sepPos));
 				
-				tokens.push_back(Address(addressId, category));
+				tokens.push_back(Address(addressId, Category(category)));
 				startPos = endPos+1;
 			}
 			sepPos = line.find("/", startPos);
@@ -38,7 +38,8 @@ namespace Rosie
 			sepPos++;
 			category = std::stoi(line.substr(sepPos, line.length()-sepPos));
 			
-			tokens.push_back(Address(addressId, category));
+			tokens.push_back(Address(addressId, Category(category)));
+			std::cout << addressId << " " << category << std::endl;
 			syntax.runOpcode(opcodeId, tokens, state);
 		}
 	}

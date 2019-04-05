@@ -150,24 +150,24 @@ namespace Rosie{
 			std::variant<float, int, bool, std::string> value;
 	};
 	
-	enum AddressType
-	{
-		INTEGER,
-		VARIABLE,
+	enum Category
+	{	
 		CONSTANT,
+		VARIABLE,
 		FUNCTION,
+		INTEGER
 	};
-	
+		
 	struct Address
 	{
 		public:
-			Address(const int& id, const int& category = 0, const std::string& name = "");
+			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "");
 			Address(const Address& address);
 			Address();
 			
 			int getId() const;
 			std::string getName() const;
-			int getCategory() const;
+			Category getCategory() const;
 			Type getType() const;
 			std::string getString() const;
 			
@@ -182,7 +182,7 @@ namespace Rosie{
 		private:
 			int id;
 			std::string name;
-			int category;
+			Category category;
 			Type type;
 			DualMap<int, std::size_t, std::shared_ptr<Address>> members;
 	};

@@ -7,6 +7,7 @@
 #include <variant>
 #include <stack>
 #include <unordered_map>
+#include <map>
 
 namespace Rosie{
 	std::size_t getId(const std::string& name);
@@ -83,20 +84,32 @@ namespace Rosie{
 	struct Type
 	{
 		public:
-			Type(const std::string& name);
-			Type();
-	
-			void setId(const std::size_t& typeId);
-			void addMember(const int& memberTypeId, const std::string& name);
-			std::size_t getSize() const;
+			bool operator==(const Type& other);
 			
-			std::string name;
-			int id;
-		
 		private:
-			std::unordered_map<std::size_t, int> members;
-			std::size_t size;
+			Type(const std::size_t& id, const int& size);
+			std::size_t id;
+			int size;
+			std::unordered_map<std::size_t, std::size_t> members; //key = name, value = typeId
+			
+			void addMember(const std::size_t& name, const std::size_t& typeId);
+			
+			friend struct TypeCollection;
 	};
+	
+	struct TypeCollection
+	{
+		public:
+			TypeCollection();
+			int addType(const std::string& name, const int& size);
+			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
+			int getSize(const Type& type);
+			Type getType(const std::string& name) const;
+			bool hasType(const std::string& name) const;
+			
+		private:
+			std::map<std::size_t, Type> types;
+	}
 	
 	struct Variable
 	{
@@ -122,19 +135,19 @@ namespace Rosie{
 			
 			friend std::ostream& operator <<(std::ostream& os, const Variable& var)
 			{
-				if(var.type == 0)
+				if(var.type == types.getType("float"))
 				{
 					os << std::to_string(var.get<float>())+ " (float)"; 
 				}
-				else if(var.type == 1)
+				else if(var.type == types.getType("int"))
 				{
 					os << std::to_string(var.get<int>())+ " (int)"; 
 				}
-				else if(var.type == 2)
+				else if(var.type == types.getType("boolean"))
 				{
 					os << std::to_string(var.get<bool>())+ " (boolean)"; 
 				}
-				else if(var.type == 3)
+				else if(var.type == types.getType("string"))
 				{
 					os << var.get<std::string>()+ " (string)"; 
 				}
@@ -146,7 +159,8 @@ namespace Rosie{
 			}
 			
 		private:
-			std::size_t type;
+			TypeCollection types;
+			Type type;
 			std::variant<float, int, bool, std::string> value;
 	};
 	
@@ -161,7 +175,7 @@ namespace Rosie{
 	struct Address
 	{
 		public:
-			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "");
+			Address(const int& id, const Category& category = Category::CONSTANT, const Type& type = Type(), const std::string& name = "");
 			Address(const Address& address);
 			Address();
 			
@@ -171,13 +185,13 @@ namespace Rosie{
 			Type getType() const;
 			std::string getString() const;
 			
-			/*std::size_t addMember(const std::size_t& category, const std::string& name, const Type& type); //add a member, returns the size of the member added
+			void addMember(const std::string& name, const Category& category, const Type& type); //add a member, returns the size of the member added
 		
 			Address getMemberAddress(const std::string& name) const;
 		
-			Address getMemberAddress(const int& offset) const;*/
+			Address getMemberAddress(const int& offset) const;
 		
-			std::size_t size() const;
+			int size() const;
 		
 		private:
 			int id;

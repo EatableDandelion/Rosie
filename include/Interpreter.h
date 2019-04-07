@@ -20,7 +20,7 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name, const Type& type);
+			Address newAddress(const std::string& name, const std::size_t& type);
 			
 			Address getAddress(const std::string& name);
 			
@@ -72,7 +72,7 @@ namespace Rosie{
 			
 			Address getStackAddress() const;
 			
-			void addType(const Type& type);
+			void addType(const std::string& name);
 			
 			Type getType(const std::string& name) const;
 			
@@ -86,8 +86,7 @@ namespace Rosie{
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;
-			int allTypeIds = 0;
-			std::unordered_map<std::size_t, Type> types;
+			TypeCollections types;
 			
 			template<typename A>
 			std::string translateInstruction(A& address)

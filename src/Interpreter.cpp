@@ -17,12 +17,12 @@ namespace Rosie{
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name, const Type& type)
+	Address Memory::newAddress(const std::string& name, const std::size_t& size)
 	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
-		head+=type.size();
+		head+=size;
 		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
 
 		return addresses[id];
@@ -54,12 +54,8 @@ namespace Rosie{
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{
-			functions.newAddress(func.getName());
+			functions.newAddress(func.getName(), 1);
 		}
-		addType(Type("float"));
-		addType(Type("int"));
-		addType(Type("boolean"));
-		addType(Type("string"));
 	}
 	
 	Address Program::getAddress(const Token& token, const Lexer& lexer)
@@ -113,7 +109,7 @@ namespace Rosie{
 	
 	Address Program::newVarAddress(const std::string& name, const Type& type)
 	{
-		return variables.newAddress(name, type);
+		return variables.newAddress(name, type.size());
 	}
 	
 	Address Program::newVarAddress(const Token& token, const Type& type)
@@ -125,8 +121,8 @@ namespace Rosie{
 	{
 		if(!hasVarAddress(token))
 		{
-			newVarAddress(token);
-			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
+			
+			std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
 	}
@@ -138,7 +134,7 @@ namespace Rosie{
 	
 	Address Program::newFunctionAddress(const std::string& name)
 	{
-		return functions.newAddress(name);
+		return functions.newAddress(name, 1);
 	}
 	
 	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
@@ -187,16 +183,14 @@ namespace Rosie{
 		return Address(0, Category::VARIABLE);
 	}
 	
-	void Program::addType(const Type& type)
+	void Program::addType(const std::string& name)
 	{
-		
-		types.insert(std::pair<std::size_t, Type>(Rosie::getId(type.name), type));
-		types[Rosie::getId(type.name)].setId(allTypeIds++);
+		types.addType(name);
 	}
 	
 	Type Program::getType(const std::string& name) const
 	{
-		return types.at(Rosie::getId(name));
+		return types.getType(name);
 	}
 	
 	Type Program::getType(const Token& token) const
@@ -206,7 +200,7 @@ namespace Rosie{
 	
 	bool Program::hasTypeName(const Token& token) const
 	{
-		return types.find(Rosie::getId(token.value)) != types.end();
+		return types.hasType(token.value);
 	}
 	
 	
@@ -252,7 +246,7 @@ namespace Rosie{
 			Type tokenType = program.getType(lexer.getToken());
 			
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken());
+			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
 			//program.addInstruction("NEW", returnAddress);
 		}
 		
@@ -273,7 +267,7 @@ namespace Rosie{
 			while(lexer.getToken() != ")")
 			{
 				lexer++;
-				int memberTypeId = program.getType(lexer.getToken()).id;
+				int memberTypeId = program.getType(lexer.getToken());
 				lexer++;
 				newType.addMember(memberTypeId, lexer.getToken().value);
 				lexer++;//"," or ")"

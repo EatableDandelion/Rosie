@@ -42,4 +42,27 @@ namespace Rosie
 			syntax.runOpcode(opcodeId, tokens, state);
 		}
 	}
+	
+	
+	Handle VirtualMachine::parseHandle(const std_string& text)
+	{
+		std::size_t slashPos = line.find("/", std::size_t(0));
+		std::string addressText = line.substr(std::size_t(0), slashPos-std::size_t(0)));
+		
+		slashPos++;
+		int category = std::stoi(line.substr(slashPos, line.length()-slashPos));
+		
+		
+		std::size_t endPos;
+		std::size_t startPos;
+		while((endPos = addressText.find(".", startPos)) != std::string::npos)
+		{
+			int id = std::stoi(line.substr(startPos, endPos-startPos));
+			
+			startPos = endPos+1;
+			firstIteration = false;
+		}
+		
+		
+	}
 }

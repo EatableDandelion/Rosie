@@ -68,10 +68,10 @@ namespace Rosie
 		return members[index];
 	}
 	
-	Handle::Handle(const int& id, const Category& category):id(id), category(category)
+	Handle::Handle(const std::vector<int>& id, const Category& category):id(id), category(category)
 	{}
 	
-	int Handle::getId() const
+	std::vector<int> Handle::getId() const
 	{
 		return id;
 	}
@@ -126,7 +126,7 @@ namespace Rosie
 		}
 		else if(handle.getCategory() == Category::VARIABLE)
 		{
-			if(handle.getId() == 0)
+			if(handle.getId()[0] == 0)
 			{
 				return pop();
 			}

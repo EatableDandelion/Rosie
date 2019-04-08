@@ -59,13 +59,13 @@ namespace Rosie
 			
 			int getOpcodeId(const Opcode& name) const;
 			
-			void addOpcode(const Opcode& name, const std::function<void(std::vector<Address>&, State&)> func);
+			void addOpcode(const Opcode& name, const std::function<void(std::vector<Handle>&, State&)> func);
 			
 			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&, State&)> func);
 			
 			bool hasMethod(const std::string& name) const;
 			
-			void runOpcode(const int& id, std::vector<Address>& args, State& state);
+			void runOpcode(const int& id, std::vector<Handle>& args, State& state);
 			
 			void execute(const std::string& name, std::vector<Variable>& arguments, State& state) const;
 			
@@ -74,7 +74,7 @@ namespace Rosie
 			std::vector<Function<Variable>> getNativeMethods() const;
 			
 		private:
-			DualMap<int, Opcode, Function<Address>> opcodes;
+			DualMap<int, Opcode, Function<Handle>> opcodes;
 			DualMap<int, std::string, Function<Variable>> methods;
 	};
 	

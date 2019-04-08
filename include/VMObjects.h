@@ -65,7 +65,7 @@ namespace Rosie
 	struct Handle
 	{
 		public:
-			Handle(const int& id, const Category& category);
+			Handle(const std::string& parsedArgument);
 		
 			int getId() const;
 			Category getCategory() const;

@@ -17,13 +17,13 @@ namespace Rosie{
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name, const std::size_t& size)
+	Address Memory::newAddress(const std::string& name, const int& size, const Type& type)
 	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
 		head+=size;
-		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, type, category, name)));
 
 		return addresses[id];
 	}
@@ -54,7 +54,7 @@ namespace Rosie{
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{
-			functions.newAddress(func.getName(), 1);
+			functions.newAddress(func.getName(), 1, types.getType("function"));
 		}
 	}
 	
@@ -109,7 +109,7 @@ namespace Rosie{
 	
 	Address Program::newVarAddress(const std::string& name, const Type& type)
 	{
-		return variables.newAddress(name, type.size());
+		return variables.newAddress(name, types.getSize(type), type);
 	}
 	
 	Address Program::newVarAddress(const Token& token, const Type& type)

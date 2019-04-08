@@ -8,7 +8,7 @@
 #include <iostream>
 #include "InputStream.h"
 #include "Token.h"
-#include "Objects.h"
+#include "InterpreterObjects.h"
 
 namespace Rosie
 {	

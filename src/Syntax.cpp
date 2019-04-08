@@ -7,7 +7,6 @@ namespace Rosie
 	{	
 		addOpcode(Opcode::SET, [&](std::vector<Address>& args, State& state){state.copyVariable(args[0], args[1]);});
 		addOpcode(Opcode::ARG, [&](std::vector<Address>& args, State& state){state.push(args[0]);});
-		//addOpcode("PRINT", [&](std::vector<Address>& args, State& state){std::cout << state.getVariable(args[0]) << std::endl;});
 		addOpcode(Opcode::CALL, [&](std::vector<Address>& args, State& state){execute(state.getVariable(args[0]).get<int>(), state);});
 		addOpcode(Opcode::ADD, [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()+state.getVariable(args[1]).get<float>()));});
 		addOpcode(Opcode::NEG, [&](std::vector<Address>& args, State& state){state.push(Variable(-state.getVariable(args[0]).get<float>()));});

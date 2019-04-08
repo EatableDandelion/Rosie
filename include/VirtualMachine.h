@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "Objects.h"
+#include "VMObjects.h"
 #include "Syntax.h"
 
 namespace Rosie

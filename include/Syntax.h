@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#include "Objects.h"
+#include "VMObjects.h"
 
 namespace Rosie
 {

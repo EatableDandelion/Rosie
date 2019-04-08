@@ -3,7 +3,7 @@
 #include <string>
 #include <set>
 #include <vector>
-#include "Objects.h"
+#include "InterpreterObjects.h"
 
 namespace Rosie
 {	

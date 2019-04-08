@@ -8,7 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include "Lexer.h"
-#include "Objects.h"
+#include "InterpreterObjects.h"
 #include "Syntax.h"
 
 namespace Rosie{
@@ -20,7 +20,7 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name, const std::size_t& type);
+			Address newAddress(const std::string& name, const int& size, const Type& type);
 			
 			Address getAddress(const std::string& name);
 			
@@ -86,7 +86,7 @@ namespace Rosie{
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;
-			TypeCollections types;
+			TypeCollection types;
 			
 			template<typename A>
 			std::string translateInstruction(A& address)

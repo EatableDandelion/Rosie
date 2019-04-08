@@ -14,7 +14,7 @@ namespace Rosie
 		
 		for(const std::string line : commands)
 		{
-			std::vector<Address> tokens;
+			std::vector<Handle> tokens;
 			
 			std::size_t startPos = 0;
 			std::size_t endPos = line.find(" ", startPos);
@@ -30,7 +30,7 @@ namespace Rosie
 				sepPos++;
 				category = std::stoi(line.substr(sepPos, endPos-sepPos));
 				
-				tokens.push_back(Address(addressId, Category(category)));
+				tokens.push_back(Handle(addressId, Category(category)));
 				startPos = endPos+1;
 			}
 			sepPos = line.find("/", startPos);
@@ -38,7 +38,7 @@ namespace Rosie
 			sepPos++;
 			category = std::stoi(line.substr(sepPos, line.length()-sepPos));
 			
-			tokens.push_back(Address(addressId, Category(category)));
+			tokens.push_back(Handle(addressId, Category(category)));
 			syntax.runOpcode(opcodeId, tokens, state);
 		}
 	}

@@ -55,8 +55,14 @@ namespace Rosie
 		type = other.type;
 	}
 	
-	Handle::Handle(const int& id, const Category& category):id(id), category(category);
-	{}
+	Handle::Handle(const std::string& parsedArgument)
+	{
+		std::size_t sepPos = line.find("/", std::size_t(0));
+		std::string value = line.substr(startPos, sepPos-startPos)
+		//addressId = std::stoi();
+		sepPos++;
+		category = std::stoi(line.substr(sepPos, endPos-sepPos));
+	}
 	
 	int Handle::getId() const
 	{

@@ -82,7 +82,7 @@ namespace Rosie{
 			
 		private:
 			Syntax syntax;
-			std::vector<Variable> constants;
+			std::vector<std::string> constants;
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;

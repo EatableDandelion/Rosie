@@ -31,6 +31,7 @@ namespace Rosie
 			void set(const bool& newValue);
 			void set(const std::string& newValue);
 			void set(const Variable& other);
+			void addMember(const Variable& member);
 			
 			friend std::ostream& operator <<(std::ostream& os, Variable& var)
 			{
@@ -50,9 +51,14 @@ namespace Rosie
 				{
 					os << var.get<std::string>()+ " (string)"; 
 				}
-				else
+				else if(var.type == 4)
 				{
-					os << "Error: undefined variable type.";
+					os << "[";
+					for(const auto& member : var.members)
+					{
+						os << *member << ", "
+					}
+					os << "]"
 				}
 				return os;
 			}
@@ -60,19 +66,22 @@ namespace Rosie
 		private:
 			int type;
 			std::variant<float, int, bool, std::string> value;
+			std::vector<std::shared_ptr<Variable>> members;
 	};
 	
 	struct Handle
 	{
 		public:
-			Handle(const std::string& parsedArgument);
+			Handle(const int& id, const Category& category, const Variable& variable);
 		
 			int getId() const;
 			Category getCategory() const;
+			Variable getVariable() const;
 		
 		private:
 			int id;
 			Category category;
+			Variable variable;
 	};
 	
 	struct State

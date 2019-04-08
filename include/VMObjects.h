@@ -32,6 +32,7 @@ namespace Rosie
 			void set(const std::string& newValue);
 			void set(const Variable& other);
 			void addMember(const Variable& member);
+			std::shared_ptr<Variable> getMember(const int& index) const;
 			
 			friend std::ostream& operator <<(std::ostream& os, Variable& var)
 			{

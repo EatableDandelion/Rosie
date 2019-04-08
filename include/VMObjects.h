@@ -73,16 +73,14 @@ namespace Rosie
 	struct Handle
 	{
 		public:
-			Handle(const int& id, const Category& category, const Variable& variable);
+			Handle(const int& id, const Category& category);
 		
 			int getId() const;
 			Category getCategory() const;
-			Variable getVariable() const;
 		
 		private:
 			int id;
 			Category category;
-			Variable variable;
 	};
 	
 	struct State

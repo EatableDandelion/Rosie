@@ -55,7 +55,7 @@ namespace Rosie
 		type = other.type;
 	}
 	
-	Handle::Handle(const std::string& parsedArgument)
+	Handle::Handle(const int& id, const Category& category, const Variable& variable)
 	{
 		std::size_t sepPos = line.find("/", std::size_t(0));
 		std::string value = line.substr(startPos, sepPos-startPos)

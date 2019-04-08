@@ -53,14 +53,23 @@ namespace Rosie
 		int category = std::stoi(line.substr(slashPos, line.length()-slashPos));
 		
 		
+		std::shared_ptr<Variable> variable;
 		std::size_t endPos;
 		std::size_t startPos;
 		while((endPos = addressText.find(".", startPos)) != std::string::npos)
 		{
 			int id = std::stoi(line.substr(startPos, endPos-startPos));
 			
+			if(variable != NULL)
+			{
+				variable = variable->getMember(id);
+			}
+			else
+			{
+				variable = make_shared<Variable>();
+			}
+			
 			startPos = endPos+1;
-			firstIteration = false;
 		}
 		
 		

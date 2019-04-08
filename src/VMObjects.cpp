@@ -58,6 +58,16 @@ namespace Rosie
 	Handle::Handle(const int& id, const Category& category):id(id), category(category);
 	{}
 	
+	int Handle::getId() const
+	{
+		return id;
+	}
+	
+	Category Handle::getCategory() const
+	{
+		return category;
+	}
+	
 	void State::addVariable(const int& id)
 	{
 		variables.insert(std::pair<int, Variable>(id, Variable()));

@@ -68,7 +68,7 @@ namespace Rosie
 		return members[index];
 	}
 	
-	Handle::Handle(const int& id, const Category& category, const Variable& variable):id(id), category(category), variable(variable)
+	Handle::Handle(const int& id, const Category& category):id(id), category(category)
 	{}
 	
 	int Handle::getId() const
@@ -79,11 +79,6 @@ namespace Rosie
 	Category Handle::getCategory() const
 	{
 		return category;
-	}
-	
-	Variable Handle::getVariable() const
-	{
-		return variable;
 	}
 	
 	void State::addVariable(const int& id)

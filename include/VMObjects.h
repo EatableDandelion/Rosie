@@ -87,7 +87,7 @@ namespace Rosie
 	struct State
 	{
 		public:
-			void addVariable(const int& id);
+			void addVariable(const Handle& handle);
 			void addConstants(const std::vector<Variable>& csts);
 			void push(const Variable& variable);
 			void push(const Handle& address);

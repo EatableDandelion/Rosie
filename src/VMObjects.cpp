@@ -62,6 +62,12 @@ namespace Rosie
 		members.push_back(std::make_shared<Variable>(member));
 	}
 	
+	
+	std::shared_ptr<Variable> Variable::getMember(const int& index) const
+	{
+		return members[index];
+	}
+	
 	Handle::Handle(const int& id, const Category& category, const Variable& variable):id(id), category(category), variable(variable)
 	{}
 	

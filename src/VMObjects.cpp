@@ -86,9 +86,9 @@ namespace Rosie
 		return id = other.id;
 	}
 	
-	void State::addVariable(const int& id)
+	void State::addVariable(const Handle& handle)
 	{
-		variables.insert(std::pair<int, Variable>(id, Variable()));
+		variables.insert(std::pair<Handle, Variable>(handle, Variable()));
 	}
 	
 	void State::addConstants(const std::vector<Variable>& csts)

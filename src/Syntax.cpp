@@ -5,14 +5,14 @@ namespace Rosie
 
 	Syntax::Syntax()
 	{	
-		addOpcode(Opcode::SET, [&](std::vector<Address>& args, State& state){state.copyVariable(args[0], args[1]);});
-		addOpcode(Opcode::ARG, [&](std::vector<Address>& args, State& state){state.push(args[0]);});
-		addOpcode(Opcode::CALL, [&](std::vector<Address>& args, State& state){execute(state.getVariable(args[0]).get<int>(), state);});
-		addOpcode(Opcode::ADD, [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()+state.getVariable(args[1]).get<float>()));});
-		addOpcode(Opcode::NEG, [&](std::vector<Address>& args, State& state){state.push(Variable(-state.getVariable(args[0]).get<float>()));});
-		addOpcode(Opcode::SUB, [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()-state.getVariable(args[1]).get<float>()));});
-		addOpcode(Opcode::MULT, [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()*state.getVariable(args[1]).get<float>()));});
-		addOpcode(Opcode::DIV, [&](std::vector<Address>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()/state.getVariable(args[1]).get<float>()));});
+		addOpcode(Opcode::SET, [&](std::vector<Handle>& args, State& state){state.copyVariable(args[0], args[1]);});
+		addOpcode(Opcode::ARG, [&](std::vector<Handle>& args, State& state){state.push(args[0]);});
+		addOpcode(Opcode::CALL, [&](std::vector<Handle>& args, State& state){execute(state.getVariable(args[0]).get<int>(), state);});
+		addOpcode(Opcode::ADD, [&](std::vector<Handle>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()+state.getVariable(args[1]).get<float>()));});
+		addOpcode(Opcode::NEG, [&](std::vector<Handle>& args, State& state){state.push(Variable(-state.getVariable(args[0]).get<float>()));});
+		addOpcode(Opcode::SUB, [&](std::vector<Handle>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()-state.getVariable(args[1]).get<float>()));});
+		addOpcode(Opcode::MULT, [&](std::vector<Handle>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()*state.getVariable(args[1]).get<float>()));});
+		addOpcode(Opcode::DIV, [&](std::vector<Handle>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()/state.getVariable(args[1]).get<float>()));});
 		
 		addMethod("print", [&](std::vector<Variable>& args, State& state){std::cout << args[0] << std::endl;});
 		//addMethod("Position", [&](std::vector<Variable>& args, State& state){});
@@ -23,9 +23,9 @@ namespace Rosie
 		return opcodes[name].getId();
 	}
 	
-	void Syntax::addOpcode(const Opcode& name, const std::function<void(std::vector<Address>&, State&)> func)
+	void Syntax::addOpcode(const Opcode& name, const std::function<void(std::vector<Handle>&, State&)> func)
 	{
-		opcodes.add(opcodes.size(), name, Function<Address>(std::to_string(name), func, opcodes.size()));
+		opcodes.add(opcodes.size(), name, Function<Handle>(std::to_string(name), func, opcodes.size()));
 	}
 	
 	void Syntax::addMethod(const std::string& name, const std::function<void(std::vector<Variable>&, State&)> func)
@@ -38,7 +38,7 @@ namespace Rosie
 		return methods.contains(name);
 	}
 	
-	void Syntax::runOpcode(const int& id, std::vector<Address>& args, State& state)
+	void Syntax::runOpcode(const int& id, std::vector<Handle>& args, State& state)
 	{
 		opcodes[id].execute(args, state);
 	}

@@ -23,7 +23,9 @@ namespace Rosie
 	}
 	
 	Variable::Variable()
-	{}
+	{
+		type = 4;
+	}
 	
 	void Variable::set(const float& newValue)
 	{
@@ -55,14 +57,13 @@ namespace Rosie
 		type = other.type;
 	}
 	
-	Handle::Handle(const int& id, const Category& category, const Variable& variable)
+	void Variable::addMember(const Variable& member)
 	{
-		std::size_t sepPos = line.find("/", std::size_t(0));
-		std::string value = line.substr(startPos, sepPos-startPos)
-		//addressId = std::stoi();
-		sepPos++;
-		category = std::stoi(line.substr(sepPos, endPos-sepPos));
+		members.push_back(std::make_shared<Variable>(member));
 	}
+	
+	Handle::Handle(const int& id, const Category& category, const Variable& variable):id(id), category(category), variable(variable)
+	{}
 	
 	int Handle::getId() const
 	{
@@ -72,6 +73,11 @@ namespace Rosie
 	Category Handle::getCategory() const
 	{
 		return category;
+	}
+	
+	Variable Handle::getVariable() const
+	{
+		return variable;
 	}
 	
 	void State::addVariable(const int& id)

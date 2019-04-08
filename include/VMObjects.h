@@ -67,6 +67,9 @@ namespace Rosie
 		public:
 			Handle(const int& id, const Category& category);
 		
+			int getId() const;
+			Category getCategory() const;
+		
 		private:
 			int id;
 			Category category;

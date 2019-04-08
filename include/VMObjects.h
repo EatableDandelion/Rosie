@@ -73,13 +73,14 @@ namespace Rosie
 	struct Handle
 	{
 		public:
-			Handle(const int& id, const Category& category);
+			Handle(const std::vector<int>& id, const Category& category);
 		
-			int getId() const;
+			std::vector<int> getId() const;
 			Category getCategory() const;
+			bool operator==(const Handle& other);
 		
 		private:
-			int id;
+			std::vector<int> id;
 			Category category;
 	};
 	
@@ -96,7 +97,7 @@ namespace Rosie
 			Variable getVariable(const Handle& handle);
 			
 		private:
-			std::unordered_map<int, Variable> variables;
+			std::unordered_map<Handle, Variable> variables;
 			std::vector<Variable> constants;
 			std::stack<Variable> callStack;
 	};	

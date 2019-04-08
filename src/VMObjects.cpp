@@ -81,6 +81,11 @@ namespace Rosie
 		return category;
 	}
 	
+	bool operator==(const Handle& other)
+	{
+		return id = other.id;
+	}
+	
 	void State::addVariable(const int& id)
 	{
 		variables.insert(std::pair<int, Variable>(id, Variable()));

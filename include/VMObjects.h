@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <stack>
 #include <variant>
 
@@ -32,7 +32,7 @@ namespace Rosie
 			void set(const std::string& newValue);
 			void set(const Variable& other);
 			void addMember(const Variable& member);
-			std::shared_ptr<Variable> getMember(const int& index) const;
+			std::shared_ptr<Variable> getMember(const std::string& name) const;
 			
 			friend std::ostream& operator <<(std::ostream& os, Variable& var)
 			{
@@ -57,7 +57,7 @@ namespace Rosie
 					os << "[";
 					for(const auto& member : var.members)
 					{
-						os << *member << ", "
+						os << *(member.second) << ", "
 					}
 					os << "]"
 				}
@@ -67,20 +67,20 @@ namespace Rosie
 		private:
 			int type;
 			std::variant<float, int, bool, std::string> value;
-			std::vector<std::shared_ptr<Variable>> members;
+			std::unordered_map<std::size_t, std::shared_ptr<Variable>> members;
 	};
 	
 	struct Handle
 	{
 		public:
-			Handle(const std::vector<int>& id, const Category& category);
+			Handle(const int& id, const Category& category);
 		
-			std::vector<int> getId() const;
+			int getId() const;
 			Category getCategory() const;
-			bool operator==(const Handle& other);
+			bool operator==(const Handle& other) const;
 		
 		private:
-			std::vector<int> id;
+			int id;
 			Category category;
 	};
 	
@@ -90,15 +90,27 @@ namespace Rosie
 			void addVariable(const Handle& handle);
 			void addConstants(const std::vector<Variable>& csts);
 			void push(const Variable& variable);
-			void push(const Handle& address);
+			void push(const Handle& handle);
 			Variable pop();
 			bool empty() const;
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);
 			
 		private:
-			std::unordered_map<Handle, Variable> variables;
+			std::DualMap<Handle, std::size_t, Variable> variables;
 			std::vector<Variable> constants;
 			std::stack<Variable> callStack;
 	};	
+}
+
+namespace std 
+{
+   	template<>
+	struct hash<Rosie::Handle>{
+		public:
+		    size_t operator()(const Handle& handle) const
+		    {
+			return hash<int>()(handle.getId());
+		    }
+   	 };
 }

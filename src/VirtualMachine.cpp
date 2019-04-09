@@ -47,22 +47,10 @@ namespace Rosie
 	Handle VirtualMachine::parseHandle(const std::string& text) const
 	{
 		std::size_t slashPos = line.find("/", std::size_t(0));
-		std::string addressText = line.substr(std::size_t(0), slashPos-std::size_t(0)));
-		
+		int id = std::stoi(line.substr(std::size_t(0), slashPos-std::size_t(0))));
 		slashPos++;
 		int category = std::stoi(line.substr(slashPos, line.length()-slashPos));
-		
-		
-		std::vector<int> id;
-		std::size_t endPos;
-		std::size_t startPos;
-		while((endPos = addressText.find(".", startPos)) != std::string::npos)
-		{
-			id.push_back(std::stoi(line.substr(startPos, endPos-startPos)));			
-			startPos = endPos+1;
-		}
-		
-		return Handle(id, Category(category));
-		
+
+		return Handle(id, Category(category));	
 	}
 }

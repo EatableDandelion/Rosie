@@ -1,37 +1,50 @@
 #pragma once
 
+#include <unordered_map>
 #include "VMObjects.h"
 
 namespace Rosie
 {
-  template<typename T>
+  class InstructionCollection
+  {
+    public:
+  
+      template<typename T, typename... Args>
+      std::string addInstruction(Args&&... args)
+      {
+        T instruction(std::forward<Args>(args)...)
+        return std::to_string(instruction.getId())+"|"+instruction.getString();
+      }
+    
+      template<typename T>
+      void runInstruction(const std::string& command, State& state)
+      {
+        T instruction;
+        instruction.run(command.substr(line.find("|", command)+1, line.size()), state);
+      }
+  };
+  
   class Instruction
   {
     public:
-      Instruction(const Opcodes& opcode):opcode(opcode)
-      {}
+      Instruction(const std::string& text, const int& id):text(text), id(id);
+      Instruction();
     
-      template<typename... Args>
-      std::string getString(Args&&... args) const
-      {
-        return opcode+"|"+instruction.getString(std::forward<Args>(args)...);
-      }
-    
-      void runInstruction(const std::string& command, State& state)
-      {
-        instruction.run(command.substr(line.find("|", command)+1, line.size()), state);
-      }
+      std::string getString() const;
+      int getId() const;
+      virtual void run(const std::string& command, State& state) const;
     
     private:
-      T instruction;
-      Opcode opcode;
-  };
+      std::string text;
+      int id;
+      
+  }
   
-  class SetInstruction
+  class SetInstruction : public Instruction
   {
     public:
-      std::string getString(const int& destId, const int& srcId,  const int& srcType) const;
-      void run(const std::string& command, State& state) const;
+      SetInstruction(const int& destId, const int& srcId,  const int& srcType);
+      virtual void run(const std::string& command, State& state) const;
   };
   
   

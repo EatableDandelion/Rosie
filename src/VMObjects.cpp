@@ -63,15 +63,15 @@ namespace Rosie
 	}
 	
 	
-	std::shared_ptr<Variable> Variable::getMember(const int& index) const
+	std::shared_ptr<Variable> Variable::getMember(const std::string& name) const
 	{
-		return members[index];
+		return members[Rosie::getId(name)];
 	}
 	
-	Handle::Handle(const std::vector<int>& id, const Category& category):id(id), category(category)
+	Handle::Handle(const int& id, const Category& category):id(id), category(category)
 	{}
 	
-	std::vector<int> Handle::getId() const
+	int Handle::getId() const
 	{
 		return id;
 	}
@@ -81,7 +81,7 @@ namespace Rosie
 		return category;
 	}
 	
-	bool operator==(const Handle& other)
+	bool Handle::operator==(const Handle& other) const
 	{
 		return id = other.id;
 	}

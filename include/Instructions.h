@@ -1,6 +1,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <cstdio>
+#include <string>
 #include "VMObjects.h"
 
 namespace Rosie
@@ -8,7 +10,6 @@ namespace Rosie
   class InstructionCollection
   {
     public:
-  
       template<typename T, typename... Args>
       std::string addInstruction(Args&&... args)
       {
@@ -32,7 +33,7 @@ namespace Rosie
     
       std::string getString() const;
       int getId() const;
-      virtual void run(const std::string& command, State& state) const;
+      virtual void run(const std::string& command, State& state) const = 0;
     
     private:
       std::string text;

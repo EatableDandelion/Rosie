@@ -18,9 +18,7 @@ namespace Rosie
 			
 			void execute(const std::vector<Variable>& constants, const std::vector<std::string>& commands);
 			
-			Handle parseHandle(const std_string& text) const;	
-		
-			Variable newVariable(const int& id);
+			Handle parseHandle(const std_string& text) const;
 		
 		private:
 			Syntax syntax;

@@ -2,7 +2,7 @@
 
 namespace Rosie
 {
-	void Token::setAddress(const Address& address)
+	/*void Token::setAddress(const Address& address)
 	{
 		m_address = address;
 	}
@@ -10,7 +10,7 @@ namespace Rosie
 	Address Token::getAddress() const
 	{
 		return m_address;
-	}
+	}*/
 	
 	int Token::length() const
 	{

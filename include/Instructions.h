@@ -18,10 +18,10 @@ namespace Rosie
       }
     
       template<typename T>
-      void runInstruction(const std::string& command, State& state)
+      void read(const std::string& command, State& state)
       {
         T instruction;
-        instruction.run(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
+        instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
       }
   };
   
@@ -31,9 +31,9 @@ namespace Rosie
       Instruction(const std::string& text, const int& id);
       Instruction();
     
-      std::string getString() const;
+      std::string write() const;
       int getId() const;
-      virtual void run(const std::string& command, State& state) const = 0;
+      virtual void read(const std::string& command, State& state) const = 0;
     
     private:
       std::string text;
@@ -44,7 +44,7 @@ namespace Rosie
   {
     public:
       SetInstruction(const int& destId, const int& srcId,  const int& srcType);
-      virtual void run(const std::string& command, State& state) const;
+      virtual void read(const std::string& command, State& state) const;
   };
   
   

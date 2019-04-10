@@ -61,21 +61,21 @@ namespace Rosie{
 	struct Address
 	{
 		public:
-			Address(const int& id, const Type& type, const Category& category = Category::CONSTANT, const std::string& name = "");
+			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "");
 			Address(const Address& address);
 			Address();
 			
 			int getId() const;
 			std::string getName() const;
 			Category getCategory() const;
-			Type getType() const;
+			//Type getType() const;
 			std::string getString() const;
 		
 		private:
 			int id;
 			std::string name;
 			Category category;
-			Type type;
+			//Type type;
 	};
 	
 	struct Memory //collection of addresses
@@ -83,7 +83,7 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name, const int& size, const Type& type);
+			Address newAddress(const std::string& name, const int& size);
 			
 			Address getAddress(const std::string& name);
 			

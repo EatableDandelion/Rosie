@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <map>
+#include <algorithm>
+#include <stack>
 #include "Utils.h"
 
 namespace Rosie{
@@ -74,6 +76,28 @@ namespace Rosie{
 			std::string name;
 			Category category;
 			Type type;
+	};
+	
+	struct Memory //collection of addresses
+	{
+		public:	
+			Memory(const Category& category, const int& startIndex = 0);
+		
+			Address newAddress(const std::string& name, const int& size, const Type& type);
+			
+			Address getAddress(const std::string& name);
+			
+			bool hasAddress(const std::string& name);
+			
+			void startScope();
+			
+			void endScope();
+						
+		private:
+			std::unordered_map<std::size_t, Address> addresses;
+			int head;
+			std::stack<int> scope;
+			Category category;
 	};
 		
 	enum TokenType

@@ -143,4 +143,14 @@ namespace Rosie
 	
 	Constant::Constant(const std::string& name, const std::string& value):typeId(Rosie::getId(name)), value(value)
 	{}
+	
+	std::size_t Constant::getTypeId() const
+	{
+		return typeId;
+	}
+	
+	std::size_t Constant::getValue() const
+	{
+		return value;
+	}
 }

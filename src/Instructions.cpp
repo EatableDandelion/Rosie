@@ -18,7 +18,7 @@ namespace Rosie
     return id;
   }
   
-  SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory), 0)
+  SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
   {}
   
   void SetInstruction::read(const std::string& command, State& state) const

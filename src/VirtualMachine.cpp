@@ -44,10 +44,10 @@ namespace Rosie
 	}
 	
 	
-	Handle VirtualMachine::parseHandle(const std::string& text) const
+	Handle VirtualMachine::parseHandle(const std::string& line) const
 	{
 		std::size_t slashPos = line.find("/", std::size_t(0));
-		int id = std::stoi(line.substr(std::size_t(0), slashPos-std::size_t(0))));
+		int id = std::stoi(line.substr(std::size_t(0), slashPos-std::size_t(0)));
 		slashPos++;
 		int category = std::stoi(line.substr(slashPos, line.length()-slashPos));
 

@@ -63,6 +63,8 @@ namespace Rosie{
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
 			bool isConstructor(const Token& token);
+			
+			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
 
 			void startScope();
 			void endScope();
@@ -72,7 +74,7 @@ namespace Rosie{
 			
 			Address getStackAddress() const;
 			
-			void addType(const std::string& name);
+			Type addType(const std::string& name);
 			
 			Type getType(const std::string& name) const;
 			
@@ -82,7 +84,7 @@ namespace Rosie{
 			
 		private:
 			Syntax syntax;
-			std::vector<std::string> constants;
+			std::vector<Constant> constants;
 			Memory variables;
 			Memory functions;
 			std::vector<std::string> instructions;

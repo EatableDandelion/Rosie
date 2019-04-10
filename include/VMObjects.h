@@ -4,9 +4,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <stack>
 #include <variant>
+#include "Utils.h"
+#include "InterpreterObjects.h"
 
 namespace Rosie
 {
@@ -31,7 +33,7 @@ namespace Rosie
 			void set(const bool& newValue);
 			void set(const std::string& newValue);
 			void set(const Variable& other);
-			void addMember(const Variable& member);
+			void addMember(const std::string& name, const Variable& member);
 			std::shared_ptr<Variable> getMember(const std::string& name) const;
 			
 			friend std::ostream& operator <<(std::ostream& os, Variable& var)
@@ -57,9 +59,9 @@ namespace Rosie
 					os << "[";
 					for(const auto& member : var.members)
 					{
-						os << *(member.second) << ", "
+						os << *(member.second) << ", ";
 					}
-					os << "]"
+					os << "]";
 				}
 				return os;
 			}
@@ -69,7 +71,7 @@ namespace Rosie
 			std::variant<float, int, bool, std::string> value;
 			std::unordered_map<std::size_t, std::shared_ptr<Variable>> members;
 	};
-	
+
 	struct Handle
 	{
 		public:
@@ -84,10 +86,27 @@ namespace Rosie
 			Category category;
 	};
 	
+}
+
+namespace std 
+{
+   	template<>
+	struct hash<Rosie::Handle>{
+		public:
+		    size_t operator()(const Rosie::Handle& handle) const
+		    {
+			return hash<int>()(handle.getId());
+		    }
+   	 };
+}
+
+namespace Rosie
+{
+	
 	struct State
 	{
 		public:
-			void addVariable(const Handle& handle);
+			void addVariable(const std::string& name, const Handle& handle);
 			void addConstants(const std::vector<Variable>& csts);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
@@ -97,20 +116,8 @@ namespace Rosie
 			Variable getVariable(const Handle& handle);
 			
 		private:
-			std::DualMap<Handle, std::size_t, Variable> variables;
+			DualMap<Handle, std::size_t, Variable> variables;
 			std::vector<Variable> constants;
 			std::stack<Variable> callStack;
 	};	
-}
-
-namespace std 
-{
-   	template<>
-	struct hash<Rosie::Handle>{
-		public:
-		    size_t operator()(const Handle& handle) const
-		    {
-			return hash<int>()(handle.getId());
-		    }
-   	 };
 }

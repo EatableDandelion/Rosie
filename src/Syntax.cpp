@@ -6,8 +6,8 @@ namespace Rosie
 	Syntax::Syntax()
 	{	
 		addOpcode(Opcode::SET, [&](std::vector<Handle>& args, State& state){state.copyVariable(args[0], args[1]);});
-		addOpcode(Opcode::NEW, [&](std::vector<Handle>& args, State& state){});
-		addOpcode(Opcode::TYPE, [&](std::vector<Handle>& args, State& state){});
+		//addOpcode(Opcode::NEW, [&](std::vector<Handle>& args, State& state){});
+		//addOpcode(Opcode::TYPE, [&](std::vector<Handle>& args, State& state){});
 		addOpcode(Opcode::ARG, [&](std::vector<Handle>& args, State& state){state.push(args[0]);});
 		addOpcode(Opcode::CALL, [&](std::vector<Handle>& args, State& state){execute(state.getVariable(args[0]).get<int>(), state);});
 		addOpcode(Opcode::ADD, [&](std::vector<Handle>& args, State& state){state.push(Variable(state.getVariable(args[0]).get<float>()+state.getVariable(args[1]).get<float>()));});

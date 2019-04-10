@@ -13,7 +13,7 @@ namespace Rosie
       template<typename T, typename... Args>
       std::string addInstruction(Args&&... args)
       {
-        T instruction(std::forward<Args>(args)...)
+        T instruction(std::forward<Args>(args)...);
         return std::to_string(instruction.getId())+"|"+instruction.getString();
       }
     
@@ -21,14 +21,14 @@ namespace Rosie
       void runInstruction(const std::string& command, State& state)
       {
         T instruction;
-        instruction.run(command.substr(line.find("|", command)+1, line.size()), state);
+        instruction.run(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
       }
   };
   
   class Instruction
   {
     public:
-      Instruction(const std::string& text, const int& id):text(text), id(id);
+      Instruction(const std::string& text, const int& id);
       Instruction();
     
       std::string getString() const;
@@ -37,9 +37,8 @@ namespace Rosie
     
     private:
       std::string text;
-      int id;
-      
-  }
+      int id;  
+  };
   
   class SetInstruction : public Instruction
   {

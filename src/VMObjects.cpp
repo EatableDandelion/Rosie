@@ -57,15 +57,15 @@ namespace Rosie
 		type = other.type;
 	}
 	
-	void Variable::addMember(const Variable& member)
+	void Variable::addMember(const std::string& name, const Variable& member)
 	{
-		members.push_back(std::make_shared<Variable>(member));
+		members.insert(std::pair<std::size_t, std::shared_ptr<Variable>>(Rosie::getId(name), std::make_shared<Variable>(member)));
 	}
 	
 	
 	std::shared_ptr<Variable> Variable::getMember(const std::string& name) const
 	{
-		return members[Rosie::getId(name)];
+		return members.at(Rosie::getId(name));
 	}
 	
 	Handle::Handle(const int& id, const Category& category):id(id), category(category)
@@ -83,12 +83,12 @@ namespace Rosie
 	
 	bool Handle::operator==(const Handle& other) const
 	{
-		return id = other.id;
+		return id == other.id;
 	}
 	
-	void State::addVariable(const Handle& handle)
+	void State::addVariable(const std::string& name, const Handle& handle)
 	{
-		variables.insert(std::pair<Handle, Variable>(handle, Variable()));
+		variables.add(handle, Rosie::getId(name), Variable());
 	}
 	
 	void State::addConstants(const std::vector<Variable>& csts)
@@ -131,17 +131,17 @@ namespace Rosie
 		}
 		else if(handle.getCategory() == Category::VARIABLE)
 		{
-			if(handle.getId()[0] == 0)
+			if(handle.getId() == 0)
 			{
 				return pop();
 			}
 			else
 			{
-				if(variables.find(handle.getId()) == variables.end())
+				if(!variables.contains(handle))
 				{
-					variables.insert(std::pair<int, Variable>(handle.getId(), Variable()));
+					variables.add(handle, std::size_t(0), Variable());
 				}
-				return variables[handle.getId()];				
+				return variables[handle];				
 			}
 		}
 		else if(handle.getCategory() == Category::INTEGER)

@@ -137,5 +137,11 @@ namespace Rosie{
 		private:
 			Address m_address;
 	};
+	
+	struct Constant
+	{
+		int typeId;
+		std::string value;
+	};
 
 }

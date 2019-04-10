@@ -19,13 +19,14 @@ namespace Rosie
   }
   
   SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory), 0)
+  {}
   
-  virtual void run(const std::string& command, State& state) const
+  void SetInstruction::run(const std::string& command, State& state) const
   {
     int destId;
     int srcId;
     int srcCategory;
-    scanf(command, "%i %i/%i", destId, srcId, srcCategory); 
+   // scanf(command, "%i %i/%i", destId, srcId, srcCategory); 
     //state.copyVariable();
   }
 }

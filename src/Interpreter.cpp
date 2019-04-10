@@ -79,7 +79,7 @@ namespace Rosie{
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), Category::CONSTANT, value);
+		Address address(constants.size(), types.getType("string"), Category::CONSTANT, value);
 		
 		constants.push_back(value);
 		
@@ -138,7 +138,7 @@ namespace Rosie{
 	
 	Address Program::newFunctionAddress(const std::string& name)
 	{
-		return functions.newAddress(name, 1);
+		return functions.newAddress(name, 1, types.getType("function"));
 	}
 	
 	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
@@ -158,6 +158,11 @@ namespace Rosie{
 	bool Program::isConstructor(const Token& token)
 	{
 		return hasTypeName(token);
+	}
+	
+	void Program::addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType)
+	{
+		types.addMemberToType(type, memberName, memberType);
 	}
 	
 	void Program::startScope()
@@ -184,12 +189,13 @@ namespace Rosie{
 	
 	Address Program::getStackAddress() const
 	{
-		return Address(0, Category::VARIABLE);
+		return Address(0, types.getType("float"), Category::VARIABLE);
 	}
 	
-	void Program::addType(const std::string& name)
+	Type Program::addType(const std::string& name)
 	{
 		types.addType(name);
+		return getType(name);
 	}
 	
 	Type Program::getType(const std::string& name) const
@@ -242,6 +248,7 @@ namespace Rosie{
 		
 		if(lexer.getToken() == "function")
 		{
+			//function getX();
 			lexer++;
 			returnAddress = program.newFunctionAddress(lexer.getToken().value);
 		}
@@ -266,17 +273,16 @@ namespace Rosie{
 		if(lexer.getToken() == "define")
 		{
 			lexer++; 
-			Type newType = Type(lexer.getToken().value);
+			Type newType = program.addType(lexer.getToken().value);
 			lexer++; //"("
 			while(lexer.getToken() != ")")
 			{
 				lexer++;
-				int memberTypeId = program.getType(lexer.getToken());
+				std::string memberType = lexer.getToken().value;
 				lexer++;
-				newType.addMember(memberTypeId, lexer.getToken().value);
+				program.addMemberToType(newType, lexer.getToken().value, memberType);
 				lexer++;//"," or ")"
 			}
-			program.addType(newType);
 		}
 	}
 	
@@ -430,7 +436,7 @@ namespace Rosie{
 					int i = 0;
 					for(Address parameter : ctorParameters)
 					{
-						program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
+						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
 						i++;
 					}
 				}

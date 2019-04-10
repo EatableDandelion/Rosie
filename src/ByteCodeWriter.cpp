@@ -2,11 +2,11 @@
 
 namespace Rosie
 {
-  Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
+  	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{
-			functions.newAddress(func.getName(), 1, types.getType("function"));
+			functions.newAddress(func.getName(), 1);
 		}
 	}
 	
@@ -31,7 +31,7 @@ namespace Rosie
 		std::string value = token.value;
 		TokenType type = token.type;
 		
-		Address address(constants.size(), types.getType("string"), Category::CONSTANT, value);
+		Address address(constants.size(), Category::CONSTANT, value);
 		
 		
 		
@@ -62,7 +62,7 @@ namespace Rosie
 	
 	Address Program::newVarAddress(const std::string& name, const Type& type)
 	{
-		return variables.newAddress(name, types.getSize(type), type);
+		return variables.newAddress(name, types.getSize(type));
 	}
 	
 	Address Program::newVarAddress(const Token& token, const Type& type)
@@ -87,7 +87,7 @@ namespace Rosie
 	
 	Address Program::newFunctionAddress(const std::string& name)
 	{
-		return functions.newAddress(name, 1, types.getType("function"));
+		return functions.newAddress(name, 1);
 	}
 	
 	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
@@ -138,7 +138,7 @@ namespace Rosie
 	
 	Address Program::getStackAddress() const
 	{
-		return Address(0, types.getType("float"), Category::VARIABLE);
+		return Address(0, Category::VARIABLE);
 	}
 	
 	Type Program::addType(const std::string& name)

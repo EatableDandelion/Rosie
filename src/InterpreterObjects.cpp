@@ -65,10 +65,10 @@ namespace Rosie
 	}
 
 	
-	Address::Address(const int& id, const Type& type, const Category& category, const std::string& name):id(id), category(category), type(type), name(name)
+	Address::Address(const int& id, const Category& category, const std::string& name):id(id), category(category), name(name)
 	{}
 	
-	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category), type(address.type)
+	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)//, type(address.type)
 	{}
 	
 	Address::Address():id(0), name(""), category(Category::CONSTANT)
@@ -89,10 +89,10 @@ namespace Rosie
 		return category;
 	}
 	
-	Type Address::getType() const
+	/*Type Address::getType() const
 	{
 		return type;
-	}
+	}*/
 	
 	std::string Address::getString() const
 	{
@@ -106,13 +106,13 @@ namespace Rosie
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name, const int& size, const Type& type)
+	Address Memory::newAddress(const std::string& name, const int& size)
 	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
 		head+=size;
-		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, type, category, name)));
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
 
 		return addresses[id];
 	}
@@ -139,46 +139,6 @@ namespace Rosie
 	}
 	
 	
-	void Token::setAddress(const Address& address)
-	{
-		m_address = address;
-	}
-	
-	Address Token::getAddress() const
-	{
-		return m_address;
-	}
-	
-	int Token::length() const
-	{
-		return value.length();
-	} 
-	
-	void Token::operator+=(const char c)
-	{
-		value.push_back(c);
-	}
-	
-	bool Token::operator==(const std::string& stringValue)
-	{
-		return value == stringValue;
-	}
-	
-	bool Token::operator!=(const std::string& stringValue)
-	{
-		return value != stringValue;
-	}
-	
-	void Token::clear()
-	{
-		type = UNDEFINED;
-		value = "";
-	}
-	
-	std::string Token::getString() const
-	{
-		return value+" ("+Rosie::typeNames[type]+")";
-	}
 	
 	Constant::Constant(const std::string& name, const std::string& value):typeId(Rosie::getId(name)), value(value)
 	{}

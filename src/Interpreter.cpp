@@ -81,31 +81,28 @@ namespace Rosie{
 		
 		Address address(constants.size(), types.getType("string"), Category::CONSTANT, value);
 		
-		constants.push_back(value);
 		
-		/*if(type == TokenType::CSTFLOAT)
+		
+		if(type == TokenType::CSTFLOAT)
 		{
-			 constants.push_back(Variable(std::stof(value)));
+			constants.push_back(Constant("float", value));
 		}
 		else if(type == TokenType::CSTINT)
 		{
-			constants.push_back(Variable(std::stoi(value)));
+			constants.push_back(Constant("int", value));
 		}
 		else if(type == TokenType::CSTBOOLEAN)
 		{
-			if(value == "true")
-			{
-				constants.push_back(Variable(true));
-			}
-			else if(value == "false")
-			{
-				constants.push_back(Variable(false));
-			}
+			constants.push_back(Constant("boolean", value));
+		}
+		else if(type == TokenType::CSTSTRING)
+		{
+			constants.push_back(Constant("string", value));
 		}
 		else
 		{
 			std::cout << "Constant type undefined" << std::endl;
-		}*/
+		}
 		
 		
 		return address;//Constants have a negative index to differentiate from addresses.	

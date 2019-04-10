@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <unordered_map>
 #include "Lexer.h"
 #include "InterpreterObjects.h"

@@ -100,6 +100,45 @@ namespace Rosie
 	}
 	
 	
+	
+	Memory::Memory(const Category& category, const int& startIndex):category(category), head(startIndex)
+	{
+		scope.push(startIndex);
+	}
+	
+	Address Memory::newAddress(const std::string& name, const int& size, const Type& type)
+	{
+		std::size_t id = Rosie::getId(name);
+		
+		int index = head;
+		head+=size;
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, type, category, name)));
+
+		return addresses[id];
+	}
+			
+	Address Memory::getAddress(const std::string& name)
+	{
+		return addresses[Rosie::getId(name)];
+	}
+	
+	bool Memory::hasAddress(const std::string& name)
+	{
+		return addresses.find(Rosie::getId(name)) != addresses.end();
+	}
+
+	void Memory::startScope()
+	{
+		scope.push(head);
+	}
+			
+	void Memory::endScope()
+	{
+		head = scope.top();
+		scope.pop();
+	}
+	
+	
 	void Token::setAddress(const Address& address)
 	{
 		m_address = address;

@@ -140,4 +140,7 @@ namespace Rosie
 	{
 		return value+" ("+Rosie::typeNames[type]+")";
 	}
+	
+	Constant::Constant(const std::string& name, const std::string& value):typeId(Rosie::getId(name)), value(value)
+	{}
 }

@@ -60,14 +60,14 @@ namespace Rosie
 			return os;
 		}
 		
-		void setAddress(const Address& address);
+		/*void setAddress(const Address& address);
 		
-		Address getAddress() const;
+		Address getAddress() const;*/
 		
 		std::string getString() const;
 		
 		private:
-			Address m_address;
+			//Address m_address;
 	};
 	
 	

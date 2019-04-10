@@ -25,10 +25,11 @@ namespace Rosie
       }
   };
   
+  template<typename T>
   class Instruction
   {
     public:
-      Instruction(const std::string& text, const int& id);
+      Instruction(const std::string& text);
       Instruction();
     
       std::string write() const;
@@ -37,10 +38,12 @@ namespace Rosie
     
     private:
       std::string text;
-      int id;  
+      static int id; 
   };
   
-  class SetInstruction : public Instruction
+  template<typename T> int Instruction<T>::id(Instruction<T>::id+1);
+  
+  class SetInstruction : public Instruction<SetInstruction>
   {
     public:
       SetInstruction(const int& destId, const int& srcId,  const int& srcType);

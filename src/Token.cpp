@@ -2,6 +2,46 @@
 
 namespace Rosie
 {
+	void Token::setAddress(const Address& address)
+	{
+		m_address = address;
+	}
+	
+	Address Token::getAddress() const
+	{
+		return m_address;
+	}
+	
+	int Token::length() const
+	{
+		return value.length();
+	} 
+	
+	void Token::operator+=(const char c)
+	{
+		value.push_back(c);
+	}
+	
+	bool Token::operator==(const std::string& stringValue)
+	{
+		return value == stringValue;
+	}
+	
+	bool Token::operator!=(const std::string& stringValue)
+	{
+		return value != stringValue;
+	}
+	
+	void Token::clear()
+	{
+		type = UNDEFINED;
+		value = "";
+	}
+	
+	std::string Token::getString() const
+	{
+		return value+" ("+Rosie::typeNames[type]+")";
+	}
 	
 	bool SpecialCharCaster::isSpecialChar(const char c) const
 	{

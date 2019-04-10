@@ -140,9 +140,14 @@ namespace Rosie{
 	
 	struct Constant
 	{
-		Constant(const std::string& name, const std::string& value);
-		std::size_t typeId;
-		std::string value;
+		public:
+			Constant(const std::string& name, const std::string& value);
+			std::size_t getTypeId() const;
+			std::string getValue() const;
+		
+		private:
+			std::size_t typeId;
+			std::string value;
 	};
 
 }

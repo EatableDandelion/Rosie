@@ -69,7 +69,7 @@ namespace Rosie{
 			void startScope();
 			void endScope();
 			
-			std::vector<Variable> getConstants() const;
+			std::vector<Constant> getConstants() const;
 			std::vector<std::string> getCommands() const;
 			
 			Address getStackAddress() const;

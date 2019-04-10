@@ -8,7 +8,7 @@ namespace Rosie
   Instruction::Instruction()
   {}
     
-  std::string Instruction::getString() const
+  std::string Instruction::write() const
   {
     return text;
   }
@@ -21,7 +21,7 @@ namespace Rosie
   SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory), 0)
   {}
   
-  void SetInstruction::run(const std::string& command, State& state) const
+  void SetInstruction::read(const std::string& command, State& state) const
   {
     int destId;
     int srcId;

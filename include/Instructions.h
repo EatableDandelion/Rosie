@@ -77,6 +77,7 @@ namespace Rosie
 		  public:
 			ConstantInstruction(const int& index, const Constant& constant);
 			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
 	};
 
 	class TestInstruction : public Instruction<TestInstruction>

@@ -91,9 +91,9 @@ namespace Rosie
 		variables.add(handle, Rosie::getId(name), Variable());
 	}
 	
-	void State::addConstants(const std::vector<Variable>& csts)
+	void State::addConstant(const int& id, const Variable& csts)
 	{
-		constants = csts;
+		constants[id] = csts;
 	}
 	
 	void State::push(const Variable& variable)

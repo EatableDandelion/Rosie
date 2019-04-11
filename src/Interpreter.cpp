@@ -115,9 +115,8 @@ namespace Rosie{
 	
 	
 	
-	Address FunctionParser::parse(Lexer& lexer, Program& program)
+	std::stack<Address> FunctionParser::parse(Lexer& lexer, Program& program)
 	{
-		std::stack<Address> ctorArgStack;
 		std::vector<Token> infixInput;
 		while(lexer.getToken() != ";")
 		{
@@ -242,7 +241,7 @@ namespace Rosie{
 		}
 		if(!activeStack.empty())
 		{
-			return activeStack.top();
+			return activeStack;
 		}
 		else
 		{

@@ -74,6 +74,7 @@ namespace Rosie{
 	
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
 	{
+
 		Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
 		
 		lexer++;//token = "="
@@ -83,7 +84,8 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction(Opcode::SET, destAddress, srcAddress);
+		program.addInstruction<SetInstruction>(destAddress.id, srcAddress.id, srcAddress.category);
+		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	
@@ -222,6 +224,7 @@ namespace Rosie{
 					int i = 0;
 					for(Address parameter : ctorParameters)
 					{
+						//program.addInstruction<SetInstruction>(destAddress.id, parameter.id, parameter.category);
 						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
 						i++;
 					}

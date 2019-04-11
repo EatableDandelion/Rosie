@@ -7,23 +7,23 @@
 
 namespace Rosie
 {
-  class InstructionCollection
-  {
-    public:
-      template<typename T, typename... Args>
-      std::string addInstruction(Args&&... args)
-      {
-        T instruction(std::forward<Args>(args)...);
-        return std::to_string(instruction.getId())+"|"+instruction.write();
-      }
-    
-      template<typename T>
-      void read(const std::string& command, State& state)
-      {
-        T instruction;
-        instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
-      }
-  };
+	class InstructionCollection
+	{
+	public:
+	template<typename T, typename... Args>
+	std::string addInstruction(Args&&... args)
+	{
+	T instruction(std::forward<Args>(args)...);
+	return std::to_string(instruction.getId())+"|"+instruction.write();
+	}
+
+	template<typename T>
+	void read(const std::string& command, State& state)
+	{
+	T instruction;
+	instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
+	}
+	};
 	
 	class InstructionCounter
 	{
@@ -33,17 +33,17 @@ namespace Rosie
 			static int allIds;
 	};
   
-  template<typename T>
-  class Instruction : InstructionCounter
-  {
-    public:
-  		Instruction(const std::string& text):text(text)
-		{}
-	  
-      		Instruction()
+	template<typename T>
+	class Instruction : InstructionCounter
+	{
+	public:
+		Instruction(const std::string& text):text(text)
 		{}
 
-	       	std::string write() const
+		Instruction()
+		{}
+
+		std::string write() const
 		{
 			return text;
 		}
@@ -52,35 +52,35 @@ namespace Rosie
 		{
 			return id;
 		}
-	  
-	  	
+
+
 	virtual void read(const std::string& command, State& state) const = 0;
-    
+
 	private:
 		std::string text;
 		static int id; 
-  };
-  
-  template<typename T> int Instruction<T>::id(InstructionCounter::createId());
-  
-  class SetInstruction : public Instruction<SetInstruction>
-  {
-	public:
-		SetInstruction(const int& destId, const int& srcId,  const int& srcType);
-		virtual void read(const std::string& command, State& state) const;
-  };
-  
-  class ConstantInstruction : public Instruction<ConstantInstruction>
-  {
-	  public:
-		ConstantInstruction(const int& index, const Constant& constant);
-		virtual void read(const std::string& command, State& state) const;
-  };
-  
-  class TestInstruction : public Instruction<TestInstruction>
-  {
-	  public:
-		TestInstruction();
-		virtual void read(const std::string& command, State& state) const;
-  };
+	};
+
+	template<typename T> int Instruction<T>::id(InstructionCounter::createId());
+
+	class SetInstruction : public Instruction<SetInstruction>
+	{
+		public:
+			SetInstruction(const int& destId, const int& srcId,  const int& srcType);
+			virtual void read(const std::string& command, State& state) const;
+	};
+
+	class ConstantInstruction : public Instruction<ConstantInstruction>
+	{
+		  public:
+			ConstantInstruction(const int& index, const Constant& constant);
+			virtual void read(const std::string& command, State& state) const;
+	};
+
+	class TestInstruction : public Instruction<TestInstruction>
+	{
+		  public:
+			TestInstruction();
+			virtual void read(const std::string& command, State& state) const;
+	};
 }

@@ -2,17 +2,6 @@
 
 namespace Rosie{
 	
-	void error(const std::string& text, const Lexer& lexer)
-	{
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, 12);
-		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
-		std::cout << lexer.getLine() << std::endl;
-		std::cout << text << std::endl;
-		SetConsoleTextAttribute(hConsole, 7);
-	}
-	
-	
 	void Parser::parse(Lexer& lexer, Program& program)
 	{
 		while(lexer.hasNext())

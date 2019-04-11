@@ -4,12 +4,16 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <windows.h>
 #include "Lexer.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
 
 namespace Rosie
 {
+	
+	void error(const std::string& text, const Lexer& lexer);
+	
   class Program
 	{
 		public:
@@ -42,7 +46,7 @@ namespace Rosie
 			void startScope();
 			void endScope();
 			
-			std::vector<Constant> getConstants() const;
+			//std::vector<Constant> getConstants() const;
 			std::vector<std::string> getCommands() const;
 			
 			Address getStackAddress() const;

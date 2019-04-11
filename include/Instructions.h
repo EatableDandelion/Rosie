@@ -14,7 +14,7 @@ namespace Rosie
       std::string addInstruction(Args&&... args)
       {
         T instruction(std::forward<Args>(args)...);
-        return std::to_string(instruction.getId())+"|"+instruction.getString();
+        return std::to_string(instruction.getId())+"|"+instruction.write();
       }
     
       template<typename T>
@@ -29,11 +29,21 @@ namespace Rosie
   class Instruction
   {
     public:
-      Instruction(const std::string& text);
-      Instruction();
+      Instruction(const std::string& text):text(text)
+	  {}
+	  
+      Instruction()
+	  {}
     
-      std::string write() const;
-      int getId() const;
+       std::string write() const
+	  {
+		return text;
+	  }
+	  
+	  int getId() const
+	  {
+		return id;
+	  }
       virtual void read(const std::string& command, State& state) const = 0;
     
     private:
@@ -50,5 +60,17 @@ namespace Rosie
       virtual void read(const std::string& command, State& state) const;
   };
   
+  class ConstantInstruction : public Instruction<ConstantInstruction>
+  {
+	  public:
+		ConstantInstruction(const int& index, const Constant& constant);
+		virtual void read(const std::string& command, State& state) const;
+  };
   
+  class TestInstruction : public Instruction<TestInstruction>
+  {
+	  public:
+		TestInstruction();
+		virtual void read(const std::string& command, State& state) const;
+  };
 }

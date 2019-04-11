@@ -148,7 +148,7 @@ namespace Rosie
 		return typeId;
 	}
 	
-	std::size_t Constant::getValue() const
+	std::string Constant::getValue() const
 	{
 		return value;
 	}

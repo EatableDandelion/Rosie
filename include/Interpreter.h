@@ -1,6 +1,5 @@
 #pragma once
 
-#include <windows.h>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -8,11 +7,10 @@
 #include <unordered_map>
 #include "Lexer.h"
 #include "InterpreterObjects.h"
+#include "ByteCodeWriter.h"
 #include "Syntax.h"
 
 namespace Rosie{
-	
-	void error(const std::string& text, const Lexer& lexer);
 	
 	
 	

@@ -2,6 +2,16 @@
 
 namespace Rosie
 {
+	void error(const std::string& text, const Lexer& lexer)
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, 12);
+		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
+		std::cout << lexer.getLine() << std::endl;
+		std::cout << text << std::endl;
+		SetConsoleTextAttribute(hConsole, 7);
+	}
+	
   	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
 	{
 		for(const auto& func : syntax.getNativeMethods())
@@ -126,10 +136,10 @@ namespace Rosie
 		variables.endScope();
 	}
 	
-	std::vector<Variable> Program::getConstants() const
+	/*std::vector<Variable> Program::getConstants() const
 	{
 		return constants;
-	}
+	}*/
 	
 	std::vector<std::string> Program::getCommands() const
 	{

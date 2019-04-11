@@ -22,6 +22,11 @@ namespace Rosie
 		Handle srcHandle(srcId, Category(srcCategory));
 		state.copyVariable(destHandle, srcHandle);
 	}
+	
+	std::string SetInstruction::getName() const
+	{
+		return "SET";
+	}
 
 	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):Instruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
 	{
@@ -63,6 +68,11 @@ namespace Rosie
 			std::cout << "Constant type " << typeId << " unknown" << std::endl;
 		}
 	}
+	
+	std::string ConstantInstruction::getName() const
+	{
+		return "CST";
+	}
 
 	TestInstruction::TestInstruction():Instruction(" ")
 	{
@@ -72,5 +82,10 @@ namespace Rosie
 	void TestInstruction::read(const std::string& command, State& state) const
 	{
 
+	}
+	
+	std::string TestInstruction::getName() const
+	{
+		return "TEST";
 	}
 }

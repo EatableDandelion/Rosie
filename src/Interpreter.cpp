@@ -117,6 +117,7 @@ namespace Rosie{
 	
 	Address FunctionParser::parse(Lexer& lexer, Program& program)
 	{
+		std::stack<Address> ctorArgStack;
 		std::vector<Token> infixInput;
 		while(lexer.getToken() != ";")
 		{
@@ -127,6 +128,7 @@ namespace Rosie{
 			}else if(program.isConstructor(token))
 			{
 				token.type = TokenType::CONSTRUCTOR;
+				ctorArgStack.push(program.createCtorAddresses(token));
 			}
 			infixInput.push_back(token);
 			lexer++;
@@ -204,10 +206,11 @@ namespace Rosie{
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)
 				{
-					std::vector<Address> ctorParameters;
+					
 					while(!activeStack.empty())
 					{
-						ctorParameters.push_back(activeStack.top());
+						program.addInstruction<SetInstruction>(ctorArgStack.top().id, activeStack.top().id, activeStack.top().category);
+						ctorArgStack.pop();
 						activeStack.pop();
 					}
 					
@@ -216,10 +219,11 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					//TODO check that the address sent is correct.
-					Address instanceAddress = program.getStackAddress();
-					activeStack.push(instanceAddress);
-					program.addInstruction(Opcode::ARG, instanceAddress);
+					
+					/*while(!memberSrc.empty())
+					{
+						
+					}
 					
 					int i = 0;
 					for(Address parameter : ctorParameters)
@@ -228,6 +232,7 @@ namespace Rosie{
 						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
 						i++;
 					}
+					ctorStack.pop();*/
 				}
 				else
 				{	

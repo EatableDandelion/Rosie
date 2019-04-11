@@ -107,7 +107,7 @@ namespace Rosie
 	{
 		public:
 			void addVariable(const std::string& name, const Handle& handle);
-			void addConstants(const std::vector<Variable>& csts);
+			void addConstant(const int& id, const Variable& cst)
 			void push(const Variable& variable);
 			void push(const Handle& handle);
 			Variable pop();
@@ -117,7 +117,7 @@ namespace Rosie
 			
 		private:
 			DualMap<Handle, std::size_t, Variable> variables;
-			std::vector<Variable> constants;
+			std::unordered_map<int, Variable> constants;
 			std::stack<Variable> callStack;
 	};	
 }

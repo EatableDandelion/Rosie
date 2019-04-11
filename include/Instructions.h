@@ -9,20 +9,20 @@ namespace Rosie
 {
 	class InstructionCollection
 	{
-	public:
-	template<typename T, typename... Args>
-	std::string addInstruction(Args&&... args)
-	{
-	T instruction(std::forward<Args>(args)...);
-	return std::to_string(instruction.getId())+"|"+instruction.write();
-	}
+		public:
+			template<typename T, typename... Args>
+			std::string addInstruction(Args&&... args)
+			{
+				T instruction(std::forward<Args>(args)...);
+				return std::to_string(instruction.getId())+"|"+instruction.write();
+			}
 
-	template<typename T>
-	void read(const std::string& command, State& state)
-	{
-	T instruction;
-	instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
-	}
+			template<typename T>
+			void read(const std::string& command, State& state)
+			{
+				T instruction;
+				instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
+			}
 	};
 	
 	class InstructionCounter
@@ -36,30 +36,30 @@ namespace Rosie
 	template<typename T>
 	class Instruction : InstructionCounter
 	{
-	public:
-		Instruction(const std::string& text):text(text)
-		{}
+		public:
+			Instruction(const std::string& text):text(text)
+			{}
 
-		Instruction()
-		{}
+			Instruction()
+			{}
 
-		std::string write() const
-		{
-			return text;
-		}
+			std::string write() const
+			{
+				return text;
+			}
 
-		int getId() const
-		{
-			return id;
-		}
-		
-		virtual void read(const std::string& command, State& state) const = 0;
-		
-		virtual std::string getName() const = 0;
+			int getId() const
+			{
+				return id;
+			}
 
-	private:
-		std::string text;
-		static int id; 
+			virtual void read(const std::string& command, State& state) const = 0;
+
+			virtual std::string getName() const = 0;
+
+		private:
+			std::string text;
+			static int id; 
 	};
 
 	template<typename T> int Instruction<T>::id(InstructionCounter::createId());

@@ -2,6 +2,11 @@
 
 namespace Rosie
 {
+	int InstructionCounter::createId()
+	{
+		return allIds++;
+	}
+	
   SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
   {
 	  std::cout << getId() << std::endl;

@@ -84,8 +84,8 @@ namespace Rosie
 	{
 		if(!hasVarAddress(token))
 		{
-			
-			std::cout << "Error, variable " << token << " undefined." <<std::endl;
+			return newVarAddress(name);
+			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
 	}

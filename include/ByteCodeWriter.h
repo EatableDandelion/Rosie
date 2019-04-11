@@ -62,7 +62,7 @@ namespace Rosie
 			std::vector<Constant> constants;
 			Memory variables;
 			Memory functions;
-			InstructionCollection instruction;
+			InstructionCollection instructions;
 			TypeCollection types;
 	};
  }

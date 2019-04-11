@@ -52,9 +52,10 @@ namespace Rosie
 		{
 			return id;
 		}
-
-
-	virtual void read(const std::string& command, State& state) const = 0;
+		
+		virtual void read(const std::string& command, State& state) const = 0;
+		
+		virtual std::string getName() const = 0;
 
 	private:
 		std::string text;
@@ -68,6 +69,7 @@ namespace Rosie
 		public:
 			SetInstruction(const int& destId, const int& srcId,  const int& srcType);
 			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
 	};
 
 	class ConstantInstruction : public Instruction<ConstantInstruction>
@@ -82,5 +84,6 @@ namespace Rosie
 		  public:
 			TestInstruction();
 			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
 	};
 }

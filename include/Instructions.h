@@ -24,40 +24,50 @@ namespace Rosie
         instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
       }
   };
+	
+	class InstructionCounter
+	{
+		public:
+			static int createId();
+		private:
+			static int allIds;
+	};
   
   template<typename T>
-  class Instruction
+  class Instruction : InstructionCounter
   {
     public:
-      Instruction(const std::string& text):text(text)
-	  {}
+  		Instruction(const std::string& text):text(text)
+		{}
 	  
-      Instruction()
-	  {}
-    
-       std::string write() const
-	  {
-		return text;
-	  }
+      		Instruction()
+		{}
+
+	       	std::string write() const
+		{
+			return text;
+		}
+
+		int getId() const
+		{
+			return id;
+		}
 	  
-	  int getId() const
-	  {
-		return id;
-	  }
-      virtual void read(const std::string& command, State& state) const = 0;
+	  	
+	virtual void read(const std::string& command, State& state) const = 0;
     
-    private:
-      std::string text;
-      static int id; 
+	private:
+		std::string text;
+		static int id; 
   };
   
-  template<typename T> int Instruction<T>::id(Instruction<T>::id+1);
+  template<typename T> int Instruction<T>::id(InstructionCounter::createId());
   
   class SetInstruction : public Instruction<SetInstruction>
   {
-    public:
-      SetInstruction(const int& destId, const int& srcId,  const int& srcType);
-      virtual void read(const std::string& command, State& state) const;
+	public:
+		SetInstruction(const int& destId, const int& srcId,  const int& srcType);
+		virtual void read(const std::string& command, State& state) const;
   };
   
   class ConstantInstruction : public Instruction<ConstantInstruction>

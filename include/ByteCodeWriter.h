@@ -19,12 +19,10 @@ namespace Rosie
 		public:
 			Program();
 			
-			template<typename... As>
-			void addInstruction(const Opcode& command, As... addresses)
-			{		
-				std::string instruction = translateInstruction(addresses...);
-				std::cout << command << " " << instruction << std::endl;
-				instructions.push_back(std::to_string(command)+" "+instruction);
+			template<typename T, typename... Args>
+			std::string addInstruction(Args&&... args)
+	  		{
+				instructions.addInstruction<T>(args...);
 			}
 			
 			Address getAddress(const Token& token, const Lexer& lexer);
@@ -64,19 +62,7 @@ namespace Rosie
 			std::vector<Constant> constants;
 			Memory variables;
 			Memory functions;
-			std::vector<std::string> instructions;
+			InstructionCollection instruction;
 			TypeCollection types;
-			
-			template<typename A>
-			std::string translateInstruction(A& address)
-			{
-				return address.getString();
-			}
-			
-			template<typename A, typename... As>
-			std::string translateInstruction(A& address, As&... addresses)
-			{
-				return address.getString()+" "+translateInstruction(addresses...);
-			}
 	};
  }

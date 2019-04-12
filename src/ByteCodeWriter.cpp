@@ -65,7 +65,7 @@ namespace Rosie
 		{
 			std::cout << "Constant type undefined" << std::endl;
 		}
-		
+		addInstruction<ConstantInstruction>(constants.size()-1, constants[constants.size()-1]);
 		
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
@@ -173,7 +173,7 @@ namespace Rosie
 	}
 
 	void ByteCodeWriter::write(const Program& program) const
-	{
+	{	
 		for(std::string command : program.getCommands())
 		{
 			std::cout << command << std::endl;

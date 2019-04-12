@@ -182,11 +182,13 @@ namespace Rosie
 	
 	ByteCodeReader::ByteCodeReader()
 	{
-		addInstruction(SetInstruction
+		addInstruction<SetInstruction>();
+		addInstruction<ConstantInstruction>();
 	}
 	
 	void ByteCodeReader::read(const std::string& command, State& state) const
 	{
-		
+		int instructionId = std::stoi(command.substr(std::size_t(0), command.find("|", std::size_t(0))));
+		instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 	}
 }

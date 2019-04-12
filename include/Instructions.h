@@ -29,7 +29,6 @@ namespace Rosie
 	{
 		public:
 			virtual void read(const std::string& command, State& state) const = 0;
-			virtual int getId() const = 0;
 			static int createId();
 			
 		private:
@@ -51,7 +50,7 @@ namespace Rosie
 				return text;
 			}
 
-			virtual int getId() const
+			static int getId() const
 			{
 				return id;
 			}

@@ -51,7 +51,7 @@ namespace Rosie
 				return text;
 			}
 
-			int getId() const
+			static int getId() const
 			{
 				return id;
 			}

@@ -83,7 +83,7 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name, const int& size);
+			Address newAddress(const std::string& name);//, const int& size);
 			
 			Address getAddress(const std::string& name);
 			

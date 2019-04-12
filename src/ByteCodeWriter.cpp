@@ -16,7 +16,7 @@ namespace Rosie
 	{
 		for(const auto& func : syntax.getNativeMethods())
 		{
-			functions.newAddress(func.getName(), 1);
+			functions.newAddress(func.getName());
 		}
 	}
 	
@@ -70,21 +70,21 @@ namespace Rosie
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
-	Address Program::newVarAddress(const std::string& name, const Type& type)
+	Address Program::newVarAddress(const std::string& name)//, const Type& type)
 	{
-		return variables.newAddress(name, types.getSize(type));
+		return variables.newAddress(name);//, types.getSize(type));
 	}
 	
-	Address Program::newVarAddress(const Token& token, const Type& type)
+	Address Program::newVarAddress(const Token& token)//, const Type& type)
 	{
-		return newVarAddress(token.value, type);
+		return newVarAddress(token.value);//, type);
 	}
 	
 	Address Program::getVarAddress(const Token& token)
 	{
 		if(!hasVarAddress(token))
 		{
-			return newVarAddress(name);
+			return newVarAddress(token.value);
 			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
@@ -97,7 +97,7 @@ namespace Rosie
 	
 	Address Program::newFunctionAddress(const std::string& name)
 	{
-		return functions.newAddress(name, 1);
+		return functions.newAddress(name);
 	}
 	
 	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
@@ -141,7 +141,7 @@ namespace Rosie
 		return constants;
 	}*/
 	
-	std::vector<std::string> Program::getCommands() const
+	InstructionCollection Program::getCommands() const
 	{
 		return instructions;
 	}
@@ -170,5 +170,11 @@ namespace Rosie
 	bool Program::hasTypeName(const Token& token) const
 	{
 		return types.hasType(token.value);
+	}
+	
+
+	void ByteCodeWriterwrite(const Program& program) const
+	{
+		
 	}
 }

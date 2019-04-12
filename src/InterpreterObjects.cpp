@@ -106,12 +106,12 @@ namespace Rosie
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name, const int& size)
+	Address Memory::newAddress(const std::string& name)//, const int& size)
 	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
-		head+=size;
+		head+=1;//size;
 		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
 
 		return addresses[id];

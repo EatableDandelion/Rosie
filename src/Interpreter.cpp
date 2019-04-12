@@ -43,8 +43,7 @@ namespace Rosie{
 			Type tokenType = program.getType(lexer.getToken());
 			
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
-			//program.addInstruction("NEW", returnAddress);
+			returnAddress = program.newVarAddress(lexer.getToken());//, tokenType);
 		}
 		
 		Token nextToken;
@@ -84,7 +83,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction<SetInstruction>(destAddress.id, srcAddress.id, srcAddress.category);
+		program.addInstruction<SetInstruction>(destAddress.getId(), srcAddress.getId(), srcAddress.getCategory());
 		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
@@ -115,7 +114,7 @@ namespace Rosie{
 	
 	
 	
-	std::stack<Address> FunctionParser::parse(Lexer& lexer, Program& program)
+	Address FunctionParser::parse(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
 		while(lexer.getToken() != ";")
@@ -127,7 +126,6 @@ namespace Rosie{
 			}else if(program.isConstructor(token))
 			{
 				token.type = TokenType::CONSTRUCTOR;
-				ctorArgStack.push(program.createCtorAddresses(token));
 			}
 			infixInput.push_back(token);
 			lexer++;
@@ -156,7 +154,7 @@ namespace Rosie{
 				{
 					if(token == "u-")
 					{												
-						program.addInstruction(Opcode::NEG, activeStack.top());
+						//program.addInstruction(Opcode::NEG, activeStack.top());
 					}
 					else if(token == "u+")
 					{}
@@ -168,19 +166,19 @@ namespace Rosie{
 						
 						if(token == "+")
 						{
-							program.addInstruction(Opcode::ADD, arg1, arg2);
+							//program.addInstruction(Opcode::ADD, arg1, arg2);
 						}
 						else if(token == "-")
 						{
-							program.addInstruction(Opcode::SUB, arg1, arg2);
+							//program.addInstruction(Opcode::SUB, arg1, arg2);
 						}
 						else if(token == "*")
 						{
-							program.addInstruction(Opcode::MULT, arg1, arg2);
+							//program.addInstruction(Opcode::MULT, arg1, arg2);
 						}
 						else if(token == "/")
 						{
-							program.addInstruction(Opcode::DIV, arg1, arg2);
+							//program.addInstruction(Opcode::DIV, arg1, arg2);
 						}	
 					}
 					activeStack.pop();
@@ -191,7 +189,7 @@ namespace Rosie{
 				{
 					while(!activeStack.empty())
 					{
-						program.addInstruction(Opcode::ARG, activeStack.top());
+						//program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -200,12 +198,12 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
+					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)
 				{
-					
+					/*
 					while(!activeStack.empty())
 					{
 						program.addInstruction<SetInstruction>(ctorArgStack.top().id, activeStack.top().id, activeStack.top().category);
@@ -219,19 +217,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					/*while(!memberSrc.empty())
-					{
-						
-					}
-					
-					int i = 0;
-					for(Address parameter : ctorParameters)
-					{
-						//program.addInstruction<SetInstruction>(destAddress.id, parameter.id, parameter.category);
-						//program.addInstruction(Opcode::SET, instanceAddress.getMemberAddress(i), parameter);
-						i++;
-					}
-					ctorStack.pop();*/
+					*/
 				}
 				else
 				{	
@@ -241,7 +227,7 @@ namespace Rosie{
 		}
 		if(!activeStack.empty())
 		{
-			return activeStack;
+			return activeStack.top();
 		}
 		else
 		{

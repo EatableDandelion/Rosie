@@ -2,15 +2,15 @@
 
 namespace Rosie
 {
+	int InstructionCounter::allIds = 0;
+	
 	int InstructionCounter::createId()
 	{
-		return allIds++;
+		return InstructionCounter::allIds++;
 	}
 	
 	SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
-	{
-		std::cout << getId() << std::endl;
-	}
+	{}
 
 	void SetInstruction::read(const std::string& command, State& state) const
 	{
@@ -18,7 +18,7 @@ namespace Rosie
 		int srcId;
 		int srcCategory;
 		scanf(command.c_str(), "%i %i/%i", &destId, &srcId, &srcCategory);
-		Handle destHandle(desId, Category::VARIABLE);
+		Handle destHandle(destId, Category::VARIABLE);
 		Handle srcHandle(srcId, Category(srcCategory));
 		state.copyVariable(destHandle, srcHandle);
 	}
@@ -29,9 +29,7 @@ namespace Rosie
 	}
 
 	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):Instruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
-	{
-		std::cout << getId() << std::endl;
-	}
+	{}
 
 	void ConstantInstruction::read(const std::string& command, State& state) const
 	{
@@ -75,9 +73,7 @@ namespace Rosie
 	}
 
 	TestInstruction::TestInstruction():Instruction(" ")
-	{
-		std::cout << getId() << std::endl;
-	}
+	{}
 
 	void TestInstruction::read(const std::string& command, State& state) const
 	{

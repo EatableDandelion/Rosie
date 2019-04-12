@@ -8,13 +8,14 @@
 #include "Lexer.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
+#include "Instructions.h"
 
 namespace Rosie
 {
 	
 	void error(const std::string& text, const Lexer& lexer);
 	
-  class Program
+	class Program
 	{
 		public:
 			Program();
@@ -22,15 +23,15 @@ namespace Rosie
 			template<typename T, typename... Args>
 			std::string addInstruction(Args&&... args)
 	  		{
-				instructions.addInstruction<T>(args...);
+				return instructions.addInstruction<T>(args...);
 			}
 			
 			Address getAddress(const Token& token, const Lexer& lexer);
 			
 			Address newCstAddress(const Token& token);
 			
-			Address newVarAddress(const std::string& name, const Type& type);
-			Address newVarAddress(const Token& token, const Type& type);
+			Address newVarAddress(const std::string& name);//, const Type& type);
+			Address newVarAddress(const Token& token);//, const Type& type);
 			Address getVarAddress(const Token& token);
 			bool hasVarAddress(const Token& token);
 			
@@ -44,8 +45,7 @@ namespace Rosie
 			void startScope();
 			void endScope();
 			
-			//std::vector<Constant> getConstants() const;
-			std::vector<std::string> getCommands() const;
+			InstructionCollection getCommands() const;
 			
 			Address getStackAddress() const;
 			
@@ -64,5 +64,11 @@ namespace Rosie
 			Memory functions;
 			InstructionCollection instructions;
 			TypeCollection types;
+	};
+	
+	class ByteCodeWriter
+	{
+		public:
+			void write(const Program& program) const;
 	};
  }

@@ -95,7 +95,7 @@ namespace std
 		public:
 		    size_t operator()(const Rosie::Handle& handle) const
 		    {
-			return hash<int>()(handle.getId());
+				return hash<int>()(handle.getId());
 		    }
    	 };
 }
@@ -107,7 +107,7 @@ namespace Rosie
 	{
 		public:
 			void addVariable(const std::string& name, const Handle& handle);
-			void addConstant(const int& id, const Variable& cst)
+			void addConstant(const int& id, const Variable& cst);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
 			Variable pop();

@@ -29,6 +29,7 @@ namespace Rosie
 	{
 		public:
 			static int createId();
+			
 		private:
 			static int allIds;
 	};

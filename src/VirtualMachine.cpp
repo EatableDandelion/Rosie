@@ -8,7 +8,6 @@ namespace Rosie
 	
 	void VirtualMachine::execute(const std::vector<Variable>& csts, const std::vector<std::string>& commands)
 	{
-		state.addConstants(csts);
 		
 		std::map<int, Variable> variables;
 		

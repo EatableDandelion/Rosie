@@ -141,9 +141,9 @@ namespace Rosie
 		return constants;
 	}*/
 	
-	InstructionCollection Program::getCommands() const
+	std::vector<std::string> Program::getCommands() const
 	{
-		return instructions;
+		return instructions.getCommands();
 	}
 	
 	Address Program::getStackAddress() const
@@ -171,9 +171,21 @@ namespace Rosie
 	{
 		return types.hasType(token.value);
 	}
-	
 
-	void ByteCodeWriterwrite(const Program& program) const
+	void ByteCodeWriter::write(const Program& program) const
+	{
+		for(std::string command : program.getCommands())
+		{
+			std::cout << command << std::endl;
+		}
+	}
+	
+	ByteCodeReader::ByteCodeReader()
+	{
+		addInstruction(SetInstruction
+	}
+	
+	void ByteCodeReader::read(const std::string& command, State& state) const
 	{
 		
 	}

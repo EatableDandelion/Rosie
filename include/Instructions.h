@@ -18,13 +18,6 @@ namespace Rosie
 				commands.push_back(command);
 				return command;
 			}
-
-			template<typename T>
-			void read(const std::string& command, State& state)
-			{
-				T instruction;
-				instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
-			}
 		
 		private:
 			std::vector<std::string> commands;

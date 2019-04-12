@@ -82,6 +82,7 @@ namespace Rosie
 			template<typename T>
 			void addInstruction()
 			{
+				T instruction;
 				instructions.insert(std::pair<int, Instruction>(instruction.getId(), instruction));
 			}
 		

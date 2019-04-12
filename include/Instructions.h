@@ -25,9 +25,10 @@ namespace Rosie
 			std::vector<std::string> commands;
 	};
 	
-	class InstructionCounter
+	class Instruction
 	{
 		public:
+			virtual void read(const std::string& command, State& state) const = 0;
 			static int createId();
 			
 		private:
@@ -35,13 +36,13 @@ namespace Rosie
 	};
   
 	template<typename T>
-	class Instruction : InstructionCounter
+	class TemplateInstruction : Instruction
 	{
 		public:
-			Instruction(const std::string& text):text(text)
+			TemplateInstruction(const std::string& text):text(text)
 			{}
 
-			Instruction()
+			TemplateInstruction()
 			{}
 
 			std::string write() const
@@ -54,8 +55,6 @@ namespace Rosie
 				return id;
 			}
 
-			virtual void read(const std::string& command, State& state) const = 0;
-
 			virtual std::string getName() const = 0;
 
 		private:
@@ -63,9 +62,9 @@ namespace Rosie
 			static int id; 
 	};
 
-	template<typename T> int Instruction<T>::id(InstructionCounter::createId());
+	template<typename T> int TemplateInstruction<T>::id(Instruction::createId());
 
-	class SetInstruction : public Instruction<SetInstruction>
+	class SetInstruction : public TemplateInstruction<SetInstruction>
 	{
 		public:
 			SetInstruction(const int& destId, const int& srcId,  const int& srcType);
@@ -73,7 +72,7 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 
-	class ConstantInstruction : public Instruction<ConstantInstruction>
+	class ConstantInstruction : public TemplateInstruction<ConstantInstruction>
 	{
 		  public:
 			ConstantInstruction(const int& index, const Constant& constant);
@@ -81,7 +80,7 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 
-	class TestInstruction : public Instruction<TestInstruction>
+	class TestInstruction : public TemplateInstruction<TestInstruction>
 	{
 		  public:
 			TestInstruction();

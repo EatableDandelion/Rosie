@@ -8,14 +8,14 @@ namespace Rosie
 		return commands;
 	}
 	
-	int InstructionCounter::allIds = 0;
+	int Instruction::allIds = 0;
 	
-	int InstructionCounter::createId()
+	int Instruction::createId()
 	{
-		return InstructionCounter::allIds++;
+		return Instruction::allIds++;
 	}
 	
-	SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):Instruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
+	SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):TemplateInstruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
 	{}
 
 	void SetInstruction::read(const std::string& command, State& state) const
@@ -34,7 +34,7 @@ namespace Rosie
 		return "SET";
 	}
 
-	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):Instruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
+	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):TemplateInstruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
 	{}
 
 	void ConstantInstruction::read(const std::string& command, State& state) const
@@ -78,7 +78,7 @@ namespace Rosie
 		return "CST";
 	}
 
-	TestInstruction::TestInstruction():Instruction(" ")
+	TestInstruction::TestInstruction():TemplateInstruction(" ")
 	{}
 
 	void TestInstruction::read(const std::string& command, State& state) const

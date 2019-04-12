@@ -65,7 +65,7 @@ namespace Rosie
 		{
 			std::cout << "Constant type undefined" << std::endl;
 		}
-		addInstruction<ConstantInstruction>(constants.size()-1, constants[constants.size()-1]);
+		addInstruction<ConstantInstruction>(constants.size()-1, constants.back());
 		
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}

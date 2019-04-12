@@ -2,6 +2,12 @@
 
 namespace Rosie
 {
+	
+	std::vector<std::string> InstructionCollection::getCommands() const
+	{
+		return commands;
+	}
+	
 	int InstructionCounter::allIds = 0;
 	
 	int InstructionCounter::createId()

@@ -84,16 +84,42 @@ namespace Rosie
 		return "CST";
 	}
 
-	TestInstruction::TestInstruction():TemplateInstruction(" ")
+	CallInstruction::CallInstruction(const int& callId):TemplateInstruction(std::to_string(id))
+	{}
+	
+	CallInstruction::CallInstruction()
 	{}
 
-	void TestInstruction::read(const std::string& command, State& state) const
+	void CallInstruction::read(const std::string& command, State& state) const
 	{
-
+		//state.execute(std::stoi(command));
 	}
 	
-	std::string TestInstruction::getName() const
+	std::string CallInstruction::getName() const
 	{
-		return "TEST";
+		return "CALL";
+	}
+	
+	AddInstruction::AddInstruction(const Address& a, const Address& b):TemplateInstruction(std::to_string(a.getId())+"/"+std::to_string(a.getCategory())+" "+std::to_string(b.getId())+"/"+std::to_string(b.getCategory()))
+	{}
+	
+	AddInstruction::AddInstruction()
+	{}
+	
+	void AddInstruction::read(const std::string& command, State& state) const
+	{
+		int aId;
+		int aCategory;
+		int bId;
+		int bCategory;
+		scanf(command.c_str(), "%i/%i %i/%i", &aId, &aCategory, &bId, &bCategory);
+		Handle aHandle(aId, Category(bCategory));
+		Handle bHandle(bId, Category(bCategory));
+		state.push(Variable(state.getVariable(aHandle).get<float>()+state.getVariable(bHandle).get<float>()));
+	}
+	
+	std::string AddInstruction::getName() const
+	{
+		return "ADD";
 	}
 }

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <string>
 #include "VMObjects.h"
+#include "InterpreterObject.h"
 
 namespace Rosie
 {
@@ -83,10 +84,20 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 
-	class TestInstruction : public TemplateInstruction<TestInstruction>
+	class CallInstruction : public TemplateInstruction<CallInstruction>
 	{
 		  public:
-			TestInstruction();
+		  	CallInstruction(const int& callId);
+			CallInstruction();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+	};
+	
+	class AddInstruction : public TemplateInstruction<AddInstruction>
+	{
+		  public:
+		  	AddInstruction(const Address& a, const Address& b);
+			AddInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 	};

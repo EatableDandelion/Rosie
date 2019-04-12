@@ -75,6 +75,7 @@ namespace Rosie
 	class ByteCodeReader
 	{
 		public:
+			ByteCodeReader();
 			void read(const std::string& command, State& state) const;
 		
 		private:
@@ -85,6 +86,6 @@ namespace Rosie
 				instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 			}
 			
-			std::map<int, 
+			std::map<int, Instruction> instructions;
 	};
  }

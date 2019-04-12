@@ -37,7 +37,7 @@ namespace Rosie
 	};
   
 	template<typename T>
-	class TemplateInstruction : Instruction
+	class TemplateInstruction : public Instruction
 	{
 		public:
 			TemplateInstruction(const std::string& text):text(text)
@@ -51,7 +51,7 @@ namespace Rosie
 				return text;
 			}
 
-			static int getId() const
+			static int getId()
 			{
 				return id;
 			}
@@ -69,6 +69,7 @@ namespace Rosie
 	{
 		public:
 			SetInstruction(const int& destId, const int& srcId,  const int& srcType);
+			SetInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 	};
@@ -77,6 +78,7 @@ namespace Rosie
 	{
 		  public:
 			ConstantInstruction(const int& index, const Constant& constant);
+			ConstantInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 	};

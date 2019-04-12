@@ -17,6 +17,9 @@ namespace Rosie
 	
 	SetInstruction::SetInstruction(const int& destId, const int& srcId,  const int& srcCategory):TemplateInstruction(std::to_string(destId)+" "+std::to_string(srcId)+"/"+std::to_string(srcCategory))
 	{}
+	
+	SetInstruction::SetInstruction()
+	{}
 
 	void SetInstruction::read(const std::string& command, State& state) const
 	{
@@ -37,6 +40,9 @@ namespace Rosie
 	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):TemplateInstruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
 	{}
 
+	ConstantInstruction::ConstantInstruction()
+	{}
+	
 	void ConstantInstruction::read(const std::string& command, State& state) const
 	{
 		int index;

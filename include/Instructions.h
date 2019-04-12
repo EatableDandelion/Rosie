@@ -25,6 +25,7 @@ namespace Rosie
 			std::vector<std::string> commands;
 	};
 	
+	
 	class Instruction
 	{
 		public:

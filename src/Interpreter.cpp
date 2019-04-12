@@ -198,16 +198,15 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
+					
 					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)
 				{
-					/*
 					while(!activeStack.empty())
 					{
-						program.addInstruction<SetInstruction>(ctorArgStack.top().id, activeStack.top().id, activeStack.top().category);
-						ctorArgStack.pop();
+						//program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -217,7 +216,9 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					*/
+					//program.addInstruction<CtorInstruction>(Opcode::NEW, token.value);
+					activeStack.push(program.getStackAddress());
+					
 				}
 				else
 				{	

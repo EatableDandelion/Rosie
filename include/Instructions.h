@@ -14,7 +14,9 @@ namespace Rosie
 			std::string addInstruction(Args&&... args)
 			{
 				T instruction(std::forward<Args>(args)...);
-				return std::to_string(instruction.getId())+"|"+instruction.write();
+				std::string command = std::to_string(instruction.getId())+"|"+instruction.write();
+				commands.push_back(command);
+				return command;
 			}
 
 			template<typename T>
@@ -23,6 +25,9 @@ namespace Rosie
 				T instruction;
 				instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 			}
+		
+		private:
+			std::vector<std::string> commands;
 	};
 	
 	class InstructionCounter

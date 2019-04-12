@@ -18,6 +18,8 @@ namespace Rosie
 				commands.push_back(command);
 				return command;
 			}
+			
+			std::vector<std::string> getCommands() const;
 		
 		private:
 			std::vector<std::string> commands;

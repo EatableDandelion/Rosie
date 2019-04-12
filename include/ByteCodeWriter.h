@@ -80,6 +80,12 @@ namespace Rosie
 		
 		private:
 			template<typename T>
+			void addInstruction()
+			{
+				instructions.insert(std::pair<int, Instruction>(instruction.getId(), instruction));
+			}
+		
+			template<typename T>
 			void readInstruction(const std::string& command, State& state)
 			{
 				T instruction;

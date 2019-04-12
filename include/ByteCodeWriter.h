@@ -82,8 +82,7 @@ namespace Rosie
 			template<typename T>
 			void addInstruction()
 			{
-				T instruction;
-				instructions.insert(std::pair<int, Instruction>(instruction.getId(), instruction));
+				instructions.insert(std::pair<int, std::shared_ptr<Instruction>>(T::getId(), std::make_shared<T>()));
 			}
 		
 			template<typename T>
@@ -93,6 +92,6 @@ namespace Rosie
 				instruction.read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 			}
 			
-			std::map<int, Instruction> instructions;
+			std::map<int, std::shared_ptr<Instruction>> instructions;
 	};
  }

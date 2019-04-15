@@ -83,7 +83,7 @@ namespace Rosie{
 		
 		Address srcAddress = functionParser.parse(lexer, program);
 		
-		program.addInstruction<SetInstruction>(destAddress.getId(), srcAddress.getId(), srcAddress.getCategory());
+		program.addInstruction<SetInstruction>(destAddress, srcAddress);
 		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
@@ -167,6 +167,7 @@ namespace Rosie{
 						if(token == "+")
 						{
 							//program.addInstruction(Opcode::ADD, arg1, arg2);
+							program.addInstruction<AddInstruction>(arg1, arg2);
 						}
 						else if(token == "-")
 						{

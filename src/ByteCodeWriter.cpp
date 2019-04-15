@@ -172,23 +172,51 @@ namespace Rosie
 		return types.hasType(token.value);
 	}
 
+	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)
+	{}
+	
 	void ByteCodeWriter::write(const Program& program) const
 	{	
+		std::ofstream file;
+		file.open(fileName);	
+		
 		for(std::string command : program.getCommands())
 		{
 			std::cout << command << std::endl;
+			file << command << std::endl;
 		}
+		
+		file.close();
 	}
 	
-	ByteCodeReader::ByteCodeReader()
+	ByteCodeReader::ByteCodeReader(const std::string& fileName):fileName(fileName)
 	{
 		addInstruction<SetInstruction>();
 		addInstruction<ConstantInstruction>();
+		addInstruction<AddInstruction>();
 	}
 	
-	void ByteCodeReader::read(const std::string& command, State& state) const
+	void ByteCodeReader::read(State& state) const
 	{
-		int instructionId = std::stoi(command.substr(std::size_t(0), command.find("|", std::size_t(0))));
-		instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
+		std::string command;
+		std::ifstream file(fileName);
+		int instructionId = 0;
+		if(file.is_open())
+		{
+			while(getline(file,command) )
+			{
+			  	instructionId = std::stoi(command.substr(std::size_t(0), command.find("|", std::size_t(0))));
+				if(instructions.find(instructionId) != instructions.end())
+				{
+					instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
+				}
+				else
+				{
+					std::cout << "Instruction "+std::to_string(instructionId)+" unknown." << std::endl;
+				}
+			}
+			file.close();
+		}
+
 	}
 }

@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <string>
 #include "VMObjects.h"
-#include "InterpreterObject.h"
+#include "InterpreterObjects.h"
 
 namespace Rosie
 {
@@ -69,7 +69,7 @@ namespace Rosie
 	class SetInstruction : public TemplateInstruction<SetInstruction>
 	{
 		public:
-			SetInstruction(const int& destId, const int& srcId,  const int& srcType);
+			SetInstruction(const Address& dest, const Address& src);
 			SetInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;

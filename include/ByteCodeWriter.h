@@ -70,16 +70,20 @@ namespace Rosie
 	class ByteCodeWriter
 	{
 		public:
+			ByteCodeWriter(const std::string& fileName);
 			void write(const Program& program) const;
+		private:
+			std::string fileName;
 	};
 	
 	class ByteCodeReader
 	{
 		public:
-			ByteCodeReader();
-			void read(const std::string& command, State& state) const;
+			ByteCodeReader(const std::string& fileName);
+			void read(State& state) const;
 		
 		private:
+			std::string fileName;
 			template<typename T>
 			void addInstruction()
 			{

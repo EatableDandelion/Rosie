@@ -8,6 +8,8 @@ namespace Rosie
 {
 	std::size_t getId(const std::string& name);
 	
+	std::vector<std::string> split(const std::string& line, const std::string& separator);
+	
 	template<typename K1, typename K2, typename V>
 	class DualMap //map that can be searched for either K1 OR K2
 	{

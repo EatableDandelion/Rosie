@@ -23,11 +23,14 @@ namespace Rosie
 
 	void SetInstruction::read(const std::string& command, State& state) const
 	{
-		int destId = 0;
-		int srcId = 0;
-		int srcCategory = 0;
 		std::cout << command.c_str() << std::endl;
-		scanf(command.c_str(), "%d %d %d", &destId, &srcId, &srcCategory);
+		std::vector<std::string> args = Rosie::split(command, " ");
+		int destId = args[0];
+		int srcId = args[1];
+		int srcCategory = args[2];
+		
+		//scanf(command.c_str(), "%d %d %d", &destId, &srcId, &srcCategory);
+
 		//Handle destHandle(destId, Category::VARIABLE);
 		//Handle srcHandle(srcId, Category(srcCategory));
 		//state.copyVariable(destHandle, srcHandle);

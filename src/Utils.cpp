@@ -11,9 +11,11 @@ namespace Rosie
 	{
 		std::vector<std::string> res;
 		std::size_t start = 0;
-		while ((std::size_t end = line.find(separator, start)) != std::string::npos) {
-			res.push_back(line.substr(start, end);
+		std::size_t end = line.find(separator, start);
+		while(end != std::string::npos){
+			res.push_back(line.substr(start, end));
 			start = end+1;
+			end = line.find(separator, start);
 		}
 		return res;
 	}

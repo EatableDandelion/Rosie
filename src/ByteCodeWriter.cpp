@@ -203,9 +203,10 @@ namespace Rosie
 		int instructionId = 0;
 		if(file.is_open())
 		{
-			while(getline(file,command) )
+			while(getline(file,command))
 			{
 			  	instructionId = std::stoi(command.substr(std::size_t(0), command.find("|", std::size_t(0))));
+				//std::cout << instructionId << "  aa" << std::endl;
 				if(instructions.find(instructionId) != instructions.end())
 				{
 					instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);

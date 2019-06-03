@@ -31,6 +31,7 @@ namespace Rosie
 	{
 		public:
 			virtual void read(const std::string& command, State& state) const = 0;
+			virtual std::string getName() const = 0;
 			static int createId();
 			
 		private:
@@ -57,8 +58,6 @@ namespace Rosie
 				return id;
 			}
 
-			virtual std::string getName() const = 0;
-
 		private:
 			std::string text;
 			static int id; 
@@ -71,6 +70,15 @@ namespace Rosie
 		public:
 			SetInstruction(const Address& dest, const Address& src);
 			SetInstruction();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+	};
+	
+	class NewInstruction : public TemplateInstruction<NewInstruction>
+	{
+		public:
+			NewInstruction(const std::string& name);
+			NewInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 	};

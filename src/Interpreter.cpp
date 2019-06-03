@@ -84,7 +84,6 @@ namespace Rosie{
 		Address srcAddress = functionParser.parse(lexer, program);
 		
 		program.addInstruction<SetInstruction>(destAddress, srcAddress);
-		//program.addInstruction(Opcode::SET, destAddress, srcAddress);
 		checkToken(";", lexer);
 	}
 	

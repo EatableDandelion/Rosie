@@ -22,21 +22,15 @@ namespace Rosie
 	{}
 
 	void SetInstruction::read(const std::string& command, State& state) const
-	{
-		std::cout << command.c_str() << std::endl;
-		
-		std::cout << "here" << std::endl;
-		
+	{		
 		std::vector<std::string> args = Rosie::split(command, " ");
 		int destId = std::stoi(args[0]);
 		int srcId = std::stoi(args[1]);
 		int srcCategory = std::stoi(args[2]);
-		
-		//scanf(command.c_str(), "%d %d %d", &destId, &srcId, &srcCategory);
 
-		//Handle destHandle(destId, Category::VARIABLE);
-		//Handle srcHandle(srcId, Category(srcCategory));
-		//state.copyVariable(destHandle, srcHandle);
+		Handle destHandle(destId, Category::VARIABLE);
+		Handle srcHandle(srcId, Category(srcCategory));
+		state.copyVariable(destHandle, srcHandle);
 	}
 	
 	std::string SetInstruction::getName() const
@@ -44,6 +38,21 @@ namespace Rosie
 		return "SET";
 	}
 
+	NewInstruction::NewInstruction(const std::string& name):TemplateInstruction(name)
+	{}
+	
+	NewInstruction::NewInstruction()
+	{}
+
+	void NewInstruction::read(const std::string& command, State& state) const
+	{		
+	}
+	
+	std::string NewInstruction::getName() const
+	{
+		return "NEW";
+	}
+	
 	ConstantInstruction::ConstantInstruction(const int& index, const Constant& constant):TemplateInstruction(std::to_string(index)+" "+std::to_string(constant.getTypeId())+" "+constant.getValue())
 	{}
 
@@ -52,10 +61,11 @@ namespace Rosie
 	
 	void ConstantInstruction::read(const std::string& command, State& state) const
 	{
-		/*int index;
-		int typeId;
-		std::string value;
-		scanf(command.c_str(), "%i %i %s", &index, &typeId, &value);
+		std::vector<std::string> args = Rosie::split(command, " ");
+		int index = std::stoi(args[0]);
+		int typeId = std::stoi(args[1]);
+		std::string value = args[2];
+
 		if(typeId == Rosie::getId("float"))
 		{
 			state.addConstant(index, Variable(std::stoi(value)));
@@ -83,7 +93,7 @@ namespace Rosie
 		else
 		{
 			std::cout << "Constant type " << typeId << " unknown" << std::endl;
-		}*/
+		}
 	}
 	
 	std::string ConstantInstruction::getName() const

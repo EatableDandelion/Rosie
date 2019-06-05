@@ -120,7 +120,7 @@ namespace Rosie
 	
 	void State::copyVariable(Handle& dest, const Handle& src)
 	{
-		variables[dest.getId()] = getVariable(src);
+		variables[dest] = getVariable(src);
 	}
 	
 	Variable State::getVariable(const Handle& handle)

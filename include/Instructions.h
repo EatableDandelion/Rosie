@@ -77,7 +77,7 @@ namespace Rosie
 	class NewInstruction : public TemplateInstruction<NewInstruction>
 	{
 		public:
-			NewInstruction(const std::string& name);
+			NewInstruction(const std::string& name, const Address& var);
 			NewInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;

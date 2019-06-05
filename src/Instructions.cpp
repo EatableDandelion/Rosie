@@ -38,14 +38,16 @@ namespace Rosie
 		return "SET";
 	}
 
-	NewInstruction::NewInstruction(const std::string& name):TemplateInstruction(name)
+	NewInstruction::NewInstruction(const std::string& name, const Address& var):TemplateInstruction(name+" "+std::to_string(var.getId()))
 	{}
 	
 	NewInstruction::NewInstruction()
 	{}
 
 	void NewInstruction::read(const std::string& command, State& state) const
-	{		
+	{
+		std::vector<std::string> args = Rosie::split(command, " ");
+		state.addVariable(args[0], Handle(std::stoi(args[1]), Category::VARIABLE));
 	}
 	
 	std::string NewInstruction::getName() const

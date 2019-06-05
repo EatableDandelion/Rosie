@@ -72,7 +72,9 @@ namespace Rosie
 	
 	Address Program::newVarAddress(const std::string& name)//, const Type& type)
 	{
-		return variables.newAddress(name);//, types.getSize(type));
+		Address newAddress = variables.newAddress(name);
+		addInstruction<NewInstruction>(name, newAddress);
+		return newAddress;
 	}
 	
 	Address Program::newVarAddress(const Token& token)//, const Type& type)
@@ -84,7 +86,6 @@ namespace Rosie
 	{
 		if(!hasVarAddress(token))
 		{
-			addInstruction<NewInstruction>(token.value);
 			return newVarAddress(token.value);
 			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}

@@ -88,7 +88,7 @@ namespace Rosie
 	
 	void State::addVariable(const std::string& name, const Handle& handle)
 	{
-		variables.add(handle, Rosie::getId(name), Variable());
+		variables.add(handle, handle.getId(), Variable());
 	}
 	
 	void State::addConstant(const int& id, const Variable& csts)

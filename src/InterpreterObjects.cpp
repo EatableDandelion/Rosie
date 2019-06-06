@@ -140,7 +140,7 @@ namespace Rosie
 	
 	
 	
-	Constant::Constant(const ConstantType& type, const std::string& value):type(type), value(value)
+	Constant::Constant(const TokenType& type, const std::string& value):type(type), value(value)
 	{}
 	
 	int Constant::getTypeId() const

@@ -83,7 +83,9 @@ namespace Rosie{
 		
 		if(lexer.getToken() == "{")
 		{
+			program.addInstruction<CompositeInstruction>(destAddress);// start scope
 			parseComposite(lexer, program, destAddress);
+			program.addInstruction<CompositeInstruction>();//end scope
 		}
 		else
 		{	
@@ -96,16 +98,13 @@ namespace Rosie{
 	}
 	
 	//A composite is any variable that is not a primitive type (ie an instance)
-	void Parser::parseComposite(Lexer& lexer, Program& program, Address& destAddress)
+	void Parser::parseComposite(Lexer& lexer, Program& program)
 	{
-		program.addInstruction<CompositeInstruction>(destAddress, true);// true to start scope
 		while(lexer.getToken() != "}")
 		{	
 			lexer++;
 			parseAssignment(lexer, program);
 		}
-		program.addInstruction<CompositeInstruction>(destAddress, false);//false to end scope
-		//token = , or token = }
 	}
 	
 	Address Parser::getVariable(const Token& token, Program& program)

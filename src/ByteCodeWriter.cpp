@@ -44,10 +44,11 @@ namespace Rosie
 		Address address(constants.size(), Category::CONSTANT, value);
 		
 		
+		constants.push_back(Constant(type, value));
 		
-		if(type == TokenType::CSTFLOAT)
+		/*if(type == TokenType::CSTFLOAT)
 		{
-			constants.push_back(Constant("float", value));
+			constants.push_back(Constant(ConstantType::FLOAT, value));
 		}
 		else if(type == TokenType::CSTINT)
 		{
@@ -64,7 +65,7 @@ namespace Rosie
 		else
 		{
 			std::cout << "Constant type undefined" << std::endl;
-		}
+		}*/
 		addInstruction<ConstantInstruction>(constants.size()-1, constants.back());
 		
 		return address;//Constants have a negative index to differentiate from addresses.	

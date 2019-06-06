@@ -65,18 +65,18 @@ namespace Rosie
 	{
 		std::vector<std::string> args = Rosie::split(command, " ");
 		int index = std::stoi(args[0]);
-		int typeId = std::stoi(args[1]);
+		ConstantType type = ConstantType(std::stoi(args[1]));
 		std::string value = args[2];
 
-		if(typeId == Rosie::getId("float"))
+		if(type == ConstantType::INTEGER)
 		{
 			state.addConstant(index, Variable(std::stoi(value)));
 		}
-		else if(typeId == Rosie::getId("int"))
+		else if(type == ConstantType::FLOAT)
 		{
 			state.addConstant(index, Variable(std::stof(value)));
 		}
-		else if(typeId == Rosie::getId("boolean"))
+		else if(type == ConstantType::BOOLEAN)
 		{
 			if(value == "true")
 			{
@@ -88,13 +88,9 @@ namespace Rosie
 			}
 			
 		}
-		else if(typeId == Rosie::getId("string"))
+		else if(type == ConstantType::STRING)
 		{
 			state.addConstant(index, Variable(value));
-		}
-		else
-		{
-			std::cout << "Constant type " << typeId << " unknown" << std::endl;
 		}
 	}
 	

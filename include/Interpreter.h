@@ -39,7 +39,7 @@ namespace Rosie{
 			void parseAssignment(Lexer& lexer, Program& program);
 			void parseDeclaration(Lexer& lexer, Program& program);
 			void parseKeyword(Lexer& lexer, Program& program);
-			void parseComposite(Lexer& lexer, Program& program, Address& destAddress);
+			void parseComposite(Lexer& lexer, Program& program);
 			Address getVariable(const Token& token, Program& program);
 			bool isVariable(Lexer& lexer);
 			

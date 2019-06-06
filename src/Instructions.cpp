@@ -76,7 +76,7 @@ namespace Rosie
 		{
 			state.addConstant(index, Variable(std::stof(value)));
 		}
-		else if(type == TokenType::CSTBOOL)
+		else if(type == TokenType::CSTBOOLEAN)
 		{
 			if(value == "true")
 			{

@@ -100,22 +100,16 @@ namespace Rosie{
 			Category category;
 	};
 		
-	enum ConstantType
-	{	
-		FLOAT,
-		STRING,
-		INTEGER
-	};
 	
 	struct Constant
 	{
 		public:
-			Constant(const ConstantType& type, const std::string& value);
+			Constant(const TokenType& type, const std::string& value);
 			int getTypeId() const;
 			std::string getValue() const;
 		
 		private:
-			ConstantType type;
+			TokenType type;
 			std::string value;
 	};
 

@@ -114,7 +114,7 @@ namespace Rosie
 	
 	std::string ArgumentInstruction::getName() const
 	{
-		return "PUSH";
+		return "ARG";
 	}
 	
 	

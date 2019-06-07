@@ -209,7 +209,7 @@ namespace Rosie{
 				{
 					while(!activeStack.empty())
 					{
-						//program.addInstruction(Opcode::ARG, activeStack.top());
+						program.addInstruction<ArgumentInstruction>(activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -220,6 +220,7 @@ namespace Rosie{
 					}
 					
 					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
+					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)

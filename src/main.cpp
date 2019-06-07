@@ -6,6 +6,8 @@ using namespace Rosie;
 int main()
 {
 	
+	//Syntax syntax;
+	
 	Interpreter c;
 	Program program(c.read("test.ros"));
 	VirtualMachine vm;

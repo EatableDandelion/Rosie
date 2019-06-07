@@ -123,18 +123,33 @@ namespace Rosie
 	
 	void AddInstruction::read(const std::string& command, State& state) const
 	{
-		/*int aId;
-		int aCategory;
-		int bId;
-		int bCategory;
-		scanf(command.c_str(), "%i %i %i %i", &aId, &aCategory, &bId, &bCategory);
+		std::vector<std::string> args = Rosie::split(command, " ");
+		int aId = std::stoi(args[0]);
+		int aCategory = std::stoi(args[1]);
+		int bId = std::stoi(args[2]);
+		int bCategory = std::stoi(args[3]);
 		Handle aHandle(aId, Category(bCategory));
 		Handle bHandle(bId, Category(bCategory));
 		state.push(Variable(state.getVariable(aHandle).get<float>()+state.getVariable(bHandle).get<float>()));
-	*/}
+	}
 	
 	std::string AddInstruction::getName() const
 	{
 		return "ADD";
+	}
+	
+	CompositeInstruction::CompositeInstruction(const Address& parent):TemplateInstruction(std::to_string(parent.getId())), parent(parent)
+	{}
+	
+	CompositeInstruction::CompositeInstruction()
+	{}
+	
+	void CompositeInstruction::read(const std::string& command, State& state) const
+	{
+	}
+	
+	std::string CompositeInstruction::getName() const
+	{
+		return "COMPOSITE VARIABLE";
 	}
 }

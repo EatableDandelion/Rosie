@@ -84,7 +84,7 @@ namespace Rosie{
 		if(lexer.getToken() == "{")
 		{
 			program.addInstruction<CompositeInstruction>(destAddress);// start scope
-			parseComposite(lexer, program, destAddress);
+			parseComposite(lexer, program);
 			program.addInstruction<CompositeInstruction>();//end scope
 		}
 		else

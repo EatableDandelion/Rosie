@@ -92,6 +92,7 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 
+	//Function call
 	class CallInstruction : public TemplateInstruction<CallInstruction>
 	{
 		  public:
@@ -101,6 +102,7 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 	
+	//Arithmetic addition
 	class AddInstruction : public TemplateInstruction<AddInstruction>
 	{
 		  public:
@@ -108,5 +110,18 @@ namespace Rosie
 			AddInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
+	};
+	
+	//This instruction deals with non-primitive variabless
+	class CompositeInstruction : public TemplateInstruction<CompositeInstruction>
+	{
+		public:
+		  	CompositeInstruction(const Address& parent);
+			CompositeInstruction();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+		
+		private:
+			Address parent;
 	};
 }

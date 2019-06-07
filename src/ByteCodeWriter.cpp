@@ -46,39 +46,19 @@ namespace Rosie
 		
 		constants.push_back(Constant(type, value));
 		
-		/*if(type == TokenType::CSTFLOAT)
-		{
-			constants.push_back(Constant(ConstantType::FLOAT, value));
-		}
-		else if(type == TokenType::CSTINT)
-		{
-			constants.push_back(Constant("int", value));
-		}
-		else if(type == TokenType::CSTBOOLEAN)
-		{
-			constants.push_back(Constant("boolean", value));
-		}
-		else if(type == TokenType::CSTSTRING)
-		{
-			constants.push_back(Constant("string", value));
-		}
-		else
-		{
-			std::cout << "Constant type undefined" << std::endl;
-		}*/
 		addInstruction<ConstantInstruction>(constants.size()-1, constants.back());
 		
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
-	Address Program::newVarAddress(const std::string& name)//, const Type& type)
+	Address Program::newVarAddress(const std::string& name)
 	{
 		Address newAddress = variables.newAddress(name);
 		addInstruction<NewInstruction>(name, newAddress);
 		return newAddress;
 	}
 	
-	Address Program::newVarAddress(const Token& token)//, const Type& type)
+	Address Program::newVarAddress(const Token& token)
 	{
 		return newVarAddress(token.value);//, type);
 	}
@@ -185,7 +165,6 @@ namespace Rosie
 		
 		for(std::string command : program.getCommands())
 		{
-			std::cout << command << std::endl;
 			file << command << std::endl;
 		}
 		
@@ -213,6 +192,9 @@ namespace Rosie
 
 				if(instructions.find(instructionId) != instructions.end())
 				{
+					std::cout << command << std::endl;
+					std::cout << instructions.at(instructionId)->getName() << std::endl;
+					std::cout << std::endl;
 					instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 				}
 				else

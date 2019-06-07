@@ -91,6 +91,16 @@ namespace Rosie
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 	};
+	
+	//Push variable onto stack
+	class PushInstruction : public TemplateInstruction<PushInstruction>
+	{
+		  public:
+		  	PushInstruction(const Address& address);
+			PushInstruction();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+	};
 
 	//Function call
 	class CallInstruction : public TemplateInstruction<CallInstruction>

@@ -99,6 +99,25 @@ namespace Rosie
 		return "CST";
 	}
 
+	
+	PushInstruction::PushInstruction(const Address& address):TemplateInstruction(sstd::to_string(address.getId())+" "+std::to_string(address.getCategory()))
+	{}
+	
+	PushInstruction::PushInstruction()
+	{}
+
+	void PushInstruction::read(const std::string& command, State& state) const
+	{
+		std::vector<std::string> args = Rosie::split(command, " ");
+		state.push(state.getVariable(Handle(std::stoi(args[0]), Category(std::stoi(args[1])))));
+	}
+	
+	std::string PushInstruction::getName() const
+	{
+		return "PUSH";
+	}
+	
+	
 	CallInstruction::CallInstruction(const int& callId):TemplateInstruction(std::to_string(callId))
 	{}
 	

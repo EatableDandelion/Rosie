@@ -100,19 +100,19 @@ namespace Rosie
 	}
 
 	
-	PushInstruction::PushInstruction(const Address& address):TemplateInstruction(sstd::to_string(address.getId())+" "+std::to_string(address.getCategory()))
+	ArgumentInstruction::ArgumentInstruction(const Address& address):TemplateInstruction(sstd::to_string(address.getId())+" "+std::to_string(address.getCategory()))
 	{}
 	
-	PushInstruction::PushInstruction()
+	ArgumentInstruction::ArgumentInstruction()
 	{}
 
-	void PushInstruction::read(const std::string& command, State& state) const
+	void ArgumentInstruction::read(const std::string& command, State& state) const
 	{
 		std::vector<std::string> args = Rosie::split(command, " ");
 		state.push(state.getVariable(Handle(std::stoi(args[0]), Category(std::stoi(args[1])))));
 	}
 	
-	std::string PushInstruction::getName() const
+	std::string ArgumentInstruction::getName() const
 	{
 		return "PUSH";
 	}

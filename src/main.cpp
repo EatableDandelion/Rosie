@@ -6,7 +6,7 @@ using namespace Rosie;
 int main()
 {
 	
-	//Syntax syntax;
+	//TODO define syntax that group the native methods, passed in program, interpreter and in state
 	
 	Interpreter c;
 	Program program(c.read("test.ros"));

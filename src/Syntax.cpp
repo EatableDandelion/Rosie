@@ -2,7 +2,7 @@
 
 namespace Rosie
 {
-	void Syntax::addMethod(const Function<Variable> func)
+	/*void Syntax::addMethod(const Function<Variable> func)
 	{
 		methods.add(methods.size(), func.getName(), func);
 	}
@@ -10,7 +10,7 @@ namespace Rosie
 	bool Syntax::hasMethod(const std::string& name) const
 	{
 		return methods.contains(name);
-	}
+	}*/
 	/*
 	void Syntax::execute(const std::string& name, std::vector<Variable>& arguments, State& state) const
 	{
@@ -27,7 +27,7 @@ namespace Rosie
 		methods[id].execute(args, state);
 	}*/
 	
-	Function<Variable> Syntax::getMethod(const int& id) const
+	/*Function<Variable> Syntax::getMethod(const int& id) const
 	{
 		return methods[id];
 	}
@@ -35,7 +35,7 @@ namespace Rosie
 	std::vector<Function<Variable>> Syntax::getNativeMethods() const
 	{
 		return methods.getValues();
-	}
+	}*/
 	
 	bool Syntax::isFunctionDeclaration(const Token& token)
 	{

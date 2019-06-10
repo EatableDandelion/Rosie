@@ -171,12 +171,14 @@ namespace Rosie
 		file.close();
 	}
 	
-	ByteCodeReader::ByteCodeReader(const std::string& fileName):fileName(fileName)
+	ByteCodeReader::ByteCodeReader(const std::string& fileName, const Syntax& syntax):fileName(fileName)
 	{
 		addInstruction<SetInstruction>();
 		addInstruction<NewInstruction>();
 		addInstruction<ConstantInstruction>();
 		addInstruction<AddInstruction>();
+		addInstruction<ArgumentInstruction>();
+		addInstruction<CallInstruction>(syntax);
 	}
 	
 	void ByteCodeReader::read(State& state) const

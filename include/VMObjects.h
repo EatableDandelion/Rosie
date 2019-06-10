@@ -9,6 +9,7 @@
 #include <variant>
 #include "Utils.h"
 #include "InterpreterObjects.h"
+#include "Syntax.h"
 
 namespace Rosie
 {
@@ -106,16 +107,19 @@ namespace Rosie
 	struct State
 	{
 		public:
+			State(const Syntax& syntax);
 			void addVariable(const std::string& name, const Handle& handle);
 			void addConstant(const int& id, const Variable& cst);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
-			Variable pop();
-			bool empty() const;
+			//Variable pop();
+			//bool empty() const;
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);
+			void execute(const int& methodId);
 			
 		private:
+			Syntax syntax;
 			DualMap<Handle, std::size_t, Variable> variables;
 			std::unordered_map<int, Variable> constants;
 			std::stack<Variable> callStack;

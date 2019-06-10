@@ -2,6 +2,9 @@
 
 namespace Rosie{
 	
+	Parser::Parser(const Syntax& syntax):syntax(syntax), functionParser(syntax)
+	{}
+	
 	void Parser::parse(Lexer& lexer, Program& program)
 	{
 		while(lexer.hasNext())
@@ -32,7 +35,7 @@ namespace Rosie{
 	{	
 		Address returnAddress; 
 		
-		if(lexer.getToken() == "function")
+		if(syntax.isFunctionDeclaration(lexer.getToken()))
 		{
 			//function getX();
 			lexer++;
@@ -47,7 +50,7 @@ namespace Rosie{
 		}
 		
 		Token nextToken;
-		if(lexer.peekToken(nextToken, 1) && nextToken == "=")
+		if(lexer.peekToken(nextToken, 1) && syntax.isAssignment(nextToken))
 		{
 			parseAssignment(lexer, program);
 		}
@@ -55,7 +58,7 @@ namespace Rosie{
 	
 	void Parser::parseKeyword(Lexer& lexer, Program& program)
 	{
-		if(lexer.getToken() == "define")
+		if(syntax.isClassDeclaration(lexer.getToken()))
 		{
 			lexer++; 
 			Type newType = program.addType(lexer.getToken().value);
@@ -77,11 +80,11 @@ namespace Rosie{
 		Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
 		
 		lexer++;//token = "="
-		checkToken("=",lexer);
+		checkToken(syntax.isAssignment(lexer.getToken()),lexer);
 		
 		lexer++;//token = "2.21"
 		
-		if(lexer.getToken() == "{")
+		if(syntax.isStartScope(lexer.getToken()))
 		{
 			program.addInstruction<CompositeInstruction>(destAddress);// start scope
 			parseComposite(lexer, program);
@@ -92,15 +95,14 @@ namespace Rosie{
 			Address srcAddress = functionParser.parse(lexer, program);
 
 			program.addInstruction<SetInstruction>(destAddress, srcAddress);
-
-			checkToken(";", lexer);
+			checkToken(syntax.isTerminator(lexer.getToken()), lexer);
 		}
 	}
 	
 	//A composite is any variable that is not a primitive type (ie an instance)
 	void Parser::parseComposite(Lexer& lexer, Program& program)
 	{
-		while(lexer.getToken() != "}")
+		while(!syntax.isEndScope(lexer.getToken()))
 		{	
 			lexer++;
 			parseAssignment(lexer, program);
@@ -124,19 +126,25 @@ namespace Rosie{
 	
 	void Parser::checkToken(const std::string& expectedToken, const Lexer& lexer)
 	{
-		if(lexer.getToken() != expectedToken)
+		checkToken(lexer.getToken() == expectedToken, lexer);
+	}
+	
+	void Parser::checkToken(bool isCorrectToken, const Lexer& lexer)
+	{
+		if(!isCorrectToken)
 		{
-			Rosie::error("Expected token: "+expectedToken, lexer);
+			Rosie::error("Unexpected token.", lexer);
 		}
 	}
 	
 	
-	
+	FunctionParser::FunctionParser(const Syntax& syntax):syntax(syntax)
+	{}
 	
 	Address FunctionParser::parse(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
-		while(lexer.getToken() != ";")
+		while(!syntax.isTerminator(lexer.getToken()))
 		{
 			Token token = lexer.getToken();
 			if(program.hasFunctionAddress(token))
@@ -219,8 +227,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					//program.addInstruction(Opcode::CALL, program.getFunctionAddress(token, lexer));
-					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
+					//program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)
@@ -281,7 +288,7 @@ namespace Rosie{
 			else if(token.type == TokenType::OPERATOR)
 			{			
 				while(
-					!stack.empty() && stack.top() != "(" &&
+					!stack.empty() && !syntax.isListStart(stack.top()) &&
 					(stack.top().type == TokenType::FUNCNAME || 
 					stack.top().type == TokenType::CONSTRUCTOR ||
 					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
@@ -293,15 +300,15 @@ namespace Rosie{
 				}
 				stack.push(token);				
 			}
-			else if(token == ",")
+			else if(syntax.isListSeparator(token))
 			{
-				while(stack.top() != "(")
+				while(!syntax.isListStart(stack.top()))
 				{
 					output.push_back(stack.top());
 					stack.pop();
 				}
 			}
-			else if(token == "(")
+			else if(syntax.isListStart(token))
 			{
 				Token wallSeparator; //WAAAALL notation, to know how many args for the function called
 				wallSeparator.value = "|";
@@ -309,9 +316,9 @@ namespace Rosie{
 				output.push_back(wallSeparator);
 				stack.push(token);
 			}				
-			else if(token == ")")
+			else if(syntax.isListEnd(token))
 			{
-				while(stack.top() != "(")
+				while(!syntax.isListStart(stack.top()))
 				{
 					output.push_back(stack.top());
 					stack.pop();
@@ -337,7 +344,7 @@ namespace Rosie{
 	bool FunctionParser::isUnary(Token& token, Token& previousToken)
 	{
 		if(token.type != TokenType::OPERATOR)return false;
-		if(previousToken == ")")return false;
+		if(syntax.isListEnd(previousToken))return false;
 		if(previousToken.type == TokenType::SEPARATOR || previousToken.type == TokenType::OPERATOR) return true;
 		return false;
 	}
@@ -372,27 +379,16 @@ namespace Rosie{
 		//addFunction()
 	}
 	
-	Program Interpreter::read(const std::string& fileName)
+	Program Interpreter::read(const std::string& fileName, const Syntax& syntax)
 	{
 		Program program;
 		
 		Lexer stream(fileName);
 
-		Parser parser;
+		Parser parser(syntax);
 		
 		parser.parse(stream, program);
 		
-		/*while(stream.hasNext())
-		{
-			Token test;
-			if(stream.peekToken(test, 2))
-			{
-				std::cout << test.value << " ";
-			}
-			std::cout << stream.getToken().value <<std::endl;
-			stream++;
-		}*/
-	
 		return program;
 	}
 

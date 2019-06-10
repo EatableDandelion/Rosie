@@ -29,9 +29,9 @@ namespace Rosie
 		
 		void operator+=(const char c);
 		
-		bool operator==(const std::string& stringValue);
+		bool operator==(const std::string& stringValue) const;
 		
-		bool operator!=(const std::string& stringValue);
+		bool operator!=(const std::string& stringValue) const;
 		
 		int length() const;
 		

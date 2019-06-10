@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#include "VMObjects.h"
+#include "Token.h"
 
 namespace Rosie
 {
@@ -40,41 +40,34 @@ namespace Rosie
 			std::function<void(std::vector<T>&, State&)> m_func;
 	};
 	
-	enum Opcode
-	{
-		SET,
-		ARG,
-		CALL,
-		ADD,
-		NEG,
-		SUB,
-		MULT,
-		DIV
-	};
-	
 	class Syntax
 	{
 		public:
-			Syntax();
-			
-			int getOpcodeId(const Opcode& name) const;
-			
-			void addOpcode(const Opcode& name, const std::function<void(std::vector<Handle>&, State&)> func);
-			
-			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&, State&)> func);
+			//usage: addMethod("print", [&](std::vector<Variable>& args){std::cout << args[0] << std::endl;});
+			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func);
 			
 			bool hasMethod(const std::string& name) const;
-			
-			void runOpcode(const int& id, std::vector<Handle>& args, State& state);
-			
+			/*
 			void execute(const std::string& name, std::vector<Variable>& arguments, State& state) const;
 			
 			void execute(const int& id, State& state);
+			*/
+			
+			Function<Variable> getMethod(const int& id) const;
 			
 			std::vector<Function<Variable>> getNativeMethods() const;
 			
+			bool isFunctionDeclaration(const Token& token);	
+			bool isAssignment(const Token& token);
+			bool isClassDeclaration(const Token& token);
+			bool isStartScope(const Token& token);	
+			bool isEndScope(const Token& token);
+			bool isTerminator(const Token& token);
+			bool isListSeparator(const Token& token);
+			bool isListStart(const Token& token);	
+			bool isListEnd(const Token& token);
+			
 		private:
-			DualMap<int, Opcode, Function<Handle>> opcodes;
 			DualMap<int, std::string, Function<Variable>> methods;
 	};
 	

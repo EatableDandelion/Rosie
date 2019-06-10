@@ -86,6 +86,9 @@ namespace Rosie
 		return id == other.id;
 	}
 	
+	State::State(const Syntax& syntax):syntax(syntax)
+	{}
+	
 	void State::addVariable(const std::string& name, const Handle& handle)
 	{
 		variables.add(handle, Rosie::getId(name), Variable());
@@ -106,17 +109,17 @@ namespace Rosie
 		push(getVariable(handle));
 	}
 	
-	Variable State::pop()
+	/*Variable State::pop()
 	{
 		Variable res = callStack.top();
 		callStack.pop();
 		return res;
 	}
 	
-	bool State::empty() const
+	/*bool State::empty() const
 	{
 		return callStack.empty();
-	}
+	}*/
 	
 	void State::copyVariable(Handle& dest, const Handle& src)
 	{
@@ -152,5 +155,20 @@ namespace Rosie
 		{
 			return Variable(handle.getId());
 		}
+	}
+	
+	void State::execute(const int& methodId)
+	{
+		std::vector<Variable> args;
+		while(!callStack.empty())
+		{
+			args.push_back(callStack.pop());
+		}
+		
+		if(syntax.hasMethod(methodId))
+		{
+			getMethod(methodId).execute(args);
+		}
+		
 	}
 }

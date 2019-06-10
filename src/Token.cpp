@@ -22,12 +22,12 @@ namespace Rosie
 		value.push_back(c);
 	}
 	
-	bool Token::operator==(const std::string& stringValue)
+	bool Token::operator==(const std::string& stringValue) const
 	{
 		return value == stringValue;
 	}
 	
-	bool Token::operator!=(const std::string& stringValue)
+	bool Token::operator!=(const std::string& stringValue) const
 	{
 		return value != stringValue;
 	}

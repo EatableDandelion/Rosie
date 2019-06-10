@@ -117,15 +117,6 @@ namespace Rosie{
 			Category category;
 	};
 	
-	/*enum ConstantType
-	{
-		INTEGER,
-		FLOAT,
-		BOOLEAN,
-		STRING
-	};*/
-		
-	
 	struct Constant
 	{
 		public:

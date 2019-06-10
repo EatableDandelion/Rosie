@@ -100,7 +100,7 @@ namespace Rosie
 	}
 
 	
-	ArgumentInstruction::ArgumentInstruction(const Address& address):TemplateInstruction(sstd::to_string(address.getId())+" "+std::to_string(address.getCategory()))
+	ArgumentInstruction::ArgumentInstruction(const Address& address):TemplateInstruction(std::to_string(address.getId())+" "+std::to_string(address.getCategory()))
 	{}
 	
 	ArgumentInstruction::ArgumentInstruction()
@@ -121,12 +121,12 @@ namespace Rosie
 	CallInstruction::CallInstruction(const int& callId):TemplateInstruction(std::to_string(callId))
 	{}
 	
-	CallInstruction::CallInstruction()
+	CallInstruction::CallInstruction(const Syntax& syntax):syntax(syntax)
 	{}
 
 	void CallInstruction::read(const std::string& command, State& state) const
 	{
-		//state.execute(std::stoi(command));
+		state.execute(std::stoi(command));
 	}
 	
 	std::string CallInstruction::getName() const

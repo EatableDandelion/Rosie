@@ -5,6 +5,7 @@
 #include <string>
 #include "VMObjects.h"
 #include "InterpreterObjects.h"
+#include "Syntax.h"
 
 namespace Rosie
 {
@@ -105,11 +106,14 @@ namespace Rosie
 	//Function call
 	class CallInstruction : public TemplateInstruction<CallInstruction>
 	{
-		  public:
+		public:
 		  	CallInstruction(const int& callId);
-			CallInstruction();
+			CallInstruction(const Syntax& syntax);
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
+		
+		private:
+			Syntax syntax;
 	};
 	
 	//Arithmetic addition

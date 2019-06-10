@@ -2,9 +2,9 @@
 
 namespace Rosie
 {
-	void Syntax::addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func)
+	void Syntax::addMethod(const Function<Variable> func)
 	{
-		methods.add(methods.size(), name, Function<Variable>(name, func, methods.size()));
+		methods.add(methods.size(), func.getName(), func);
 	}
 	
 	bool Syntax::hasMethod(const std::string& name) const

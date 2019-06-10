@@ -5,6 +5,7 @@
 #include <functional>
 #include "Token.h"
 
+
 namespace Rosie
 {
 	template<typename T>
@@ -44,7 +45,7 @@ namespace Rosie
 	{
 		public:
 			//usage: addMethod("print", [&](std::vector<Variable>& args){std::cout << args[0] << std::endl;});
-			void addMethod(const std::string& name, const std::function<void(std::vector<Variable>&)> func);
+			void addMethod(Function<Variable> func);
 			
 			bool hasMethod(const std::string& name) const;
 			/*

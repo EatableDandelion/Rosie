@@ -13,6 +13,7 @@
 
 namespace Rosie
 {
+	
 	struct Variable
 	{
 		public:
@@ -123,5 +124,6 @@ namespace Rosie
 			DualMap<Handle, std::size_t, Variable> variables;
 			std::unordered_map<int, Variable> constants;
 			std::stack<Variable> callStack;
+			DualMap<int, std::string, Function<Variable>> methods;
 	};	
 }

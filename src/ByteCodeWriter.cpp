@@ -146,7 +146,7 @@ namespace Rosie
 	void ByteCodeWriter::write(const Program& program) const
 	{	
 		std::ofstream file;
-		file.open(fileName);	
+		file.open(fileName);
 		
 		for(std::string command : program.getCommands())
 		{

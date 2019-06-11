@@ -139,6 +139,21 @@ namespace Rosie
 	{
 		return types.hasType(token.value);
 	}
+	
+	std::vector<Constant> Program::getConstants()
+	{
+		return constants;
+	}
+		
+	std::vector<Address> Program::getVariables()
+	{
+		return variables.getAddresses();
+	}
+		
+	std::vector<Address> Program::getFunctions()
+	{
+		return functions.getAddresses();
+	}
 
 	
 	
@@ -153,10 +168,19 @@ namespace Rosie
 		int i = 0;
 		for(Constant constant : program.getConstants())
 		{
-			file << i << " " << constant.getTypeId() << " " << constant.getValue() << std::endl;
+			file << 0 << " " << i << " " << constant.getTypeId() << " " << constant.getValue() << std::endl;
 			i++;
 		}
 		
+		for(Address variable : program.getVariables())
+		{
+			file << 1 << " " << variable.getName() << " " << variable.getId() << std::endl;
+		}
+		
+		for(Address function : program.getFunctions())
+		{
+			file << 2 << " " << function.getName() << " " << function.getId() << std::endl;
+		}
 		
 		file.close();
 	}

@@ -187,6 +187,27 @@ namespace Rosie
 	
 	
 	
+	HeaderReader::HeaderReader(const std::string& fileName):fileName(fileName)
+	{}
+	
+	void HeaderReader::read(State& state) const
+	{
+		std::string line;
+		std::ifstream file(fileName);
+		int typeId = 0;
+		if(file.is_open())
+		{
+			while(getline(file,line))
+			{
+				
+			}
+			file.close();
+		}
+
+	}
+	
+	
+	
 	
 	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)
 	{}

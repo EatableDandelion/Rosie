@@ -105,6 +105,8 @@ namespace Rosie{
 			Address getAddress(const std::string& name);
 			
 			bool hasAddress(const std::string& name);
+		
+			std::vector<Address> getAddresses();
 			
 			void startScope();
 			

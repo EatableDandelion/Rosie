@@ -16,7 +16,7 @@ int main()
 	writer.write(program);
 	ByteCodeReader reader("test.bc", syntax);
 	State state(syntax);
-	//state.addMethod("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;});
+	state.addMethod(Function("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;}, 0));
 	reader.read(state);
 	
 

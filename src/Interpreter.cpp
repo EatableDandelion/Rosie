@@ -229,7 +229,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
+					program.addInstruction<CallInstruction>(token.value);
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)

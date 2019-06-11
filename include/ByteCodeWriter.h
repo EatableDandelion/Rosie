@@ -60,9 +60,8 @@ namespace Rosie
 		private:
 			Syntax syntax;
 			std::vector<Constant> constants;
-			std::unordered_map<std::string, int> functions;
 			Memory variables;
-			//Memory functions;
+			Memory functions;
 			InstructionCollection instructions;
 			TypeCollection types;
 	};

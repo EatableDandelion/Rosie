@@ -66,6 +66,15 @@ namespace Rosie
 			TypeCollection types;
 	};
 	
+	class HeaderWriter
+	{
+		public:
+			HeaderWriter(const std::string& fileName);
+			void write(const Program& program) const;
+		private:
+			std::string fileName;
+	};
+	
 	class ByteCodeWriter
 	{
 		public:

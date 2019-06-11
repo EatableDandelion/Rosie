@@ -13,12 +13,7 @@ namespace Rosie
 	}
 	
   	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
-	{
-		for(const auto& func : syntax.getNativeMethods())
-		{
-			functions.newAddress(func.getName());
-		}
-	}
+	{}
 	
 	Address Program::getAddress(const Token& token, const Lexer& lexer)
 	{
@@ -97,11 +92,6 @@ namespace Rosie
 		return functions.hasAddress(token.value);
 	}
 	
-	bool Program::isConstructor(const Token& token)
-	{
-		return hasTypeName(token);
-	}
-	
 	void Program::addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType)
 	{
 		types.addMemberToType(type, memberName, memberType);
@@ -118,11 +108,6 @@ namespace Rosie
 		std::cout << "End scope" << std::endl;
 		variables.endScope();
 	}
-	
-	/*std::vector<Variable> Program::getConstants() const
-	{
-		return constants;
-	}*/
 	
 	std::vector<std::string> Program::getCommands() const
 	{

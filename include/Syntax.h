@@ -7,40 +7,7 @@
 
 
 namespace Rosie
-{
-	template<typename S, typename T>
-	struct Function
-	{
-		public:
-			Function(const std::string& name, const std::function<S(std::vector<T>&)> func, const int& id):name(name), id(id)
-			{
-				m_func = func;
-			}
-			
-			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
-			{}
-		
-			S execute(std::vector<T>& arguments) const
-			{
-				return m_func(arguments);
-			}
-	
-			std::string getName() const
-			{
-				return name;
-			}
-	
-			int getId() const
-			{
-				return id;
-			}
-			
-		private:
-			std::string name;
-			int id;
-			std::function<S(std::vector<T>&)> m_func;
-	};
-	
+{	
 	class Syntax
 	{
 		public:
@@ -58,6 +25,7 @@ namespace Rosie
 			
 			//std::vector<Function<Variable, Variable>> getNativeMethods() const;
 			
+			bool isFunction(const Token& token, const Token& nextToken);
 			bool isFunctionDeclaration(const Token& token);	
 			bool isAssignment(const Token& token);
 			bool isClassDeclaration(const Token& token);
@@ -70,7 +38,6 @@ namespace Rosie
 			
 		private:
 			//DualMap<int, std::string, Function<Variable, Variable>> methods;
-			std::vector<std::string> methodNames;
 	};
 	
 	

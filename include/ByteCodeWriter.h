@@ -39,7 +39,6 @@ namespace Rosie
 			Address newFunctionAddress(const std::string& name);
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
-			bool isConstructor(const Token& token);
 			
 			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
 

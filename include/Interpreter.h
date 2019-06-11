@@ -20,6 +20,7 @@ namespace Rosie{
 		public:
 			FunctionParser(const Syntax& syntax);
 			Address parse(Lexer& lexer, Program& program);
+			bool isFunction(Lexer& lexer);
 		
 		private:
 			Syntax syntax;

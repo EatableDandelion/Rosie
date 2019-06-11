@@ -18,8 +18,7 @@ namespace Rosie{
 			{
 				parseKeyword(lexer, program);
 			}
-			else if(program.hasFunctionAddress(lexer.getToken())
-				 || program.isConstructor(lexer.getToken()))		//If it's a function or a ctor
+			else if(functionParser.isFunction(lexer))		//If it's a function or a ctor
 			{
 				functionParser.parse(lexer, program);				//add(a, b);
 			}
@@ -138,6 +137,7 @@ namespace Rosie{
 	}
 	
 	
+	
 	FunctionParser::FunctionParser(const Syntax& syntax):syntax(syntax)
 	{}
 	
@@ -147,13 +147,11 @@ namespace Rosie{
 		while(!syntax.isTerminator(lexer.getToken()))
 		{
 			Token token = lexer.getToken();
-			if(program.hasFunctionAddress(token))
+			if(isFunction(lexer))
 			{
 				token.type = TokenType::FUNCNAME;
-			}else if(program.isConstructor(token))
-			{
-				token.type = TokenType::CONSTRUCTOR;
 			}
+			
 			infixInput.push_back(token);
 			lexer++;
 		}
@@ -371,6 +369,12 @@ namespace Rosie{
 		return token != "^";
 	}
 
+	bool FunctionParser::isFunction(Lexer& lexer)
+	{
+		Token nextToken;
+		return (lexer.peekToken(nextToken, 1) && syntax.isFunction(lexer.getToken(), nextToken));
+	}
+	
 	
 	
 	

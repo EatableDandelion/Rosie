@@ -109,7 +109,7 @@ namespace Rosie
 		push(getVariable(handle));
 	}
 	
-	/*Variable State::pop()
+	Variable State::pop()
 	{
 		Variable res = callStack.top();
 		callStack.pop();
@@ -162,12 +162,12 @@ namespace Rosie
 		std::vector<Variable> args;
 		while(!callStack.empty())
 		{
-			args.push_back(callStack.pop());
+			args.push_back(pop());
 		}
 		
-		if(syntax.hasMethod(methodId))
+		if(methods.contains(methodId))
 		{
-			getMethod(methodId).execute(args);
+			methods[methodId].execute(args, callStack);
 		}
 		
 	}

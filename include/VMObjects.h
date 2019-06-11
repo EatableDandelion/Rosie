@@ -88,6 +88,39 @@ namespace Rosie
 			Category category;
 	};
 	
+	template<typename T>
+	struct Function
+	{
+		public:
+			Function(const std::string& name, const std::function<void(std::vector<T>&, std::stack<T>&)> func, const int& id):name(name), id(id)
+			{
+				m_func = func;
+			}
+			
+			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
+			{}
+		
+			void execute(std::vector<T>& arguments, std::stack<T>& results) const
+			{
+				m_func(arguments, results);
+			}
+	
+			std::string getName() const
+			{
+				return name;
+			}
+	
+			int getId() const
+			{
+				return id;
+			}
+			
+		private:
+			std::string name;
+			int id;
+			std::function<void(std::vector<T>&, std::stack<T>&)> m_func;
+	};
+	
 }
 
 namespace std 
@@ -113,7 +146,7 @@ namespace Rosie
 			void addConstant(const int& id, const Variable& cst);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
-			//Variable pop();
+			Variable pop();
 			//bool empty() const;
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);

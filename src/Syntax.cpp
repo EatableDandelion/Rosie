@@ -37,6 +37,11 @@ namespace Rosie
 		return methods.getValues();
 	}*/
 	
+	bool Syntax::isFunction(const Token& token, const Token& nextToken)
+	{
+		return (token.type == TokenType::VARNAME) && isListStart(nextToken);
+	}
+	
 	bool Syntax::isFunctionDeclaration(const Token& token)
 	{
 		return token == "function";

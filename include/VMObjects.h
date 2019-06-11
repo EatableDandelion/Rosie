@@ -150,7 +150,7 @@ namespace Rosie
 			//bool empty() const;
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);
-			void execute(const int& methodId);
+			void execute(const std::string& methodName);
 			
 		private:
 			Syntax syntax;

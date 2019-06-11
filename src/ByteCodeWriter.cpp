@@ -78,7 +78,7 @@ namespace Rosie
 		return functions.newAddress(name);
 	}
 	
-	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
+	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer) const
 	{
 		if(!hasFunctionAddress(token))
 		{
@@ -87,7 +87,7 @@ namespace Rosie
 		return functions.getAddress(token.value);
 	}
 	
-	bool Program::hasFunctionAddress(const Token& token)
+	bool Program::hasFunctionAddress(const Token& token) const
 	{
 		return functions.hasAddress(token.value);
 	}

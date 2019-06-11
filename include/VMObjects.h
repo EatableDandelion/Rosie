@@ -144,6 +144,7 @@ namespace Rosie
 			State(const Syntax& syntax);
 			void addVariable(const std::string& name, const Handle& handle);
 			void addConstant(const int& id, const Variable& cst);
+			void addMethod(const Function<Variable>& func);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
 			Variable pop();

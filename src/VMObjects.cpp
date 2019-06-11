@@ -99,6 +99,11 @@ namespace Rosie
 		constants[id] = csts;
 	}
 	
+	void State::addMethod(const Function<Variable>& func)
+	{
+		methods.insert(std::pair<std::string, Function<Variable>> (func.getName(), func));
+	}
+	
 	void State::push(const Variable& variable)
 	{
 		callStack.push(variable);
@@ -157,18 +162,14 @@ namespace Rosie
 		}
 	}
 	
-	void State::execute(const int& methodId)
+	void State::execute(const std::string& methodName)
 	{
 		std::vector<Variable> args;
 		while(!callStack.empty())
 		{
 			args.push_back(pop());
 		}
-		
-		if(methods.contains(methodId))
-		{
-			methods[methodId].execute(args, callStack);
-		}
-		
+
+		methods[methodName].execute(args, callStack);	
 	}
 }

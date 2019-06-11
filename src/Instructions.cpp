@@ -118,7 +118,7 @@ namespace Rosie
 	}
 	
 	
-	CallInstruction::CallInstruction(const int& callId):TemplateInstruction(std::to_string(callId))
+	CallInstruction::CallInstruction(const std::string& name):TemplateInstruction(name)
 	{}
 	
 	CallInstruction::CallInstruction(const Syntax& syntax):syntax(syntax)
@@ -126,7 +126,7 @@ namespace Rosie
 
 	void CallInstruction::read(const std::string& command, State& state) const
 	{
-		state.execute(std::stoi(command));
+		state.execute(command);
 	}
 	
 	std::string CallInstruction::getName() const

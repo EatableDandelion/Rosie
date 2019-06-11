@@ -140,6 +140,30 @@ namespace Rosie
 		return types.hasType(token.value);
 	}
 
+	
+	
+	HeaderWriter::HeaderWriter(const std::string& fileName):fileName(fileName)
+	{}
+	
+	void HeaderWriter::write(const Program& program) const
+	{	
+		std::ofstream file;
+		file.open(fileName);
+		
+		int i = 0;
+		for(Constant constant : program.getConstants())
+		{
+			file << i << " " << constant.getTypeId() << " " << constant.getValue() << std::endl;
+			i++;
+		}
+		
+		
+		file.close();
+	}
+	
+	
+	
+	
 	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)
 	{}
 	
@@ -155,6 +179,10 @@ namespace Rosie
 		
 		file.close();
 	}
+	
+	
+	
+	
 	
 	ByteCodeReader::ByteCodeReader(const std::string& fileName, const Syntax& syntax):fileName(fileName)
 	{

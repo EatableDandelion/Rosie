@@ -5,7 +5,7 @@ using namespace Rosie;
 int main()
 {
 	
-	//TODO define syntax that group the native methods, passed in program, interpreter and in state
+	//TODO write real bytecode, with header to give the names of constants, functions and variables, and exec code later
 	
 	Syntax syntax;
 	

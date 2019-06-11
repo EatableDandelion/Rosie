@@ -150,6 +150,10 @@ namespace Rosie{
 			if(isFunction(lexer))
 			{
 				token.type = TokenType::FUNCNAME;
+				if(!program.hasFunctionAddress(token))
+				{
+					program.newFunctionAddress(token.value);
+				}
 			}
 			
 			infixInput.push_back(token);
@@ -225,7 +229,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					//program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
+					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer));
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)

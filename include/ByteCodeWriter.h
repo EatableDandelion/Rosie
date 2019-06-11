@@ -56,6 +56,12 @@ namespace Rosie
 			Type getType(const Token& token) const;
 	
 			bool hasTypeName(const Token& token) const;
+		
+			std::vector<Constant> getConstants();
+		
+			std::vector<Address> getVariables();
+		
+			std::vector<Address> getFunctions();
 			
 		private:
 			Syntax syntax;

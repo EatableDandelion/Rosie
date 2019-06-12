@@ -21,6 +21,7 @@ namespace Rosie
 			Variable(const int& integerValue);
 			Variable(const bool& booleanValue);
 			Variable(const std::string& stringValue);
+			Variable(const TokenType& tokenType);
 			Variable();
 
 			

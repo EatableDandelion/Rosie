@@ -99,6 +99,11 @@ namespace Rosie
 		return std::to_string(id)+"/"+std::to_string(category);
 	}
 	
+	void Address::setType(const TokenType& tokenType)
+	{
+		type = tokenType;
+	}
+	
 	int Address::getTypeId() const
 	{
 		return int(type);

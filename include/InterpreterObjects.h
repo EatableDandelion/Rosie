@@ -87,11 +87,13 @@ namespace Rosie{
 			Category getCategory() const;
 			//Type getType() const;
 			std::string getString() const;
+			int getTypeId() const;
 		
 		private:
 			int id;
 			std::string name;
 			Category category;
+			TokenType type;
 			//Type type;
 	};
 	

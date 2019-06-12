@@ -109,6 +109,11 @@ namespace Rosie
 		return int(type);
 	}
 	
+	TokenType Address:getType() const
+	{
+		return type;
+	}
+	
 	
 	
 	Memory::Memory(const Category& category, const int& startIndex):category(category), head(startIndex)

@@ -46,24 +46,24 @@ namespace Rosie
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
-	Address Program::newVarAddress(const std::string& name)
+	Address Program::newVarAddress(const std::string& name, const TokenType& type)
 	{
 		Address newAddress = variables.newAddress(name);
 		addInstruction<NewInstruction>(name, newAddress);
 		return newAddress;
 	}
 	
-	Address Program::newVarAddress(const Token& token)
+	Address Program::newVarAddress(const Token& token, const TokenType& type)
 	{
-		return newVarAddress(token.value);//, type);
+		return newVarAddress(token.value, type);
 	}
 	
 	Address Program::getVarAddress(const Token& token)
 	{
 		if(!hasVarAddress(token))
 		{
-			return newVarAddress(token.value);
-			//std::cout << "Error, variable " << token << " undefined." <<std::endl;
+			//return newVarAddress(token.value);
+			std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
 	}

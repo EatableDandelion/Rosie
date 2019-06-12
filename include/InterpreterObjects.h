@@ -89,6 +89,7 @@ namespace Rosie{
 			std::string getString() const;
 			int getTypeId() const;
 			void setType(const TokenType& tokenType);
+			TokenType getType() const;
 		
 		private:
 			int id;

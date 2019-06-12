@@ -231,6 +231,8 @@ namespace Rosie{
 					}
 					
 					program.addInstruction<CallInstruction>(token.value);
+					
+					/** TODO: get type of function output. */
 					activeStack.push(program.getStackAddress());
 				}
 				else if(token.type == TokenType::CONSTRUCTOR)

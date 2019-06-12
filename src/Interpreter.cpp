@@ -75,7 +75,15 @@ namespace Rosie{
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
 	{
 
-		Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
+		//Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
+		Address destAddress;
+		bool newAddress = true;
+		if(program.hasAddress(lexer.getToken()))
+		{
+			newAddress = false;
+			destAddress = program.getVarAddress(lexer.getToken());
+		}
+		Token var = lexer.getToken();
 		
 		lexer++;//token = "="
 		checkToken(syntax.isAssignment(lexer.getToken()),lexer);
@@ -92,6 +100,10 @@ namespace Rosie{
 		{	
 			Address srcAddress = functionParser.parse(lexer, program);
 			
+			if(newAddress)
+			{
+				program.newVarAddress(var, srcAddres.getType());
+			}
 			destAddress.setType(srcAddress.getType());
 			
 			program.addInstruction<SetInstruction>(destAddress, srcAddress);

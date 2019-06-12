@@ -119,6 +119,13 @@ namespace Rosie
 		return Address(0, Category::VARIABLE);
 	}
 	
+	Address Program::getStackAddress(const TokenType& type)
+	{
+		Address res = getStackAddress();
+		res.setType(type);
+		return res;
+	}
+	
 	Type Program::addType(const std::string& name)
 	{
 		types.addType(name);

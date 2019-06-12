@@ -99,6 +99,11 @@ namespace Rosie
 		return std::to_string(id)+"/"+std::to_string(category);
 	}
 	
+	int Address::getTypeId() const
+	{
+		return int(type);
+	}
+	
 	
 	
 	Memory::Memory(const Category& category, const int& startIndex):category(category), head(startIndex)

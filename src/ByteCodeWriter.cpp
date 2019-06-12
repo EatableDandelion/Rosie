@@ -37,7 +37,7 @@ namespace Rosie
 		TokenType type = token.type;
 		
 		Address address(constants.size(), Category::CONSTANT, value);
-		
+		address.setType(type);
 		
 		constants.push_back(Constant(type, value));
 		

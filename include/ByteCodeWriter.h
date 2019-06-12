@@ -49,7 +49,7 @@ namespace Rosie
 			
 			Address getStackAddress() const;
 		
-			Address getStackAddress(const TokenType& type) const;
+			Address getStackAddress(const TokenType& type);
 			
 			Type addType(const std::string& name);
 			

@@ -77,12 +77,6 @@ namespace Rosie{
 
 		//Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
 		Address destAddress;
-		bool newAddress = true;
-		if(program.hasAddress(lexer.getToken()))
-		{
-			newAddress = false;
-			destAddress = program.getVarAddress(lexer.getToken());
-		}
 		Token var = lexer.getToken();
 		
 		lexer++;//token = "="
@@ -92,6 +86,15 @@ namespace Rosie{
 		
 		if(syntax.isStartScope(lexer.getToken()))
 		{
+			if(program.hasAddress(var))
+			{
+				destAddress = program.getVarAddress(var);
+			}
+			else
+			{
+				destAddress = program.newVarAddress(var, TokenType::CSTARRAY);
+			}
+			
 			program.addInstruction<CompositeInstruction>(destAddress);// start scope
 			parseComposite(lexer, program);
 			program.addInstruction<CompositeInstruction>();//end scope
@@ -100,11 +103,14 @@ namespace Rosie{
 		{	
 			Address srcAddress = functionParser.parse(lexer, program);
 			
-			if(newAddress)
+			if(program.hasAddress(var))
 			{
-				program.newVarAddress(var, srcAddres.getType());
+				destAddress = program.getVarAddress(var);
 			}
-			destAddress.setType(srcAddress.getType());
+			else
+			{
+				destAddress = program.newVarAddress(var, srcAddres.getType());
+			}
 			
 			program.addInstruction<SetInstruction>(destAddress, srcAddress);
 			checkToken(syntax.isTerminator(lexer.getToken()), lexer);

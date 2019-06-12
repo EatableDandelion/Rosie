@@ -31,8 +31,8 @@ namespace Rosie
 			
 			Address newCstAddress(const Token& token);
 			
-			Address newVarAddress(const std::string& name);//, const Type& type);
-			Address newVarAddress(const Token& token);//, const Type& type);
+			Address newVarAddress(const std::string& name, const TokenType& type);
+			Address newVarAddress(const Token& token, const TokenType& type);
 			Address getVarAddress(const Token& token);
 			bool hasVarAddress(const Token& token);
 			

@@ -91,7 +91,9 @@ namespace Rosie{
 		else
 		{	
 			Address srcAddress = functionParser.parse(lexer, program);
-
+			
+			destAddress.setType(srcAddress.getType());
+			
 			program.addInstruction<SetInstruction>(destAddress, srcAddress);
 			checkToken(syntax.isTerminator(lexer.getToken()), lexer);
 		}
@@ -211,7 +213,7 @@ namespace Rosie{
 						}	
 					}
 					activeStack.pop();
-					activeStack.push(program.getStackAddress());
+					activeStack.push(program.getStackAddress(TokenType::CSTFLOAT));
 					
 				}
 				else if(token.type == TokenType::FUNCNAME)//function

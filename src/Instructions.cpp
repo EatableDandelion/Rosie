@@ -15,7 +15,7 @@ namespace Rosie
 		return Instruction::allIds++;
 	}
 	
-	SetInstruction::SetInstruction(const Address& dest, const Address& src):TemplateInstruction(std::to_string(dest.getId())+" "+std::to_string(src.getId())+" "+std::to_string(src.getCategory()))
+	SetInstruction::SetInstruction(const Address& dest, const Address& src):TemplateInstruction(std::to_string(dest.getId())+" "+std::to_string(src.getId())+" "+std::to_string(src.getCategory())+" "+std::to_string(src.getTypeId()))
 	{}
 	
 	SetInstruction::SetInstruction()
@@ -27,6 +27,7 @@ namespace Rosie
 		int destId = std::stoi(args[0]);
 		int srcId = std::stoi(args[1]);
 		int srcCategory = std::stoi(args[2]);
+		int srcType = std::stoi(args[3]);
 
 		Handle destHandle(destId, Category::VARIABLE);
 		Handle srcHandle(srcId, Category(srcCategory));
@@ -38,7 +39,7 @@ namespace Rosie
 		return "SET";
 	}
 
-	NewInstruction::NewInstruction(const std::string& name, const Address& var):TemplateInstruction(name+" "+std::to_string(var.getId()))
+	NewInstruction::NewInstruction(const std::string& name, const Address& var):TemplateInstruction(name+" "+std::to_string(var.getId())+" "+std::to_string(var.getTypeId()))
 	{}
 	
 	NewInstruction::NewInstruction()
@@ -47,6 +48,7 @@ namespace Rosie
 	void NewInstruction::read(const std::string& command, State& state) const
 	{
 		std::vector<std::string> args = Rosie::split(command, " ");
+		int type = std::stoi(args[2]);
 		state.addVariable(args[0], Handle(std::stoi(args[1]), Category::VARIABLE));
 	}
 	

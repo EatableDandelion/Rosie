@@ -43,9 +43,8 @@ namespace Rosie{
 		else
 		{
 			Type tokenType = program.getType(lexer.getToken());
-			
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken());//, tokenType);
+			returnAddress = program.newVarAddress(lexer.getToken());
 		}
 		
 		Token nextToken;

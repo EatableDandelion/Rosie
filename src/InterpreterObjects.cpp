@@ -127,12 +127,12 @@ namespace Rosie
 		return addresses.find(Rosie::getId(name)) != addresses.end();
 	}
 	
-	std::vector<Address> Memory::getAddresses()
+	std::vector<Address> Memory::getAddresses() const
 	{
 		std::vector<Address> res;
 		for(std::pair<std::size_t, Address> pair : addresses)
 		{
-			res.push_back(pair->second);
+			res.push_back(pair.second);
 		}
 		return res; 
 	}

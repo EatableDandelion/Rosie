@@ -37,8 +37,8 @@ namespace Rosie
 			bool hasVarAddress(const Token& token);
 			
 			Address newFunctionAddress(const std::string& name);
-			Address getFunctionAddress(const Token& token, const Lexer& lexer) const;
-			bool hasFunctionAddress(const Token& token) const;
+			Address getFunctionAddress(const Token& token, const Lexer& lexer);
+			bool hasFunctionAddress(const Token& token);
 			
 			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
 
@@ -57,11 +57,11 @@ namespace Rosie
 	
 			bool hasTypeName(const Token& token) const;
 		
-			std::vector<Constant> getConstants();
+			std::vector<Constant> getConstants() const;
 		
-			std::vector<Address> getVariables();
+			std::vector<Address> getVariables() const;
 		
-			std::vector<Address> getFunctions();
+			std::vector<Address> getFunctions() const;
 			
 		private:
 			Syntax syntax;
@@ -76,7 +76,17 @@ namespace Rosie
 	{
 		public:
 			HeaderWriter(const std::string& fileName);
-			void write(const Program& program) const;
+			void write(const Program& program);
+		private:
+			std::string fileName;
+	};
+	
+	class HeaderReader
+	{
+		public:
+			HeaderReader(const std::string& fileName);
+			void read(State& state) const;
+		
 		private:
 			std::string fileName;
 	};

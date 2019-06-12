@@ -99,6 +99,9 @@ namespace Rosie
 			
 			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
 			{}
+			
+			Function()
+			{}
 		
 			void execute(std::vector<T>& arguments, std::stack<T>& results) const
 			{

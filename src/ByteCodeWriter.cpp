@@ -78,7 +78,7 @@ namespace Rosie
 		return functions.newAddress(name);
 	}
 	
-	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer) const
+	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
 	{
 		if(!hasFunctionAddress(token))
 		{
@@ -87,7 +87,7 @@ namespace Rosie
 		return functions.getAddress(token.value);
 	}
 	
-	bool Program::hasFunctionAddress(const Token& token) const
+	bool Program::hasFunctionAddress(const Token& token)
 	{
 		return functions.hasAddress(token.value);
 	}
@@ -140,17 +140,17 @@ namespace Rosie
 		return types.hasType(token.value);
 	}
 	
-	std::vector<Constant> Program::getConstants()
+	std::vector<Constant> Program::getConstants() const
 	{
 		return constants;
 	}
 		
-	std::vector<Address> Program::getVariables()
+	std::vector<Address> Program::getVariables() const
 	{
 		return variables.getAddresses();
 	}
 		
-	std::vector<Address> Program::getFunctions()
+	std::vector<Address> Program::getFunctions() const
 	{
 		return functions.getAddresses();
 	}
@@ -160,7 +160,7 @@ namespace Rosie
 	HeaderWriter::HeaderWriter(const std::string& fileName):fileName(fileName)
 	{}
 	
-	void HeaderWriter::write(const Program& program) const
+	void HeaderWriter::write(const Program& program)
 	{	
 		std::ofstream file;
 		file.open(fileName);

@@ -22,6 +22,30 @@ namespace Rosie
 		set(stringValue);
 	}
 	
+	Variable::Variable(const TokenType& tokenType)
+	{
+		if(tokenType == TokenType::CSTFLOAT)
+		{
+			type = 0;
+		}
+		else if(tokenType == TokenType::CSTINT)
+		{
+			type = 1;
+		}
+		else if(tokenType == TokenType::CSTBOOLEAN)
+		{
+			type = 2;
+		}
+		else if(tokenType == TokenType::CSTSTRING)
+		{
+			type = 3;
+		}
+		else
+		{
+			type = 4;
+		}
+	}
+	
 	Variable::Variable()
 	{
 		type = 4;
@@ -89,9 +113,9 @@ namespace Rosie
 	State::State(const Syntax& syntax):syntax(syntax)
 	{}
 	
-	void State::addVariable(const std::string& name, const Handle& handle)
+	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
 	{
-		variables.add(handle, Rosie::getId(name), Variable());
+		variables.add(handle, Rosie::getId(name), Variable(TokenType(type)));
 	}
 	
 	void State::addConstant(const int& id, const Variable& csts)

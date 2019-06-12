@@ -115,7 +115,7 @@ namespace Rosie
 	
 	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
 	{
-		variables.add(handle, Rosie::getId(name), Variable(TokenType(type)));
+		variables.add(handle, Rosie::getId(name), Variable(TokenType(tokenType)));
 	}
 	
 	void State::addConstant(const int& id, const Variable& csts)

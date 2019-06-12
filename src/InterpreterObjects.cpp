@@ -109,7 +109,7 @@ namespace Rosie
 		return int(type);
 	}
 	
-	TokenType Address:getType() const
+	TokenType Address::getType() const
 	{
 		return type;
 	}

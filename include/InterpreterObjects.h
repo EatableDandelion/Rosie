@@ -79,7 +79,7 @@ namespace Rosie{
 	struct Address
 	{
 		public:
-			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "");
+			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "", const TokenType& type = TokenType::UNDEFINED);
 			Address(const Address& address);
 			Address();
 			
@@ -97,7 +97,6 @@ namespace Rosie{
 			std::string name;
 			Category category;
 			TokenType type;
-			//Type type;
 	};
 	
 	struct Memory //collection of addresses
@@ -105,7 +104,9 @@ namespace Rosie{
 		public:	
 			Memory(const Category& category, const int& startIndex = 0);
 		
-			Address newAddress(const std::string& name);//, const int& size);
+			Address newAddress(const std::string& name);
+			
+			Address newAddress(const std::string& name, const TokenType& tokenType);
 			
 			Address getAddress(const std::string& name);
 			

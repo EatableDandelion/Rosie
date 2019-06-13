@@ -40,6 +40,16 @@ namespace Rosie
 				return values.at(key2);
 			}
 			
+			V& operator[](const K1& key1)
+			{
+				return values[keymap.at(key1)];
+			}
+			
+			V& operator[](const K2& key2)
+			{
+				return values[key2];
+			}
+			
 			int size() const
 			{
 				return values.size();

@@ -151,7 +151,7 @@ namespace Rosie
 	}*/
 	
 	void State::copyVariable(Handle& dest, const Handle& src)
-	{
+	{	
 		variables[dest] = getVariable(src);
 	}
 	

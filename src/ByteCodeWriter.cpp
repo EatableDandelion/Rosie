@@ -48,7 +48,7 @@ namespace Rosie
 	
 	Address Program::newVarAddress(const std::string& name, const TokenType& type)
 	{
-		Address newAddress = variables.newAddress(name);
+		Address newAddress = variables.newAddress(name, type);
 		addInstruction<NewInstruction>(name, newAddress);
 		return newAddress;
 	}

@@ -42,9 +42,25 @@ namespace Rosie{
 		}
 		else
 		{
-			Type tokenType = program.getType(lexer.getToken());
+			TokenType tokenType = TokenType::UNDEFINED;
+			if(lexer.getToken().value == "float")
+			{
+				tokenType = TokenType::CSTFLOAT;
+			}
+			else if(lexer.getToken().value == "int")
+			{
+				tokenType = TokenType::CSTINT;
+			}
+			else if(lexer.getToken().value == "boolean")
+			{
+				tokenType = TokenType::CSTBOOLEAN;
+			}
+			else if(lexer.getToken().value == "string")
+			{
+				tokenType = TokenType::CSTSTRING;
+			}
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken());
+			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
 		}
 		
 		Token nextToken;
@@ -86,7 +102,7 @@ namespace Rosie{
 		
 		if(syntax.isStartScope(lexer.getToken()))
 		{
-			if(program.hasAddress(var))
+			if(program.hasVarAddress(var))
 			{
 				destAddress = program.getVarAddress(var);
 			}
@@ -103,13 +119,13 @@ namespace Rosie{
 		{	
 			Address srcAddress = functionParser.parse(lexer, program);
 			
-			if(program.hasAddress(var))
+			if(program.hasVarAddress(var))
 			{
 				destAddress = program.getVarAddress(var);
 			}
 			else
 			{
-				destAddress = program.newVarAddress(var, srcAddres.getType());
+				destAddress = program.newVarAddress(var, srcAddress.getType());
 			}
 			
 			program.addInstruction<SetInstruction>(destAddress, srcAddress);

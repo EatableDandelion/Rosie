@@ -19,6 +19,6 @@ int main()
 	state.addMethod(Function<Variable>("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;}, 0));
 	reader.read(state);
 	
-
+	
 	return 0;
 }

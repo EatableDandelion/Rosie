@@ -65,13 +65,13 @@ namespace Rosie
 	}
 
 	
-	Address::Address(const int& id, const Category& category, const std::string& name):id(id), category(category), name(name)
+	Address::Address(const int& id, const Category& category, const std::string& name, const TokenType& type):id(id), category(category), name(name), type(type)
 	{}
 	
-	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category)//, type(address.type)
+	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category), type(address.type)
 	{}
 	
-	Address::Address():id(0), name(""), category(Category::CONSTANT)
+	Address::Address():id(0), name(""), category(Category::CONSTANT), type(TokenType::UNDEFINED)
 	{}
 	
 	int Address::getId() const
@@ -123,11 +123,16 @@ namespace Rosie
 	
 	Address Memory::newAddress(const std::string& name)//, const int& size)
 	{
+		return newAddress(name, TokenType::UNDEFINED);
+	}
+	
+	Address Memory::newAddress(const std::string& name, const TokenType& tokenType)
+	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
 		head+=1;//size;
-		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name)));
+		addresses.insert(std::pair<std::size_t, Address>(id, Address(index, category, name, tokenType)));
 
 		return addresses[id];
 	}

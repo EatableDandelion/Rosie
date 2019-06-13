@@ -149,6 +149,7 @@ namespace Rosie
 		int bCategory = std::stoi(args[3]);
 		Handle aHandle(aId, Category(bCategory));
 		Handle bHandle(bId, Category(bCategory));
+
 		state.push(Variable(state.getVariable(aHandle).get<float>()+state.getVariable(bHandle).get<float>()));
 	}
 	

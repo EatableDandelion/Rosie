@@ -59,8 +59,7 @@ namespace Rosie
 	
 	void Variable::set(const int& newValue)
 	{
-		value = newValue;
-		type = 1;
+		set((float)newValue);
 	}
 	
 	void Variable::set(const bool& newValue)

@@ -31,6 +31,7 @@ namespace Rosie
 				return std::get<T>(value);
 			}
 			
+			
 			void set(const float& newValue);
 			void set(const int& newValue);
 			void set(const bool& newValue);

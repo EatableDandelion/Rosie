@@ -32,7 +32,8 @@ namespace Rosie
 			return false;
 		}
 		
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token) = 0; //returns true if has token to stack, false otherwise
+		/** return true if finish token with character, false to continue appending on current token */
+		virtual bool appendToToken(char& c, InputStream& stream, Token& token) = 0;
 		
 		protected:
 			Caster typeCaster;

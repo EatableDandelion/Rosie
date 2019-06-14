@@ -202,7 +202,7 @@ namespace Rosie{
 		
 		for(Token token : rpn)
 		{
-			if(isNumber(token) || token.type == TokenType::VARNAME)
+			if(isConstant(token) || token.type == TokenType::VARNAME)
 			{
 				activeStack.push(program.getAddress(token, lexer));
 			}
@@ -311,7 +311,7 @@ namespace Rosie{
 		bool firstToken = true;
 		for(Token token : input)
 		{		
-			if(isNumber(token) || token.type == TokenType::VARNAME)
+			if(isConstant(token) || token.type == TokenType::VARNAME)
 			{
 				output.push_back(token);
 			}
@@ -364,6 +364,7 @@ namespace Rosie{
 				}
 				stack.pop();
 			}
+			
 			previousToken = token;
 			firstToken = false;
 		}
@@ -375,9 +376,12 @@ namespace Rosie{
 		return output;
 	}
 	
-	bool FunctionParser::isNumber(Token& token)
+	bool FunctionParser::isConstant(Token& token)
 	{
-		return token.type == TokenType::CSTFLOAT || token.type == TokenType::CSTINT;
+		return 	token.type == TokenType::CSTFLOAT || 
+				token.type == TokenType::CSTINT || 
+				token.type == TokenType::CSTBOOLEAN ||
+				token.type == TokenType::CSTSTRING;
 	}
 	
 	bool FunctionParser::isUnary(Token& token, Token& previousToken)

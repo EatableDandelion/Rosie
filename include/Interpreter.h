@@ -25,7 +25,7 @@ namespace Rosie{
 		private:
 			Syntax syntax;
 			std::vector<Token> getRPN(const std::vector<Token>& input);//reverse polish notation
-			bool isNumber(Token& token);
+			bool isConstant(Token& token);
 			bool isUnary(Token& token, Token& previousToken);
 			int getOperatorPrecedence(Token& token);
 			bool isLeftAssociative(Token& token);

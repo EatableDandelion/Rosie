@@ -39,19 +39,58 @@ namespace Rosie
 	}
 
 	bool CommentLex::appendToToken(char& c, InputStream& stream, Token& token)
-	{		
+	{	
+		
+		if(inComment)
+		{
+			return runMultiLineComment(c, stream);
+		}
+		
 		if(c == '#')
 		{
 			if(!stream.next(c))
 				return false;
 			
-			while(c != '#' && stream.hasNext())
+			//If ## then it is the start of a multi-line comment.
+			if(c == '#')
 			{
 				stream.next(c);
+				return runMultiLineComment(c, stream);
 			}
-			stream.next(c);
+			else //otherwise it is an inline comment.
+			{
+				while(stream.hasNext())
+				{
+					stream.next(c);
+				}
+				stream.next(c);
+				return false;
+			}
 		}
 		return false;
+	}
+	
+	bool CommentLex::runMultiLineComment(char& c, InputStream& stream)
+	{
+		while(stream.hasNext())
+		{
+			if(c != '#')
+			{
+				//Append char to comment
+				std::cout << c;
+				stream.next(c);
+			}
+			else
+			{
+				//Finish comment;
+				std::cout << std::endl;
+				inComment = false;
+				return false;
+			}					
+		}
+		stream.next(c);
+		inComment = true;
+		return true;
 	}
 	
 	bool WhiteSpaceLex::appendToToken(char& c, InputStream& stream, Token& token)
@@ -110,11 +149,12 @@ namespace Rosie
 	
 	Lexer::Lexer(const std::string& fileName): lineStream(fileName)
 	{
+		rules.push_back(std::make_shared<CommentLex>());
 		rules.push_back(std::make_shared<StringLex>());
 		rules.push_back(std::make_shared<LiteralLex>());
+		
 		rules.push_back(std::make_shared<NumeralLex>());
-		rules.push_back(std::make_shared<SpecialCharLex>());
-		rules.push_back(std::make_shared<CommentLex>());
+		rules.push_back(std::make_shared<SpecialCharLex>());	
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
 		m_hasNext = true;
 		loadNextLine();

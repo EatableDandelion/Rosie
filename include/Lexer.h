@@ -90,6 +90,11 @@ namespace Rosie
 	struct CommentLex : Lex<VoidCaster> // comments
 	{
 		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+	
+		
+		private:
+			bool inComment = false;
+			bool runMultiLineComment(char& c, InputStream& stream);
 	};
 	
 	class Lexer

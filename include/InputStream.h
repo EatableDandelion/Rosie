@@ -7,13 +7,14 @@
 namespace Rosie
 {
 
-	class InputStream
+	class CharStream
 	{
 		public:
-			InputStream(const std::string& line);
+			CharStream();
+			CharStream(const std::string& line);
 			
-			bool next(char& ch);
-			bool hasNext();
+			bool nextChar(char& ch);
+			bool hasNextChar();
 			char getChar() const;
 		
 		private:
@@ -37,6 +38,25 @@ namespace Rosie
 			std::ifstream stream;
 			std::string line;
 			int lineIndex;
+	};
+	
+	class FileStream
+	{
+		public:
+			FileStream(const std::string& fileName);
+			
+			bool nextChar(char& ch);
+			bool hasNextChar();
+			char getChar() const;
+			
+			bool nextLine();
+			bool hasNextLine();
+			std::string getLine() const;
+			int getLineIndex() const;
+			
+		private:
+			CharStream charStream;
+			LineStream lineStream;
 	};
 
 }

@@ -2,114 +2,115 @@
 
 namespace Rosie
 {		
-	bool StringLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool StringLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
 		if(c == '\"')
 		{
-			if(!stream.next(c))
+			if(!stream.nextChar(c))
 				return false;
 			
-			while(c != '\"' && stream.hasNext())
+			while(c != '\"' && stream.hasNextChar())
 			{
 				token += c;
-				stream.next(c);
+				stream.nextChar(c);
 			}
-			stream.next(c);
+			stream.nextChar(c);
 			return true;
 		}
 		return false;
 	}
 	
-	bool LiteralLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool LiteralLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
 		if(isLetter(c))
 		{
 			token += c;
-			if(!stream.next(c))
+			if(!stream.nextChar(c))
 				return true;
 			
-			while((isLetter(c) || isDigit(c)) && stream.hasNext())
+			while((isLetter(c) || isDigit(c)) && stream.hasNextChar())
 			{
 				token += c;
-				stream.next(c);		
+				stream.nextChar(c);		
 			}
 			return true;
 		}
 		return false;
 	}
 
-	bool CommentLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool CommentLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{	
-		
-		if(inComment)
-		{
-			return runMultiLineComment(c, stream);
-		}
-		
 		if(c == '#')
 		{
-			if(!stream.next(c))
+			if(!stream.nextChar(c))
 				return false;
 			
 			//If ## then it is the start of a multi-line comment.
 			if(c == '#')
 			{
-				stream.next(c);
+				stream.nextChar(c);
 				return runMultiLineComment(c, stream);
 			}
 			else //otherwise it is an inline comment.
 			{
-				while(stream.hasNext())
-				{
-					stream.next(c);
+				while(stream.hasNextChar())
+				{std::cout << c;
+					stream.nextChar(c);
 				}
-				stream.next(c);
+				stream.nextChar(c);
 				return false;
 			}
 		}
 		return false;
 	}
 	
-	bool CommentLex::runMultiLineComment(char& c, InputStream& stream)
+	bool CommentLex::runMultiLineComment(char& c, FileStream& stream)
 	{
-		while(stream.hasNext())
+		while(stream.hasNextChar())
 		{
 			if(c != '#')
 			{
 				//Append char to comment
 				std::cout << c;
-				stream.next(c);
+				stream.nextChar(c);
 			}
 			else
 			{
 				//Finish comment;
 				std::cout << std::endl;
-				inComment = false;
 				return false;
 			}					
 		}
-		stream.next(c);
-		inComment = true;
+		stream.nextChar(c);
+		
+		if(!stream.nextLine())
+		{
+			return false;
+		}
+		
+		runMultiLineComment(c, stream);
+		stream.nextChar(c);
+		
 		return true;
 	}
 	
-	bool WhiteSpaceLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool WhiteSpaceLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
-		while(isWhiteSpace(c) && stream.hasNext())
+		while(isWhiteSpace(c) && stream.hasNextChar())
 		{
-			stream.next(c);
+			stream.nextChar(c);
 		}
 		return false;
 	}
 	
-	bool NumeralLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool NumeralLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
 		if(isDigit(c))
 		{
 			bool hadDot = false;
 			token.type = TokenType::CSTINT;
 			token+=c;
-			if(!stream.next(c))
+			if(!stream.nextChar(c))
 				return true;
 			
 			while(isDigit(c) || (c == '.' && !hadDot))
@@ -121,7 +122,7 @@ namespace Rosie
 				}
 				token += c;
 				
-				if(!stream.next(c))
+				if(!stream.nextChar(c))
 					return true;
 			}
 			
@@ -130,12 +131,12 @@ namespace Rosie
 		return false;
 	}
 	
-	bool SpecialCharLex::appendToToken(char& c, InputStream& stream, Token& token)
+	bool SpecialCharLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
 		if(isSpecialChar(c))
 		{			
 			token+=c;
-			stream.next(c);
+			stream.nextChar(c);
 			return true;
 		}
 		return false;
@@ -147,15 +148,15 @@ namespace Rosie
 	}
 	
 	
-	Lexer::Lexer(const std::string& fileName): lineStream(fileName)
+	Lexer::Lexer(const std::string& fileName): fileStream(fileName)
 	{
-		rules.push_back(std::make_shared<CommentLex>());
 		rules.push_back(std::make_shared<StringLex>());
 		rules.push_back(std::make_shared<LiteralLex>());
-		
+		rules.push_back(std::make_shared<CommentLex>());
 		rules.push_back(std::make_shared<NumeralLex>());
 		rules.push_back(std::make_shared<SpecialCharLex>());	
 		rules.push_back(std::make_shared<WhiteSpaceLex>());
+		
 		m_hasNext = true;
 		loadNextLine();
 	}
@@ -175,13 +176,15 @@ namespace Rosie
 	{
 		while(tokens.empty())
 		{
-			if(!lineStream.nextLine())return false;
-			InputStream charStream(lineStream.getLine());
-
-			Token token;
-			while(charStream.hasNext())
+			if(!fileStream.nextLine())
 			{
-				if(nextToken(charStream, token))
+				return false;
+			}
+			
+			Token token;
+			while(fileStream.hasNextChar())
+			{
+				if(nextToken(token))
 				{
 					tokens.push_back(token);
 					token.clear();				
@@ -191,19 +194,20 @@ namespace Rosie
 		return true;
 	}
 	
-	bool Lexer::nextToken(InputStream& charStream, Token& token)
+	bool Lexer::nextToken(Token& token)
 	{
-		char c = charStream.getChar();
+		char c = fileStream.getChar();
 
 		for(std::shared_ptr<Rule> rule : rules)
 		{
-			if(rule->nextToken(c, charStream, token))
+			if(rule->nextToken(c, fileStream, token))
 			{
 				return true;
 			}
 		}
 		return false;
 	}
+
 	
 	void Lexer::operator++(int)
 	{
@@ -237,11 +241,11 @@ namespace Rosie
 	
 	int Lexer::getLineIndex() const
 	{
-		return lineStream.getLineIndex();
+		return fileStream.getLineIndex();
 	}
 	
 	std::string Lexer::getLine() const
 	{
-		return lineStream.getLine();
+		return fileStream.getLine();
 	}
 }

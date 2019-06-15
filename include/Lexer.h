@@ -15,13 +15,13 @@ namespace Rosie
 
 	struct Rule
 	{
-		virtual bool nextToken(char& c, InputStream& stream, Token& token) = 0;
+		virtual bool nextToken(char& c, FileStream& stream, Token& token) = 0;
 	};
 	
 	template<typename Caster>
 	struct Lex : public Rule
 	{
-		virtual bool nextToken(char& c, InputStream& stream, Token& token)
+		virtual bool nextToken(char& c, FileStream& stream, Token& token)
 		{
 			if(appendToToken(c, stream, token))
 			{
@@ -33,7 +33,7 @@ namespace Rosie
 		}
 		
 		/** return true if finish token with character, false to continue appending on current token */
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token) = 0;
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token) = 0;
 		
 		protected:
 			Caster typeCaster;
@@ -61,22 +61,22 @@ namespace Rosie
 		
 	struct StringLex : Lex<StringCaster> //CSTSTRING
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 	};
 	
 	struct LiteralLex : Lex<LiteralCaster> //CSTBOOLEAN, VARTYPE, VARNAME or KEYWORD
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 	};
 	
 	struct NumeralLex : Lex<VoidCaster> //CSTFLOAT, CSTINT number
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 	};
 	
 	struct SpecialCharLex : Lex<SpecialCharCaster> //SEPARATOR or OPERATOR
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 		
 		private:
 			bool isSpecialChar(const char c);
@@ -84,19 +84,18 @@ namespace Rosie
 	
 	struct WhiteSpaceLex : Lex<VoidCaster> // white spaces
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 	};
 	
 	struct CommentLex : Lex<VoidCaster> // comments
 	{
-		virtual bool appendToToken(char& c, InputStream& stream, Token& token);
+		virtual bool appendToToken(char& c, FileStream& stream, Token& token);
 	
 		
 		private:
-			bool inComment = false;
-			bool runMultiLineComment(char& c, InputStream& stream);
+			bool runMultiLineComment(char& c, FileStream& stream);
 	};
-	
+
 	class Lexer
 	{
 		public:
@@ -117,13 +116,13 @@ namespace Rosie
 			std::string getLine() const;
 			
 		private:
-			LineStream lineStream;
+			FileStream fileStream;
 			std::vector<std::shared_ptr<Rule>> rules;
 			std::deque<Token> tokens;
 			bool m_hasNext;
 			
 			bool next();
 			bool loadNextLine();
-			bool nextToken(InputStream& charStream, Token& token);
+			bool nextToken(Token& token);
 	};
 }

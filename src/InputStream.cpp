@@ -2,14 +2,17 @@
 
 namespace Rosie
 {
-	InputStream::InputStream(const std::string& line):m_line(line)
+	CharStream::CharStream()
+	{}
+	
+	CharStream::CharStream(const std::string& line):m_line(line)
 	{
 		index = 0;
 	}
 	
-	bool InputStream::next(char& ch)//increment read character and returns false if eof, true otherwise
+	bool CharStream::nextChar(char& ch)//increment read character and returns false if eof, true otherwise
 	{
-		if(hasNext())
+		if(hasNextChar())
 		{
 			index++;
 			ch = m_line[index];
@@ -21,12 +24,12 @@ namespace Rosie
 		}
 	}
 	
-	char InputStream::getChar() const
+	char CharStream::getChar() const
 	{
 		return m_line[index];
 	}
 	
-	bool InputStream::hasNext()
+	bool CharStream::hasNextChar()
 	{
 		return index<m_line.size();
 	}
@@ -46,7 +49,6 @@ namespace Rosie
 	
 	bool LineStream::nextLine()
 	{
-		
 		if(!hasNextLine())return false;
 		std::getline(stream, line);
 		lineIndex++;
@@ -67,4 +69,50 @@ namespace Rosie
 	{
 		return lineIndex;
 	}
+	
+	
+	
+	FileStream::FileStream(const std::string& fileName):lineStream(fileName)
+	{}
+	
+	bool FileStream::nextChar(char& ch)
+	{
+		return charStream.nextChar(ch);
+	}
+	
+	char FileStream::getChar() const
+	{
+		return charStream.getChar();
+	}
+	
+	bool FileStream::hasNextChar()
+	{
+		return charStream.hasNextChar();
+	}
+	
+	bool FileStream::nextLine()
+	{
+		bool res = lineStream.nextLine();
+		if(res)
+		{
+			charStream = CharStream(lineStream.getLine());
+		}
+		return res;
+	}
+	
+	bool FileStream::hasNextLine()
+	{
+		return lineStream.hasNextLine();
+	}
+	
+	std::string FileStream::getLine() const
+	{
+		return lineStream.getLine();
+	}
+	
+	int FileStream::getLineIndex() const
+	{
+		return lineStream.getLineIndex();
+	}
+	
 }

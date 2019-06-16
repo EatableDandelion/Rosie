@@ -14,9 +14,14 @@ int main()
 	Program program(interpreter.read("test.ros", syntax));
 	ByteCodeWriter writer("test.bc");
 	writer.write(program);
-	ByteCodeReader reader("test.bc", syntax);
+	HeaderWriter headerWriter("test.hc");
+	headerWriter.write(program);
+	
 	State state(syntax);
-	state.addMethod(Function<Variable>("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;}, 0));
+	HeaderReader headerReader("test.hc");
+	headerReader.read(state);
+	ByteCodeReader reader("test.bc", syntax);
+	state.setFunction("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;});
 	reader.read(state);
 	
 	

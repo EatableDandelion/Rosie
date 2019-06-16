@@ -172,16 +172,14 @@ namespace Rosie
 		std::ofstream file;
 		file.open(fileName);
 		
-		int i = 0;
 		for(Constant constant : program.getConstants())
 		{
-			file << 0 << " " << i << " " << constant.getTypeId() << " " << constant.getValue() << std::endl;
-			i++;
+			file << 0 << " " << constant.getValue() << " " << constant.getTypeId() << std::endl;
 		}
 		
 		for(Address variable : program.getVariables())
 		{
-			file << 1 << " " << variable.getName() << " " << variable.getId() << std::endl;
+			file << 1 << " " << variable.getName() << " " << variable.getId() << " " << variable.getTypeId() << std::endl;
 		}
 		
 		for(Address function : program.getFunctions())
@@ -194,10 +192,10 @@ namespace Rosie
 	
 	
 	
-	HeaderReader::HeaderReader(const std::string& fileName):fileName(fileName)
+	HeaderReader::HeaderReader(const std::string& fileName):fileName(fileName), cstIndex(0)
 	{}
 	
-	void HeaderReader::read(State& state) const
+	void HeaderReader::read(State& state)
 	{
 		std::string line;
 		std::ifstream file(fileName);
@@ -206,14 +204,71 @@ namespace Rosie
 		{
 			while(getline(file,line))
 			{
+				int category;
+				char name[20];
+				int int1;
+				int int2;
+				sscanf(line.c_str(), "%d %s %d %d", &category, &name, &int1, &int2);
 				
+				if(category == 0) // It's a constant
+				{
+					defineConstant(state, std::string(name), int1);
+				}
+				else if(category == 1) // It's a variable
+				{
+					defineVariable(state, std::string(name), int1, int2);
+				}
+				else if(category == 2) // It's a function
+				{
+					defineFunction(state, std::string(name), int1);
+				}
+				
+				std::cout << line << std::endl;
 			}
 			file.close();
 		}
 
 	}
 	
+	void HeaderReader::defineConstant(State& state, const std::string& value, const int& typeId)
+	{
+		TokenType type = TokenType(typeId);
+
+		if(type == TokenType::CSTINT)
+		{
+			state.addConstant(cstIndex, Variable(std::stoi(value)));
+		}
+		else if(type == TokenType::CSTFLOAT)
+		{
+			state.addConstant(cstIndex, Variable(std::stof(value)));
+		}
+		else if(type == TokenType::CSTBOOLEAN)
+		{
+			if(value == "true")
+			{
+				state.addConstant(cstIndex, Variable(true));
+			}
+			else
+			{
+				state.addConstant(cstIndex, Variable(false));
+			}
+		}
+		else if(type == TokenType::CSTSTRING)
+		{
+			state.addConstant(cstIndex, Variable(value));
+		}
+		cstIndex++;
+	}
 	
+	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const
+	{
+		state.addVariable(name, typeId, Handle(id, Category::VARIABLE));
+	}
+	
+	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id) const
+	{
+		state.addFunction(id, name);
+	}
 	
 	
 	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)

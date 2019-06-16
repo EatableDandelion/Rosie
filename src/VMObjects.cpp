@@ -122,9 +122,14 @@ namespace Rosie
 		constants[id] = csts;
 	}
 	
-	void State::addMethod(const Function<Variable>& func)
+	void State::addFunction(const int& id, const std::string& name)
 	{
-		methods.insert(std::pair<std::string, Function<Variable>> (func.getName(), func));
+		functions.add(id, name, Function<Variable>(name, id));
+	}
+	
+	void State::setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::stack<Variable>&)>& func)
+	{
+		functions[name].setFunction(func);
 	}
 	
 	void State::push(const Variable& variable)
@@ -143,11 +148,6 @@ namespace Rosie
 		callStack.pop();
 		return res;
 	}
-	
-	/*bool State::empty() const
-	{
-		return callStack.empty();
-	}*/
 	
 	void State::copyVariable(Handle& dest, const Handle& src)
 	{	
@@ -185,7 +185,7 @@ namespace Rosie
 		}
 	}
 	
-	void State::execute(const std::string& methodName)
+	void State::execute(const int& functionId)
 	{
 		std::vector<Variable> args;
 		while(!callStack.empty())
@@ -193,6 +193,6 @@ namespace Rosie
 			args.push_back(pop());
 		}
 
-		methods[methodName].execute(args, callStack);	
+		functions[functionId].execute(args, callStack);	
 	}
 }

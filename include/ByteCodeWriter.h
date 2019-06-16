@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <windows.h>
 #include <memory>
+#include <stdio.h>
 #include "Lexer.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
@@ -87,10 +88,15 @@ namespace Rosie
 	{
 		public:
 			HeaderReader(const std::string& fileName);
-			void read(State& state) const;
+			void read(State& state);
 		
 		private:
 			std::string fileName;
+			int cstIndex;
+			
+			void defineConstant(State& state, const std::string& value, const int& type);
+			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
+			void defineFunction(State& state, const std::string& name, const int& id) const;
 	};
 	
 	class ByteCodeWriter

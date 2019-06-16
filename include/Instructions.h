@@ -75,7 +75,7 @@ namespace Rosie
 			virtual std::string getName() const;
 	};
 	
-	class NewInstruction : public TemplateInstruction<NewInstruction>
+	/*class NewInstruction : public TemplateInstruction<NewInstruction>
 	{
 		public:
 			NewInstruction(const std::string& name, const Address& var);
@@ -91,7 +91,7 @@ namespace Rosie
 			ConstantInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
-	};
+	};*/
 	
 	//Push variable onto stack for function call
 	class ArgumentInstruction : public TemplateInstruction<ArgumentInstruction>

@@ -94,10 +94,8 @@ namespace Rosie
 	struct Function
 	{
 		public:
-			Function(const std::string& name, const std::function<void(std::vector<T>&, std::stack<T>&)> func, const int& id):name(name), id(id)
-			{
-				m_func = func;
-			}
+			Function(const std::string& name, const int& id):name(name), id(id)
+			{}
 			
 			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
 			{}
@@ -113,6 +111,11 @@ namespace Rosie
 			std::string getName() const
 			{
 				return name;
+			}
+	
+			void setFunction(const std::function<void(std::vector<T>&, std::stack<T>&)>& func)
+			{
+				m_func = func;
 			}
 	
 			int getId() const
@@ -149,21 +152,20 @@ namespace Rosie
 			State(const Syntax& syntax);
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
 			void addConstant(const int& id, const Variable& cst);
-			void addMethod(const Function<Variable>& func);
+			void addFunction(const int& id, const std::string& name);
+			void setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::stack<Variable>&)>& func);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
 			Variable pop();
-			//bool empty() const;
 			void copyVariable(Handle& dest, const Handle& src);
-			Variable getVariable(const Handle& handle);
-			void execute(const std::string& methodName);
+			Variable getVariable(const Handle& handle);	
+			void execute(const int& functionId);
 			
 		private:
 			Syntax syntax;
 			DualMap<Handle, std::size_t, Variable> variables;
 			std::unordered_map<int, Variable> constants;
 			std::stack<Variable> callStack;
-			//DualMap<int, std::string, Function<Variable>> methods;
-			std::unordered_map<std::string, Function<Variable>> methods;
+			DualMap<int, std::string, Function<Variable>> functions;
 	};	
 }

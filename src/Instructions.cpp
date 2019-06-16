@@ -38,7 +38,7 @@ namespace Rosie
 		return "SET";
 	}
 
-	NewInstruction::NewInstruction(const std::string& name, const Address& var):TemplateInstruction(name+" "+std::to_string(var.getId())+" "+std::to_string(var.getTypeId()))
+	/*NewInstruction::NewInstruction(const std::string& name, const Address& var):TemplateInstruction(name+" "+std::to_string(var.getId())+" "+std::to_string(var.getTypeId()))
 	{}
 	
 	NewInstruction::NewInstruction()
@@ -97,7 +97,7 @@ namespace Rosie
 	std::string ConstantInstruction::getName() const
 	{
 		return "CST";
-	}
+	}*/
 
 	
 	ArgumentInstruction::ArgumentInstruction(const Address& address):TemplateInstruction(std::to_string(address.getId())+" "+std::to_string(address.getCategory()))
@@ -126,7 +126,7 @@ namespace Rosie
 
 	void CallInstruction::read(const std::string& command, State& state) const
 	{
-		state.execute(command);
+		//state.execute(command);
 	}
 	
 	std::string CallInstruction::getName() const

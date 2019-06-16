@@ -24,7 +24,6 @@ namespace Rosie
 			Variable(const TokenType& tokenType);
 			Variable();
 
-			
 			template<typename T>
 			T get() const
 			{

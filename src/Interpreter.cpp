@@ -190,6 +190,13 @@ namespace Rosie{
 					program.newFunctionAddress(token.value);
 				}
 			}
+			else if(token.type == TokenType::OPERATOR)
+			{
+				if(!program.hasFunctionAddress(token))
+				{
+					program.newFunctionAddress(token.value);
+				}
+			}
 			
 			infixInput.push_back(token);
 			lexer++;
@@ -226,7 +233,10 @@ namespace Rosie{
 					{
 						Address arg2 = activeStack.top();
 						activeStack.pop();
-						Address arg1 = activeStack.top();			
+						Address arg1 = activeStack.top();	
+						
+						program.addInstruction<ArgumentInstruction>(arg2);
+						program.addInstruction<ArgumentInstruction>(arg1);
 						
 						if(token == "+")
 						{
@@ -248,6 +258,7 @@ namespace Rosie{
 					}
 					activeStack.pop();
 					activeStack.push(program.getStackAddress(TokenType::CSTFLOAT));
+					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer).getId());
 					
 				}
 				else if(token.type == TokenType::FUNCNAME)//function
@@ -264,7 +275,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction<CallInstruction>(token.value);
+					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer).getId());
 					
 					/** TODO: get type of function output. */
 					activeStack.push(program.getStackAddress());
@@ -273,7 +284,6 @@ namespace Rosie{
 				{
 					while(!activeStack.empty())
 					{
-						//program.addInstruction(Opcode::ARG, activeStack.top());
 						activeStack.pop();
 					}
 					
@@ -282,10 +292,7 @@ namespace Rosie{
 						activeStack = stack.top();
 						stack.pop();
 					}
-					
-					//program.addInstruction<CtorInstruction>(Opcode::NEW, token.value);
-					activeStack.push(program.getStackAddress());
-					
+					activeStack.push(program.getStackAddress());				
 				}
 				else
 				{	

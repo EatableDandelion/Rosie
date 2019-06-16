@@ -40,16 +40,13 @@ namespace Rosie
 		address.setType(type);
 		
 		constants.push_back(Constant(type, value));
-		
-		addInstruction<ConstantInstruction>(constants.size()-1, constants.back());
-		
+
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
 	Address Program::newVarAddress(const std::string& name, const TokenType& type)
 	{
 		Address newAddress = variables.newAddress(name, type);
-		addInstruction<NewInstruction>(name, newAddress);
 		return newAddress;
 	}
 	
@@ -294,8 +291,8 @@ namespace Rosie
 	ByteCodeReader::ByteCodeReader(const std::string& fileName, const Syntax& syntax):fileName(fileName)
 	{
 		addInstruction<SetInstruction>();
-		addInstruction<NewInstruction>();
-		addInstruction<ConstantInstruction>();
+		//addInstruction<NewInstruction>();
+		//addInstruction<ConstantInstruction>();
 		addInstruction<AddInstruction>();
 		addInstruction<ArgumentInstruction>();
 		addInstruction<CallInstruction>(syntax);

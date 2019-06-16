@@ -107,7 +107,7 @@ namespace Rosie
 	class CallInstruction : public TemplateInstruction<CallInstruction>
 	{
 		public:
-		  	CallInstruction(const std::string& name);
+		  	CallInstruction(const int& functionId);
 			CallInstruction(const Syntax& syntax);
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;

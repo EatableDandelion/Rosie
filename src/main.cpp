@@ -20,8 +20,11 @@ int main()
 	State state(syntax);
 	HeaderReader headerReader("test.hc");
 	headerReader.read(state);
+	std::cout << std::endl;
 	ByteCodeReader reader("test.bc", syntax);
 	state.setFunction("print", [&](std::vector<Variable>& args, std::stack<Variable>& results){std::cout << args[0] << std::endl;});
+	state.setFunction("-", [&](std::vector<Variable>& args, std::stack<Variable>& results){results.push(args[0].get<float>()-args[1].get<float>());});
+
 	reader.read(state);
 	
 	

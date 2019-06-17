@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
-#include <stack>
+#include <queue>
 #include <variant>
 #include "Utils.h"
 #include "InterpreterObjects.h"
@@ -102,7 +102,7 @@ namespace Rosie
 			Function()
 			{}
 		
-			void execute(std::vector<T>& arguments, std::stack<T>& results) const
+			void execute(std::vector<T>& arguments, std::queue<T>& results) const
 			{
 				m_func(arguments, results);
 			}
@@ -112,7 +112,7 @@ namespace Rosie
 				return name;
 			}
 	
-			void setFunction(const std::function<void(std::vector<T>&, std::stack<T>&)>& func)
+			void setFunction(const std::function<void(std::vector<T>&, std::queue<T>&)>& func)
 			{
 				m_func = func;
 			}
@@ -125,7 +125,7 @@ namespace Rosie
 		private:
 			std::string name;
 			int id;
-			std::function<void(std::vector<T>&, std::stack<T>&)> m_func;
+			std::function<void(std::vector<T>&, std::queue<T>&)> m_func;
 	};
 	
 }
@@ -152,7 +152,7 @@ namespace Rosie
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
 			void addConstant(const int& id, const Variable& cst);
 			void addFunction(const int& id, const std::string& name);
-			void setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::stack<Variable>&)>& func);
+			void setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::queue<Variable>&)>& func);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
 			Variable pop();
@@ -164,7 +164,7 @@ namespace Rosie
 			Syntax syntax;
 			DualMap<Handle, std::size_t, Variable> variables;
 			std::unordered_map<int, Variable> constants;
-			std::stack<Variable> callStack;
+			std::queue<Variable> callStack;
 			DualMap<int, std::string, Function<Variable>> functions;
 	};	
 }

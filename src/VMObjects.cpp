@@ -127,7 +127,7 @@ namespace Rosie
 		functions.add(id, name, Function<Variable>(name, id));
 	}
 	
-	void State::setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::stack<Variable>&)>& func)
+	void State::setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::queue<Variable>&)>& func)
 	{
 		functions[name].setFunction(func);
 	}
@@ -144,7 +144,7 @@ namespace Rosie
 	
 	Variable State::pop()
 	{
-		Variable res = callStack.top();
+		Variable res = callStack.front();
 		callStack.pop();
 		return res;
 	}
@@ -190,9 +190,10 @@ namespace Rosie
 		std::vector<Variable> args;
 		while(!callStack.empty())
 		{
-			args.push_back(pop());
+			std::cout << callStack.front().get<float>() << std::endl;
+			args.push_back(pop());		
 		}
-
+		
 		functions[functionId].execute(args, callStack);	
 	}
 }

@@ -190,13 +190,6 @@ namespace Rosie{
 					program.newFunctionAddress(token.value);
 				}
 			}
-			else if(token.type == TokenType::OPERATOR)
-			{
-				if(!program.hasFunctionAddress(token))
-				{
-					program.newFunctionAddress(token.value);
-				}
-			}
 			
 			infixInput.push_back(token);
 			lexer++;
@@ -206,6 +199,12 @@ namespace Rosie{
 		std::stack<std::stack<Address>> stack; //stack of stack to handle variable nb of args.
 		std::stack<Address> activeStack;
 		
+		std::cout << std::endl;
+		for(Token token : rpn)
+		{
+			std::cout << token.value;
+		}
+		std::cout << std::endl;
 		
 		for(Token token : rpn)
 		{
@@ -223,38 +222,22 @@ namespace Rosie{
 			{
 				if(token.type == TokenType::OPERATOR)
 				{
-					if(token == "u-")
-					{												
-						//program.addInstruction(Opcode::NEG, activeStack.top());
+					if(!program.hasFunctionAddress(token))
+					{
+						program.newFunctionAddress(token.value);
 					}
-					else if(token == "u+")
-					{}
+					if(token == "u-" || token == "u+")
+					{
+						program.addInstruction<ArgumentInstruction>(activeStack.top());
+					}
 					else
 					{
 						Address arg2 = activeStack.top();
 						activeStack.pop();
 						Address arg1 = activeStack.top();	
 						
-						program.addInstruction<ArgumentInstruction>(arg2);
 						program.addInstruction<ArgumentInstruction>(arg1);
-						
-						if(token == "+")
-						{
-							//program.addInstruction(Opcode::ADD, arg1, arg2);
-							program.addInstruction<AddInstruction>(arg1, arg2);
-						}
-						else if(token == "-")
-						{
-							//program.addInstruction(Opcode::SUB, arg1, arg2);
-						}
-						else if(token == "*")
-						{
-							//program.addInstruction(Opcode::MULT, arg1, arg2);
-						}
-						else if(token == "/")
-						{
-							//program.addInstruction(Opcode::DIV, arg1, arg2);
-						}	
+						program.addInstruction<ArgumentInstruction>(arg2);
 					}
 					activeStack.pop();
 					activeStack.push(program.getStackAddress(TokenType::CSTFLOAT));
@@ -263,10 +246,17 @@ namespace Rosie{
 				}
 				else if(token.type == TokenType::FUNCNAME)//function
 				{
+					/** Double stack exchange necessary to specify args in correct order */
+					std::stack<Address> argumentStack;
 					while(!activeStack.empty())
 					{
-						program.addInstruction<ArgumentInstruction>(activeStack.top());
+						argumentStack.push(activeStack.top());
 						activeStack.pop();
+					}
+					while(!argumentStack.empty())
+					{
+						program.addInstruction<ArgumentInstruction>(argumentStack.top());
+						argumentStack.pop();
 					}
 					
 					if(!stack.empty())
@@ -344,7 +334,7 @@ namespace Rosie{
 					output.push_back(stack.top());
 					stack.pop();
 				}
-				stack.push(token);				
+				stack.push(token);
 			}
 			else if(syntax.isListSeparator(token))
 			{
@@ -412,6 +402,10 @@ namespace Rosie{
 		else if(token == "^")
 		{
 			return 4;
+		}
+		else if(token == "u+" || token == "u-")
+		{
+			return 3;
 		}
 		return 0;
 	}

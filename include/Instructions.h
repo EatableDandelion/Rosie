@@ -3,12 +3,24 @@
 #include <unordered_map>
 #include <cstdio>
 #include <string>
+#include <initializer_list>
+#include <queue>
 #include "VMObjects.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
 
 namespace Rosie
 {
+	
+	class AddressTranslator
+	{
+		public:
+			std::string toString(const std::initializer_list<Address>& addresses) const;
+
+			std::vector<Handle> toHandles(const std::string& string) const;
+			
+	};
+	
 	class InstructionCollection
 	{
 		public:
@@ -45,6 +57,15 @@ namespace Rosie
 		public:
 			TemplateInstruction(const std::string& text):text(text)
 			{}
+			
+			TemplateInstruction(const std::initializer_list<Address>& addresses)
+			{
+				for(const Address& address : addresses)
+				{
+					text+=std::to_string(address.getId())+" "+std::to_string(address.getCategory())+" ";
+				}
+				text.pop_back();//remove last character (white space).
+			}
 
 			TemplateInstruction()
 			{}
@@ -59,9 +80,32 @@ namespace Rosie
 				return id;
 			}
 
+		protected:
+			std::vector<Handle> getHandles(const std::string& string) const
+			{
+				std::vector<Handle> res;
+				
+				std::queue<std::string> args;
+				for(const std::string& token : Rosie::split(string, " "))
+				{
+					args.push(token);
+				}
+				
+				while(!args.empty())
+				{
+					int id = std::stoi(args.front());
+					args.pop();
+					int category = std::stoi(args.front());
+					args.pop();
+					res.push_back(Handle(id, Category(category)));
+				}
+				
+				return res;
+			}
+
 		private:
 			std::string text;
-			static int id; 
+			static int id;
 	};
 
 	template<typename T> int TemplateInstruction<T>::id(Instruction::createId());
@@ -73,25 +117,10 @@ namespace Rosie
 			SetInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
+			
+		private:
+			AddressTranslator translator;
 	};
-	
-	/*class NewInstruction : public TemplateInstruction<NewInstruction>
-	{
-		public:
-			NewInstruction(const std::string& name, const Address& var);
-			NewInstruction();
-			virtual void read(const std::string& command, State& state) const;
-			virtual std::string getName() const;
-	};
-
-	class ConstantInstruction : public TemplateInstruction<ConstantInstruction>
-	{
-		  public:
-			ConstantInstruction(const int& index, const Constant& constant);
-			ConstantInstruction();
-			virtual void read(const std::string& command, State& state) const;
-			virtual std::string getName() const;
-	};*/
 	
 	//Push variable onto stack for function call
 	class ArgumentInstruction : public TemplateInstruction<ArgumentInstruction>
@@ -116,22 +145,12 @@ namespace Rosie
 			Syntax syntax;
 	};
 	
-	//Arithmetic addition
-	class AddInstruction : public TemplateInstruction<AddInstruction>
-	{
-		  public:
-		  	AddInstruction(const Address& a, const Address& b);
-			AddInstruction();
-			virtual void read(const std::string& command, State& state) const;
-			virtual std::string getName() const;
-	};
-	
 	//This instruction deals with non-primitive variabless
-	class CompositeInstruction : public TemplateInstruction<CompositeInstruction>
+	class ScopeInstruction : public TemplateInstruction<ScopeInstruction>
 	{
 		public:
-		  	CompositeInstruction(const Address& parent);
-			CompositeInstruction();
+		  	ScopeInstruction(const Address& parent);
+			ScopeInstruction();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 		

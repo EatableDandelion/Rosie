@@ -14,10 +14,6 @@ namespace Rosie{
 			{		
 				parseDeclaration(lexer, program); 					//float a = 2.1;
 			}
-			else if(lexer.getToken().type == TokenType::KEYWORD)
-			{
-				parseKeyword(lexer, program);
-			}
 			else if(functionParser.isFunction(lexer))		//If it's a function or a ctor
 			{
 				functionParser.parse(lexer, program);				//add(a, b);
@@ -70,36 +66,15 @@ namespace Rosie{
 		}
 	}
 	
-	void Parser::parseKeyword(Lexer& lexer, Program& program)
-	{
-		if(syntax.isClassDeclaration(lexer.getToken()))
-		{
-			lexer++; 
-			Type newType = program.addType(lexer.getToken().value);
-			lexer++; //"("
-			while(lexer.getToken() != ")")
-			{
-				lexer++;
-				std::string memberType = lexer.getToken().value;
-				lexer++;
-				program.addMemberToType(newType, lexer.getToken().value, memberType);
-				lexer++;//"," or ")"
-			}
-		}
-	}
-	
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
 	{
-
-		//Address destAddress = program.getVarAddress(lexer.getToken());//token = "variableName"
 		Address destAddress;
 		Token var = lexer.getToken();
-		
+		checkToken(var.type == TokenType::VARNAME,lexer, "Variable name expected.");
 		lexer++;//token = "="
-		checkToken(syntax.isAssignment(lexer.getToken()),lexer);
+		checkToken(syntax.isAssignment(lexer.getToken()),lexer, "Assignment operator expected.");
 		
 		lexer++;//token = "2.21"
-		
 		if(syntax.isStartScope(lexer.getToken()))
 		{
 			if(program.hasVarAddress(var))
@@ -111,36 +86,26 @@ namespace Rosie{
 				destAddress = program.newVarAddress(var, TokenType::CSTARRAY);
 			}
 			
-			program.addInstruction<CompositeInstruction>(destAddress);// start scope
-			parseComposite(lexer, program);
-			program.addInstruction<CompositeInstruction>();//end scope
+			program.addInstruction<ScopeInstruction>(destAddress);// start scope
+			parseScope(lexer, program);
+			program.addInstruction<ScopeInstruction>();//end scope
 		}
 		else
 		{	
-			Address srcAddress = functionParser.parse(lexer, program);
-			
-			if(program.hasVarAddress(var))
-			{
-				destAddress = program.getVarAddress(var);
-			}
-			else
-			{
-				destAddress = program.newVarAddress(var, srcAddress.getType());
-			}
-			
-			program.addInstruction<SetInstruction>(destAddress, srcAddress);
-			checkToken(syntax.isTerminator(lexer.getToken()), lexer);
+			destAddress = program.setAddress(var, functionParser.parse(lexer, program));
 		}
+		checkToken(syntax.isTerminator(lexer.getToken()), lexer, "Terminator expected.");
 	}
 	
-	//A composite is any variable that is not a primitive type (ie an instance)
-	void Parser::parseComposite(Lexer& lexer, Program& program)
+	void Parser::parseScope(Lexer& lexer, Program& program)
 	{
+		lexer++;
 		while(!syntax.isEndScope(lexer.getToken()))
-		{	
-			lexer++;
+		{
 			parseAssignment(lexer, program);
+			lexer++;
 		}
+		lexer++;
 	}
 	
 	Address Parser::getVariable(const Token& token, Program& program)
@@ -158,16 +123,16 @@ namespace Rosie{
 		return false;
 	}
 	
-	void Parser::checkToken(const std::string& expectedToken, const Lexer& lexer)
+	void Parser::checkToken(const std::string& expectedToken, const Lexer& lexer, const std::string& errorMsg)
 	{
-		checkToken(lexer.getToken() == expectedToken, lexer);
+		checkToken(lexer.getToken() == expectedToken, lexer, errorMsg);
 	}
 	
-	void Parser::checkToken(bool isCorrectToken, const Lexer& lexer)
+	void Parser::checkToken(bool isCorrectToken, const Lexer& lexer, const std::string& errorMsg)
 	{
 		if(!isCorrectToken)
 		{
-			Rosie::error("Unexpected token.", lexer);
+			Rosie::error("Unexpected token.\n"+errorMsg, lexer);
 		}
 	}
 	
@@ -198,13 +163,6 @@ namespace Rosie{
 
 		std::stack<std::stack<Address>> stack; //stack of stack to handle variable nb of args.
 		std::stack<Address> activeStack;
-		
-		std::cout << std::endl;
-		for(Token token : rpn)
-		{
-			std::cout << token.value;
-		}
-		std::cout << std::endl;
 		
 		for(Token token : rpn)
 		{
@@ -246,17 +204,10 @@ namespace Rosie{
 				}
 				else if(token.type == TokenType::FUNCNAME)//function
 				{
-					/** Double stack exchange necessary to specify args in correct order */
-					std::stack<Address> argumentStack;
 					while(!activeStack.empty())
 					{
-						argumentStack.push(activeStack.top());
+						program.addInstruction<ArgumentInstruction>(activeStack.top());
 						activeStack.pop();
-					}
-					while(!argumentStack.empty())
-					{
-						program.addInstruction<ArgumentInstruction>(argumentStack.top());
-						argumentStack.pop();
 					}
 					
 					if(!stack.empty())
@@ -267,22 +218,7 @@ namespace Rosie{
 					
 					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer).getId());
 					
-					/** TODO: get type of function output. */
 					activeStack.push(program.getStackAddress());
-				}
-				else if(token.type == TokenType::CONSTRUCTOR)
-				{
-					while(!activeStack.empty())
-					{
-						activeStack.pop();
-					}
-					
-					if(!stack.empty())
-					{
-						activeStack = stack.top();
-						stack.pop();
-					}
-					activeStack.push(program.getStackAddress());				
 				}
 				else
 				{	
@@ -312,7 +248,7 @@ namespace Rosie{
 			{
 				output.push_back(token);
 			}
-			else if(token.type == TokenType::FUNCNAME || token.type == TokenType::CONSTRUCTOR)
+			else if(token.type == TokenType::FUNCNAME)
 			{
 				stack.push(token);
 			}
@@ -325,8 +261,7 @@ namespace Rosie{
 			{			
 				while(
 					!stack.empty() && !syntax.isListStart(stack.top()) &&
-					(stack.top().type == TokenType::FUNCNAME || 
-					stack.top().type == TokenType::CONSTRUCTOR ||
+					(stack.top().type == TokenType::FUNCNAME ||
 					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
 					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
 					)

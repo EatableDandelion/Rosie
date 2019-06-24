@@ -70,6 +70,22 @@ namespace Rosie
 		return variables.hasAddress(token.value);
 	}
 	
+	Address Program::setAddress(const Token& destToken, const Address& srcAddress)
+	{
+		Address destAddress;
+		if(hasVarAddress(destToken))
+		{
+			destAddress = getVarAddress(destToken);
+		}
+		else
+		{
+			destAddress = newVarAddress(destToken, srcAddress.getType());
+		}
+		addInstruction<SetInstruction>(destAddress, srcAddress);
+		
+		return destAddress;
+	}
+	
 	Address Program::newFunctionAddress(const std::string& name)
 	{
 		return functions.newAddress(name);
@@ -230,9 +246,9 @@ namespace Rosie
 	void HeaderReader::defineConstant(State& state, const std::string& value, const int& typeId)
 	{
 		TokenType type = TokenType(typeId);
-
+		
 		if(type == TokenType::CSTINT)
-		{
+		{			
 			state.addConstant(cstIndex, Variable(std::stoi(value)));
 		}
 		else if(type == TokenType::CSTFLOAT)
@@ -291,11 +307,9 @@ namespace Rosie
 	ByteCodeReader::ByteCodeReader(const std::string& fileName, const Syntax& syntax):fileName(fileName)
 	{
 		addInstruction<SetInstruction>();
-		//addInstruction<NewInstruction>();
-		//addInstruction<ConstantInstruction>();
-		addInstruction<AddInstruction>();
 		addInstruction<ArgumentInstruction>();
 		addInstruction<CallInstruction>(syntax);
+		addInstruction<ScopeInstruction>();
 	}
 	
 	void ByteCodeReader::read(State& state) const

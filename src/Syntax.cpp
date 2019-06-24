@@ -69,7 +69,7 @@ namespace Rosie
 	
 	bool Syntax::isTerminator(const Token& token)
 	{
-		return token == ";";
+	return token == ";";
 	}
 	
 	bool Syntax::isListSeparator(const Token& token)

@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
-#include <queue>
+#include <stack>
 #include <variant>
 #include "Utils.h"
 #include "InterpreterObjects.h"
@@ -13,8 +13,19 @@
 
 namespace Rosie
 {
+	class State;
 	
-	struct Variable
+	class IVariable
+	{
+		public:
+			virtual std::shared_ptr<IVariable> add(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
+			virtual std::string toString() const = 0;
+	};
+	
+	class Variable
 	{
 		public:
 			Variable(const float& floatValue);
@@ -22,57 +33,59 @@ namespace Rosie
 			Variable(const bool& booleanValue);
 			Variable(const std::string& stringValue);
 			Variable(const TokenType& tokenType);
+			Variable(const std::shared_ptr<IVariable>& variable);
 			Variable();
-
+			
+			Variable operator+(const Variable& other);
+			Variable operator-(const Variable& other);
+			Variable operator*(const Variable& other);
+			Variable operator/(const Variable& other);
+			
+			friend std::ostream& operator <<(std::ostream& os, Variable& var)
+			{
+				std::string text = (var.variable)->toString();
+				os << text; 
+				return os;
+			}
+			
+			std::shared_ptr<IVariable> getVariable() const;
+			
+		private:
+			std::shared_ptr<IVariable> variable;
+	};
+	
+	class Primitive : public IVariable
+	{
+		public:
+			Primitive(const float& floatValue);
+			Primitive(const int& integerValue);
+			Primitive(const bool& booleanValue);
+			Primitive(const std::string& stringValue);
+			Primitive(const TokenType& tokenType);
+			Primitive();
+			
+			virtual std::shared_ptr<IVariable> add(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
+			
 			template<typename T>
 			T get() const
 			{
 				return std::get<T>(value);
 			}
-			
-			
+
 			void set(const float& newValue);
 			void set(const int& newValue);
 			void set(const bool& newValue);
 			void set(const std::string& newValue);
-			void set(const Variable& other);
-			void addMember(const std::string& name, const Variable& member);
-			std::shared_ptr<Variable> getMember(const std::string& name) const;
+			void set(const Primitive& other);
 			
-			friend std::ostream& operator <<(std::ostream& os, Variable& var)
-			{
-				if(var.type == 0)
-				{
-					os << std::to_string(var.get<float>())+ " (float)"; 
-				}
-				else if(var.type == 1)
-				{
-					os << std::to_string(var.get<int>())+ " (int)"; 
-				}
-				else if(var.type == 2)
-				{
-					os << std::to_string(var.get<bool>())+ " (boolean)"; 
-				}
-				else if(var.type == 3)
-				{
-					os << var.get<std::string>()+ " (string)"; 
-				}
-				else if(var.type == 4)
-				{
-					os << "[";
-					for(const auto& member : var.members)
-					{
-						os << *(member.second) << ", ";
-					}
-					os << "]";
-				}
-				return os;
-			}
+			virtual std::string toString() const;
 			
 		private:
 			int type;
 			std::variant<float, int, bool, std::string> value;
-			std::unordered_map<std::size_t, std::shared_ptr<Variable>> members;
 	};
 
 	struct Handle
@@ -89,22 +102,22 @@ namespace Rosie
 			Category category;
 	};
 	
-	template<typename T>
+	template<typename... A>
 	struct Function
 	{
 		public:
 			Function(const std::string& name, const int& id):name(name), id(id)
 			{}
 			
-			Function(const Function<T>& other):name(other.name), m_func(other.m_func), id(other.id)
+			Function(const Function<A...>& other):name(other.name), m_func(other.m_func), id(other.id)
 			{}
 			
 			Function()
 			{}
 		
-			void execute(std::vector<T>& arguments, std::queue<T>& results) const
+			void execute(A... arguments) const
 			{
-				m_func(arguments, results);
+				m_func(arguments...);
 			}
 	
 			std::string getName() const
@@ -112,7 +125,7 @@ namespace Rosie
 				return name;
 			}
 	
-			void setFunction(const std::function<void(std::vector<T>&, std::queue<T>&)>& func)
+			void setFunction(const std::function<void(A...)>& func)
 			{
 				m_func = func;
 			}
@@ -125,7 +138,7 @@ namespace Rosie
 		private:
 			std::string name;
 			int id;
-			std::function<void(std::vector<T>&, std::queue<T>&)> m_func;
+			std::function<void(A...)> m_func;
 	};
 	
 }
@@ -145,26 +158,60 @@ namespace std
 namespace Rosie
 {
 	
-	struct State
+	struct CallStack
 	{
 		public:
-			State(const Syntax& syntax);
+			Variable pop();
+			Variable peek();
+			void push(const Variable& variable);
+			bool empty() const;
+			
+		private:
+			std::stack<Variable> queue;
+	};
+	
+	class CompositeVariable : public IVariable
+	{
+		public:
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
 			void addConstant(const int& id, const Variable& cst);
 			void addFunction(const int& id, const std::string& name);
-			void setFunction(const std::string& name, const std::function<void(std::vector<Variable>&, std::queue<Variable>&)>& func);
-			void push(const Variable& variable);
-			void push(const Handle& handle);
-			Variable pop();
+			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);	
 			void execute(const int& functionId);
+			virtual std::string toString() const;
+			void push(const Variable& variable);
+			void push(const Handle& handle);
 			
 		private:
-			Syntax syntax;
 			DualMap<Handle, std::size_t, Variable> variables;
 			std::unordered_map<int, Variable> constants;
-			std::queue<Variable> callStack;
-			DualMap<int, std::string, Function<Variable>> functions;
-	};	
+			DualMap<int, std::string, Function<CallStack&>> functions;
+			CallStack callStack;
+			std::weak_ptr<IVariable> parent;
+	};
+	
+	class State
+	{
+		public:
+			State();
+			
+			void addVariable(const std::string& name, const int& type, const Handle& handle);
+			void addConstant(const int& id, const Variable& cst);
+			void addFunction(const int& id, const std::string& name);
+			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
+			void copyVariable(Handle& dest, const Handle& src);
+			Variable getVariable(const Handle& handle);	
+			void execute(const int& functionId);
+			void push(const Variable& variable);
+			void push(const Handle& handle);
+			
+			void startScope(const Handle& handle);
+			void endScope();
+				
+		private:				
+			std::shared_ptr<CompositeVariable> scope;
+			
+	};
 }

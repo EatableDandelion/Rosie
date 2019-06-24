@@ -19,7 +19,6 @@ namespace Rosie
 												"Integer constant",
 												"Boolean constant",
 												"Function name",
-												"Constructor",
 												"Undefined"};
 	
 	struct Token

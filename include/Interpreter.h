@@ -44,13 +44,12 @@ namespace Rosie{
 			
 			void parseAssignment(Lexer& lexer, Program& program);
 			void parseDeclaration(Lexer& lexer, Program& program);
-			void parseKeyword(Lexer& lexer, Program& program);
-			void parseComposite(Lexer& lexer, Program& program);
+			void parseScope(Lexer& lexer, Program& program);
 			Address getVariable(const Token& token, Program& program);
 			bool isVariable(Lexer& lexer);
 			
-			void checkToken(const std::string& expectedToken, const Lexer& lexer);
-			void checkToken(bool isCorrectToken, const Lexer& lexer);
+			void checkToken(const std::string& expectedToken, const Lexer& lexer, const std::string& errorMsg = "");
+			void checkToken(bool isCorrectToken, const Lexer& lexer, const std::string& errorMsg = "");
 			
 	};
 	

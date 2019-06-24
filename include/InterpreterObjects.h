@@ -26,8 +26,7 @@ namespace Rosie{
 	/*9*/	CSTBOOLEAN,	//true, false
 	/*10*/	CSTARRAY,
 	/*11*/	FUNCNAME,	//any function
-	/*12*/	CONSTRUCTOR,//class constructors
-	/*13*/	UNDEFINED	//base value
+	/*12*/	UNDEFINED	//base value
 	};
 	
 	struct Member

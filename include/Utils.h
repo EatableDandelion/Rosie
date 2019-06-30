@@ -87,4 +87,63 @@ namespace Rosie
 			std::unordered_map<K2, V> values;
 			std::unordered_map<K1, K2> keymap;
 	};
+	
+	template<typename T, typename Key>
+	class TreeNode
+	{
+		public:
+			TreeNode(const std::shared_ptr<T>& value):m_value(value)
+			{}
+		
+			std::shared_ptr<T> operator->()
+			{
+				return m_value;
+			}
+			
+			void addChild(const Key& key, const T& child)
+			{
+				TreeNode childNode = TreeNode(std::make_shared<T>(child));
+				childNode.parent = std::weak_ptr<T>(m_value);
+				children.insert(std::pair<Key, TreeNode>(key, childNode));
+			}
+			
+			TreeNode getChild(const Key& key)
+			{
+				return children[key];
+			}
+			
+			std::shared_ptr<T> getParent()
+			{
+				return parent.lock();
+			}
+		
+		private:
+			std::shared_ptr<T> m_value;
+			std::unordered_map<Key, TreeNode> children;
+			std::weak_ptr<T> parent;
+	};
+	
+	template<typename T, typename Key>
+	class Scope
+	{
+		public:
+			void createScope(const Key& key, const T& value)
+			{
+				node.addChild(key, value);
+			}
+		
+			void scopeIn(const Key& key)
+			{
+				node = node.getChild(key);
+			}
+			
+			void scopeOut()
+			{
+				node = TreeNode<T, Key>(node.getParent());
+			}
+
+		private:
+			TreeNode<T, Key> node;
+	}
+	
 }

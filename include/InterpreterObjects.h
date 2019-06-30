@@ -29,44 +29,6 @@ namespace Rosie{
 	/*12*/	UNDEFINED	//base value
 	};
 	
-	struct Member
-	{
-		Member(const std::size_t typeId, const int& offset);
-		std::size_t typeId;
-		int offset;
-	};
-	
-	struct Type
-	{
-		public:
-			bool operator==(const Type& other);
-			Type();
-			Type(const Type& other);
-			
-		private:
-			Type(const std::size_t& id);
-			std::size_t id;
-			std::unordered_map<std::size_t, Member> members;
-			
-			void addMember(const std::size_t& name, const std::size_t& typeId);
-			
-			friend struct TypeCollection;
-	};
-	
-	struct TypeCollection
-	{
-		public:
-			TypeCollection();
-			void addType(const std::string& name);
-			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
-			int getSize(const Type& type);
-			Type getType(const std::string& name) const;
-			bool hasType(const std::string& name) const;
-			
-		private:
-			std::map<std::size_t, Type> types;
-	};
-	
 	enum Category
 	{	
 		CONSTANT,
@@ -85,17 +47,19 @@ namespace Rosie{
 			int getId() const;
 			std::string getName() const;
 			Category getCategory() const;
-			//Type getType() const;
 			std::string getString() const;
 			int getTypeId() const;
 			void setType(const TokenType& tokenType);
 			TokenType getType() const;
+			void setScope(const int& scope);
+			int getScope();
 		
 		private:
 			int id;
 			std::string name;
 			Category category;
 			TokenType type;
+			int scope;
 	};
 	
 	struct Memory //collection of addresses

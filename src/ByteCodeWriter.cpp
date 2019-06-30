@@ -12,7 +12,7 @@ namespace Rosie
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 	
-  	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION)
+  	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION, 1)
 	{}
 	
 	Address Program::getAddress(const Token& token, const Lexer& lexer)
@@ -59,7 +59,6 @@ namespace Rosie
 	{
 		if(!hasVarAddress(token))
 		{
-			//return newVarAddress(token.value);
 			std::cout << "Error, variable " << token << " undefined." <<std::endl;
 		}
 		return variables.getAddress(token.value);
@@ -105,21 +104,45 @@ namespace Rosie
 		return functions.hasAddress(token.value);
 	}
 	
-	void Program::addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType)
+	void Program::setArguments(std::stack<Address>& activeStack, const int& nbArgs)
 	{
-		types.addMemberToType(type, memberName, memberType);
+		if(nbArgs == -1)
+		{
+			while(!activeStack.empty())
+			{
+				addInstruction<ArgumentInstruction>(activeStack.top());
+				activeStack.pop();
+			}
+		}
+		else
+		{
+			for(int i = 0; i< nbArgs; i++)
+			{
+				Address arg = activeStack.top();
+				activeStack.pop();	
+				addInstruction<ArgumentInstruction>(arg);
+			}
+		}
 	}
 	
-	void Program::startScope()
+	void Program::callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType)
 	{
-		std::cout << "Starting scope" << std::endl;
+		addInstruction<CallInstruction>(getFunctionAddress(token, lexer).getId());
+		activeStack.push(getStackAddress(returnType));
+	}
+	
+	void Program::startScope(const Address& destAddress)
+	{
+		addInstruction<ScopeInstruction>(destAddress);
 		variables.startScope();
+		functions.startScope();
 	}
 	
 	void Program::endScope()
 	{
-		std::cout << "End scope" << std::endl;
+		addInstruction<ScopeInstruction>();
 		variables.endScope();
+		functions.endScope();
 	}
 	
 	std::vector<std::string> Program::getCommands() const
@@ -137,27 +160,6 @@ namespace Rosie
 		Address res = getStackAddress();
 		res.setType(type);
 		return res;
-	}
-	
-	Type Program::addType(const std::string& name)
-	{
-		types.addType(name);
-		return getType(name);
-	}
-	
-	Type Program::getType(const std::string& name) const
-	{
-		return types.getType(name);
-	}
-	
-	Type Program::getType(const Token& token) const
-	{
-		return getType(token.value);
-	}
-	
-	bool Program::hasTypeName(const Token& token) const
-	{
-		return types.hasType(token.value);
 	}
 	
 	std::vector<Constant> Program::getConstants() const
@@ -192,12 +194,12 @@ namespace Rosie
 		
 		for(Address variable : program.getVariables())
 		{
-			file << 1 << " " << variable.getName() << " " << variable.getId() << " " << variable.getTypeId() << std::endl;
+			file << 1 << " " << variable.getName() << " " << variable.getId() << " " << variable.getTypeId() << " " << variable.getScope() << std::endl;
 		}
 		
 		for(Address function : program.getFunctions())
 		{
-			file << 2 << " " << function.getName() << " " << function.getId() << std::endl;
+			file << 2 << " " << function.getName() << " " << function.getId() << " " << function.getScope() << std::endl;
 		}
 		
 		file.close();
@@ -221,7 +223,8 @@ namespace Rosie
 				char name[20];
 				int int1;
 				int int2;
-				sscanf(line.c_str(), "%d %s %d %d", &category, &name, &int1, &int2);
+				int int3;
+				sscanf(line.c_str(), "%d %s %d %d %d", &category, &name, &int1, &int2, &int3);
 				
 				if(category == 0) // It's a constant
 				{
@@ -229,11 +232,11 @@ namespace Rosie
 				}
 				else if(category == 1) // It's a variable
 				{
-					defineVariable(state, std::string(name), int1, int2);
+					defineVariable(state, std::string(name), int1, int2, int3);
 				}
 				else if(category == 2) // It's a function
 				{
-					defineFunction(state, std::string(name), int1);
+					defineFunction(state, std::string(name), int1, int2);
 				}
 				
 				std::cout << line << std::endl;
@@ -273,14 +276,14 @@ namespace Rosie
 		cstIndex++;
 	}
 	
-	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const
+	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId, const int& scope) const
 	{
-		state.addVariable(name, typeId, Handle(id, Category::VARIABLE));
+		state.addVariable(name, typeId, Handle(id, Category::VARIABLE), scope);
 	}
 	
-	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id) const
+	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id, const int& scope) const
 	{
-		state.addFunction(id, name);
+		state.addFunction(id, name, scope);
 	}
 	
 	

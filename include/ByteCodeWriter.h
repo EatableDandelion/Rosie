@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <memory>
 #include <stdio.h>
+#include <stack>
 #include "Lexer.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
@@ -20,13 +21,7 @@ namespace Rosie
 	class Program
 	{
 		public:
-			Program();
-			
-			template<typename T, typename... Args>
-			std::string addInstruction(Args&&... args)
-	  		{
-				return instructions.addInstruction<T>(args...);
-			}
+			Program(); 
 			
 			Address getAddress(const Token& token, const Lexer& lexer);
 			
@@ -42,9 +37,10 @@ namespace Rosie
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
 			
-			void addMemberToType(const Type& type, const std::string& memberName, const std::string& memberType);
+			void setArguments(std::stack<Address>& activeStack, const int& nbArgs = -1);
+			void callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType = TokenType::UNDEFINED);
 
-			void startScope();
+			void startScope(const Address& destAddress);
 			void endScope();
 			
 			std::vector<std::string> getCommands() const;
@@ -53,14 +49,6 @@ namespace Rosie
 		
 			Address getStackAddress(const TokenType& type);
 			
-			Type addType(const std::string& name);
-			
-			Type getType(const std::string& name) const;
-			
-			Type getType(const Token& token) const;
-	
-			bool hasTypeName(const Token& token) const;
-		
 			std::vector<Constant> getConstants() const;
 		
 			std::vector<Address> getVariables() const;
@@ -73,8 +61,14 @@ namespace Rosie
 			Memory variables;
 			Memory functions;
 			InstructionCollection instructions;
-			TypeCollection types;
+			
+			template<typename T, typename... Args>
+			std::string addInstruction(Args&&... args)
+	  		{
+				return instructions.addInstruction<T>(args...);
+			}
 	};
+	
 	
 	class HeaderWriter
 	{
@@ -96,8 +90,8 @@ namespace Rosie
 			int cstIndex;
 			
 			void defineConstant(State& state, const std::string& value, const int& type);
-			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
-			void defineFunction(State& state, const std::string& name, const int& id) const;
+			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId, const int& scope) const;
+			void defineFunction(State& state, const std::string& name, const int& id, const int& scope) const;
 	};
 	
 	class ByteCodeWriter

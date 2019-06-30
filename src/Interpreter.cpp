@@ -10,11 +10,7 @@ namespace Rosie{
 		while(lexer.hasNext())
 		{
 			//if(lexer.getToken().type == TokenType::VARTYPE) 		//If it's a type such as float, int
-			if(program.hasTypeName(lexer.getToken()))
-			{		
-				parseDeclaration(lexer, program); 					//float a = 2.1;
-			}
-			else if(functionParser.isFunction(lexer))		//If it's a function or a ctor
+			if(functionParser.isFunction(lexer))		//If it's a function or a ctor
 			{
 				functionParser.parse(lexer, program);				//add(a, b);
 			}
@@ -86,9 +82,9 @@ namespace Rosie{
 				destAddress = program.newVarAddress(var, TokenType::CSTARRAY);
 			}
 			
-			program.addInstruction<ScopeInstruction>(destAddress);// start scope
+			program.startScope(destAddress);
 			parseScope(lexer, program);
-			program.addInstruction<ScopeInstruction>();//end scope
+			program.endScope();
 		}
 		else
 		{	
@@ -186,29 +182,19 @@ namespace Rosie{
 					}
 					if(token == "u-" || token == "u+")
 					{
-						program.addInstruction<ArgumentInstruction>(activeStack.top());
+						program.setArguments(activeStack, 1);
+		
 					}
 					else
 					{
-						Address arg2 = activeStack.top();
-						activeStack.pop();
-						Address arg1 = activeStack.top();	
-						
-						program.addInstruction<ArgumentInstruction>(arg1);
-						program.addInstruction<ArgumentInstruction>(arg2);
+						program.setArguments(activeStack, 2);
 					}
-					activeStack.pop();
-					activeStack.push(program.getStackAddress(TokenType::CSTFLOAT));
-					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer).getId());
-					
+					program.callFunction(activeStack, token, lexer, TokenType::CSTFLOAT);
+	
 				}
 				else if(token.type == TokenType::FUNCNAME)//function
 				{
-					while(!activeStack.empty())
-					{
-						program.addInstruction<ArgumentInstruction>(activeStack.top());
-						activeStack.pop();
-					}
+					program.setArguments(activeStack);
 					
 					if(!stack.empty())
 					{
@@ -216,9 +202,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.addInstruction<CallInstruction>(program.getFunctionAddress(token, lexer).getId());
-					
-					activeStack.push(program.getStackAddress());
+					program.callFunction(activeStack, token, lexer);
 				}
 				else
 				{	

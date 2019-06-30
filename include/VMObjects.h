@@ -18,6 +18,8 @@ namespace Rosie
 	class IVariable
 	{
 		public:
+			virtual void addVariable(const std::string& name, const int& type, const Handle& handle);
+			virtual void addFunction(const int& id, const std::string& name);
 			virtual std::shared_ptr<IVariable> add(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
@@ -48,6 +50,8 @@ namespace Rosie
 				return os;
 			}
 			
+			void addVariable(const std::string& name, const int& type, const Handle& handle);
+			void addFunction(const int& id, const std::string& name);		
 			std::shared_ptr<IVariable> getVariable() const;
 			
 		private:
@@ -174,8 +178,8 @@ namespace Rosie
 	{
 		public:
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
-			void addConstant(const int& id, const Variable& cst);
 			void addFunction(const int& id, const std::string& name);
+			void addConstant(const int& id, const Variable& cst);
 			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);	
@@ -198,8 +202,8 @@ namespace Rosie
 			State();
 			
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
-			void addConstant(const int& id, const Variable& cst);
 			void addFunction(const int& id, const std::string& name);
+			void addConstant(const int& id, const Variable& cst);
 			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);	

@@ -2,6 +2,8 @@
 
 namespace Rosie
 {
+	void IVariable::addVariable(const std::string& name, const int& type, const Handle& handle){}
+	void IVariable::addFunction(const int& id, const std::string& name){}
 	std::shared_ptr<IVariable> IVariable::add(const std::shared_ptr<IVariable> other){return nullptr;}
 	std::shared_ptr<IVariable> IVariable::subtract(const std::shared_ptr<IVariable> other){return nullptr;}
 	std::shared_ptr<IVariable> IVariable::multiply(const std::shared_ptr<IVariable> other){return nullptr;}
@@ -48,6 +50,16 @@ namespace Rosie
 	{
 		return Variable(variable->divide(other.variable));
 	}
+	
+	void Variable::addVariable(const std::string& name, const int& type, const Handle& handle)
+	{
+		variable->addVariable(name, type, handle);
+	}
+	
+	void Variable::addFunction(const int& id, const std::string& name)
+	{
+		variable->addFunction(id, name);
+	}	
 	
 	std::shared_ptr<IVariable> Variable::getVariable() const
 	{
@@ -247,14 +259,14 @@ namespace Rosie
 		variables.add(handle, Rosie::getId(name), Variable(TokenType(tokenType)));
 	}
 	
-	void CompositeVariable::addConstant(const int& id, const Variable& csts)
-	{
-		constants[id] = csts;
-	}
-	
 	void CompositeVariable::addFunction(const int& id, const std::string& name)
 	{
 		functions.add(id, name, Function<CallStack&>(name, id));
+	}
+	
+	void CompositeVariable::addConstant(const int& id, const Variable& csts)
+	{
+		constants[id] = csts;
 	}
 	
 	void CompositeVariable::setFunction(const std::string& name, const std::function<void(CallStack&)>& func)
@@ -332,14 +344,14 @@ namespace Rosie
 		scope->addVariable(name, tokenType, handle);
 	}
 	
-	void State::addConstant(const int& id, const Variable& csts)
-	{
-		scope->addConstant(id, csts);
-	}
-	
 	void State::addFunction(const int& id, const std::string& name)
 	{
 		scope->addFunction(id, name);
+	}
+	
+	void State::addConstant(const int& id, const Variable& csts)
+	{
+		scope->addConstant(id, csts);
 	}
 	
 	void State::setFunction(const std::string& name, const std::function<void(CallStack&)>& func)

@@ -12,10 +12,10 @@ namespace Rosie
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 	
-  	Program::Program():variables(Category::VARIABLE,1), functions(Category::FUNCTION, 1)
+	Memory::Memory():variables(Category::VARIABLE,1), functions(Category::FUNCTION, 1), scopePrefix("")
 	{}
 	
-	Address Program::getAddress(const Token& token, const Lexer& lexer)
+	Address Memory::getAddress(const Token& token, const Lexer& lexer)
 	{
 		if(hasFunctionAddress(token))
 		{
@@ -31,7 +31,7 @@ namespace Rosie
 		}
 	}
 	
-	Address Program::newCstAddress(const Token& token)
+	Address Memory::newCstAddress(const Token& token)
 	{
 		std::string value = token.value;
 		TokenType type = token.type;
@@ -44,32 +44,44 @@ namespace Rosie
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
-	Address Program::newVarAddress(const std::string& name, const TokenType& type)
+	Address Memory::newVarAddress(const std::string& name, const TokenType& type)
 	{
-		Address newAddress = variables.newAddress(name, type);
+		Address newAddress = variables.newAddress(rename(name), type);
 		return newAddress;
 	}
 	
-	Address Program::newVarAddress(const Token& token, const TokenType& type)
+	Address Memory::newVarAddress(const Token& token, const TokenType& type)
 	{
 		return newVarAddress(token.value, type);
 	}
 	
-	Address Program::getVarAddress(const Token& token)
+	Address Memory::getVarAddress(const Token& token)
 	{
-		if(!hasVarAddress(token))
+		for(std::string possibleName : getPossibleNames(token.value))
 		{
-			std::cout << "Error, variable " << token << " undefined." <<std::endl;
+			if(variables.hasAddress(possibleName))
+			{
+				return variables.getAddress(possibleName);
+			}
 		}
-		return variables.getAddress(token.value);
+		
+		std::cout << "Error, variable " << token << " undefined." <<std::endl;
+		return Address(0, Category::VARIABLE);
 	}
 	
-	bool Program::hasVarAddress(const Token& token)
+	bool Memory::hasVarAddress(const Token& token)
 	{
-		return variables.hasAddress(token.value);
+		for(std::string possibleName : getPossibleNames(token.value))
+		{
+			if(variables.hasAddress(possibleName))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
-	Address Program::setAddress(const Token& destToken, const Address& srcAddress)
+	Address Memory::setAddress(const Token& destToken, const Address& srcAddress)
 	{
 		Address destAddress;
 		if(hasVarAddress(destToken))
@@ -85,12 +97,12 @@ namespace Rosie
 		return destAddress;
 	}
 	
-	Address Program::newFunctionAddress(const std::string& name)
+	Address Memory::newFunctionAddress(const std::string& name)
 	{
 		return functions.newAddress(name);
 	}
 	
-	Address Program::getFunctionAddress(const Token& token, const Lexer& lexer)
+	Address Memory::getFunctionAddress(const Token& token, const Lexer& lexer)
 	{
 		if(!hasFunctionAddress(token))
 		{
@@ -99,12 +111,32 @@ namespace Rosie
 		return functions.getAddress(token.value);
 	}
 	
-	bool Program::hasFunctionAddress(const Token& token)
+	bool Memory::hasFunctionAddress(const Token& token)
 	{
 		return functions.hasAddress(token.value);
 	}
 	
-	void Program::setArguments(std::stack<Address>& activeStack, const int& nbArgs)
+	std::vector<Constant> Memory::getConstants() const
+	{
+		return constants;
+	}
+		
+	std::vector<Address> Memory::getVariables() const
+	{
+		return variables.getAddresses();
+	}
+		
+	std::vector<Address> Memory::getFunctions() const
+	{
+		return functions.getAddresses();
+	}
+	
+	std::vector<std::string> Memory::getCommands() const
+	{
+		return instructions.getCommands();
+	}
+	
+	void Memory::setArguments(std::stack<Address>& activeStack, const int& nbArgs)
 	{
 		if(nbArgs == -1)
 		{
@@ -125,29 +157,86 @@ namespace Rosie
 		}
 	}
 	
-	void Program::callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType)
+	void Memory::callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType)
 	{
 		addInstruction<CallInstruction>(getFunctionAddress(token, lexer).getId());
-		activeStack.push(getStackAddress(returnType));
+		Address stackAddress = Address(0, Category::VARIABLE);
+		stackAddress.setType(returnType);
+		activeStack.push(stackAddress);
 	}
+	
+	void Memory::startScope(const Address& destAddress)
+	{
+		scopePrefix = destAddress.getName();
+		
+		std::size_t dotPos = scopePrefix.find_last_of(".");
+		if(dotPos == std::string::npos)
+		{
+			scopes.push_back(scopePrefix);
+		}
+		else
+		{
+			scopes.push_back(scopePrefix.substr(dotPos+1, scopePrefix.length()));
+		}
+		
+	}
+		
+	void Memory::endScope()
+	{
+		scopes.pop_back();
+		std::size_t dotPos = scopePrefix.find_last_of(".");
+		if(dotPos == std::string::npos)
+		{
+			scopePrefix = "";
+		}
+		else
+		{
+			scopePrefix = scopePrefix.substr(0, dotPos);
+		}
+		
+	}
+	
+	std::string Memory::rename(const std::string& name) const
+	{
+		if(scopePrefix == "")
+		{
+			return name;
+		}
+		else
+		{
+			return scopePrefix+"."+name;
+		}
+	}
+	
+	std::vector<std::string> Memory::getPossibleNames(const std::string& name) const
+	{
+		std::vector<std::string> res;
+		res.push_back(name);
+		std::deque<std::string> scopesCopy = scopes;
+		std::string possibleName = "";
+		while(!scopesCopy.empty())
+		{
+			possibleName += scopesCopy.front()+".";
+			res.push_back(possibleName+name);
+			scopesCopy.pop_front();
+		}
+		return res;
+	}
+	
+	
+	Program::Program():memory(std::make_shared<Memory>())
+	{}
 	
 	void Program::startScope(const Address& destAddress)
 	{
-		addInstruction<ScopeInstruction>(destAddress);
-		variables.startScope();
-		functions.startScope();
+		//addInstruction<ScopeInstruction>(destAddress);
+		memory->startScope(destAddress);
 	}
 	
 	void Program::endScope()
 	{
-		addInstruction<ScopeInstruction>();
-		variables.endScope();
-		functions.endScope();
-	}
-	
-	std::vector<std::string> Program::getCommands() const
-	{
-		return instructions.getCommands();
+		//addInstruction<ScopeInstruction>();
+		memory->endScope();
 	}
 	
 	Address Program::getStackAddress() const
@@ -162,44 +251,29 @@ namespace Rosie
 		return res;
 	}
 	
-	std::vector<Constant> Program::getConstants() const
-	{
-		return constants;
-	}
-		
-	std::vector<Address> Program::getVariables() const
-	{
-		return variables.getAddresses();
-	}
-		
-	std::vector<Address> Program::getFunctions() const
-	{
-		return functions.getAddresses();
-	}
-
 	
 	
 	HeaderWriter::HeaderWriter(const std::string& fileName):fileName(fileName)
 	{}
 	
-	void HeaderWriter::write(const Program& program)
+	void HeaderWriter::write(Program& program)
 	{	
 		std::ofstream file;
 		file.open(fileName);
 		
-		for(Constant constant : program.getConstants())
+		for(Constant constant : program->getConstants())
 		{
 			file << 0 << " " << constant.getValue() << " " << constant.getTypeId() << std::endl;
 		}
 		
-		for(Address variable : program.getVariables())
+		for(Address variable : program->getVariables())
 		{
-			file << 1 << " " << variable.getName() << " " << variable.getId() << " " << variable.getTypeId() << " " << variable.getScope() << std::endl;
+			file << 1 << " " << variable.getName() << " " << variable.getId() << " " << variable.getTypeId() << std::endl;
 		}
 		
-		for(Address function : program.getFunctions())
+		for(Address function : program->getFunctions())
 		{
-			file << 2 << " " << function.getName() << " " << function.getId() << " " << function.getScope() << std::endl;
+			file << 2 << " " << function.getName() << " " << function.getId() << std::endl;
 		}
 		
 		file.close();
@@ -223,8 +297,7 @@ namespace Rosie
 				char name[20];
 				int int1;
 				int int2;
-				int int3;
-				sscanf(line.c_str(), "%d %s %d %d %d", &category, &name, &int1, &int2, &int3);
+				sscanf(line.c_str(), "%d %s %d %d", &category, &name, &int1, &int2);
 				
 				if(category == 0) // It's a constant
 				{
@@ -232,11 +305,11 @@ namespace Rosie
 				}
 				else if(category == 1) // It's a variable
 				{
-					defineVariable(state, std::string(name), int1, int2, int3);
+					defineVariable(state, std::string(name), int1, int2);
 				}
 				else if(category == 2) // It's a function
 				{
-					defineFunction(state, std::string(name), int1, int2);
+					defineFunction(state, std::string(name), int1);
 				}
 				
 				std::cout << line << std::endl;
@@ -276,26 +349,26 @@ namespace Rosie
 		cstIndex++;
 	}
 	
-	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId, const int& scope) const
+	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const
 	{
-		state.addVariable(name, typeId, Handle(id, Category::VARIABLE), scope);
+		state.addVariable(name, typeId, Handle(id, Category::VARIABLE));
 	}
 	
-	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id, const int& scope) const
+	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id) const
 	{
-		state.addFunction(id, name, scope);
+		state.addFunction(id, name);
 	}
 	
 	
 	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)
 	{}
 	
-	void ByteCodeWriter::write(const Program& program) const
+	void ByteCodeWriter::write(Program& program) const
 	{	
 		std::ofstream file;
 		file.open(fileName);
 		
-		for(std::string command : program.getCommands())
+		for(std::string command : program->getCommands())
 		{
 			file << command << std::endl;
 		}

@@ -14,6 +14,7 @@
 namespace Rosie
 {
 	class State;
+	struct Handle;
 	
 	class IVariable
 	{
@@ -24,6 +25,7 @@ namespace Rosie
 			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> negate();
 			virtual std::string toString() const = 0;
 	};
 	
@@ -42,6 +44,7 @@ namespace Rosie
 			Variable operator-(const Variable& other);
 			Variable operator*(const Variable& other);
 			Variable operator/(const Variable& other);
+			Variable operator-();
 			
 			friend std::ostream& operator <<(std::ostream& os, Variable& var)
 			{
@@ -72,6 +75,7 @@ namespace Rosie
 			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
 			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
+			virtual std::shared_ptr<IVariable> negate();
 			
 			template<typename T>
 			T get() const

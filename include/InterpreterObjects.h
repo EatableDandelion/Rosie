@@ -62,10 +62,10 @@ namespace Rosie{
 			int scope;
 	};
 	
-	struct Memory //collection of addresses
+	struct AddressMap //collection of addresses
 	{
 		public:	
-			Memory(const Category& category, const int& startIndex = 0);
+			AddressMap(const Category& category, const int& startIndex = 0);
 		
 			Address newAddress(const std::string& name);
 			

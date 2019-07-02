@@ -59,40 +59,40 @@ namespace Rosie
 	
 	
 	
-	Memory::Memory(const Category& category, const int& startIndex):category(category), head(startIndex)
+	AddressMap::AddressMap(const Category& category, const int& startIndex):category(category), head(startIndex)
 	{
 		scope.push(startIndex);
 	}
 	
-	Address Memory::newAddress(const std::string& name)//, const int& size)
+	Address AddressMap::newAddress(const std::string& name)//, const int& size)
 	{
 		return newAddress(name, TokenType::UNDEFINED);
 	}
 	
-	Address Memory::newAddress(const std::string& name, const TokenType& tokenType)
+	Address AddressMap::newAddress(const std::string& name, const TokenType& tokenType)
 	{
 		std::size_t id = Rosie::getId(name);
 		
 		int index = head;
-		head+=1;//size;
+		head+=1;
+		//newAddress.setScope(scope.top()-1);
 		Address newAddress = Address(index, category, name, tokenType);
-		newAddress.setScope(scope.top()-1);
 		addresses.insert(std::pair<std::size_t, Address>(id, newAddress));
 
 		return addresses[id];
 	}
 			
-	Address Memory::getAddress(const std::string& name)
+	Address AddressMap::getAddress(const std::string& name)
 	{
 		return addresses[Rosie::getId(name)];
 	}
 	
-	bool Memory::hasAddress(const std::string& name)
+	bool AddressMap::hasAddress(const std::string& name)
 	{
 		return addresses.find(Rosie::getId(name)) != addresses.end();
 	}
 	
-	std::vector<Address> Memory::getAddresses() const
+	std::vector<Address> AddressMap::getAddresses() const
 	{
 		std::vector<Address> res;
 		for(std::pair<std::size_t, Address> pair : addresses)
@@ -101,18 +101,17 @@ namespace Rosie
 		}
 		return res; 
 	}
-
-	void Memory::startScope()
+	
+	void AddressMap::startScope()
 	{
 		scope.push(head);
 	}
 			
-	void Memory::endScope()
+	void AddressMap::endScope()
 	{
 		head = scope.top();
 		scope.pop();
 	}
-	
 	
 	
 	Constant::Constant(const TokenType& type, const std::string& value):type(type), value(value)

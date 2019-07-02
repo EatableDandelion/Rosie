@@ -35,10 +35,10 @@ int main()
 	state.setFunction("-", [&](CallStack& stack){stack.push(stack.pop()-stack.pop());});
 	state.setFunction("*", [&](CallStack& stack){stack.push(stack.pop()*stack.pop());});
 	state.setFunction("/", [&](CallStack& stack){stack.push(stack.pop()/stack.pop());});
+	state.setFunction("u+", [&](CallStack& stack){});
+	state.setFunction("u-", [&](CallStack& stack){stack.push(-stack.pop());});
 
-	/*state.setFunction("u+", [&](std::vector<Variable>& args, std::queue<Variable>& results){results.push(args[0].get<float>());});
-	state.setFunction("u-", [&](std::vector<Variable>& args, std::queue<Variable>& results){results.push(-args[0].get<float>());});
-	*/reader.read(state);
+	reader.read(state);
 	
 	
 	return 0;

@@ -18,6 +18,10 @@ namespace Rosie{
 			{
 				parseAssignment(lexer, program);					//a = 2.1;
 			}
+			else
+			{
+				Rosie::error("Unexpected token.\n", lexer);
+			}
 			lexer++;
 		}
 	}
@@ -30,7 +34,7 @@ namespace Rosie{
 		{
 			//function getX();
 			lexer++;
-			returnAddress = program.newFunctionAddress(lexer.getToken().value);
+			returnAddress = program->newFunctionAddress(lexer.getToken().value);
 		}
 		else
 		{
@@ -52,7 +56,7 @@ namespace Rosie{
 				tokenType = TokenType::CSTSTRING;
 			}
 			lexer++;
-			returnAddress = program.newVarAddress(lexer.getToken(), tokenType);
+			returnAddress = program->newVarAddress(lexer.getToken(), tokenType);
 		}
 		
 		Token nextToken;
@@ -73,22 +77,22 @@ namespace Rosie{
 		lexer++;//token = "2.21"
 		if(syntax.isStartScope(lexer.getToken()))
 		{
-			if(program.hasVarAddress(var))
+			if(program->hasVarAddress(var))
 			{
-				destAddress = program.getVarAddress(var);
+				destAddress = program->getVarAddress(var);
 			}
 			else
 			{
-				destAddress = program.newVarAddress(var, TokenType::CSTARRAY);
+				destAddress = program->newVarAddress(var, TokenType::CSTARRAY);
 			}
-			
+		
 			program.startScope(destAddress);
 			parseScope(lexer, program);
 			program.endScope();
 		}
 		else
 		{	
-			destAddress = program.setAddress(var, functionParser.parse(lexer, program));
+			destAddress = program->setAddress(var, functionParser.parse(lexer, program));
 		}
 		checkToken(syntax.isTerminator(lexer.getToken()), lexer, "Terminator expected.");
 	}
@@ -106,7 +110,7 @@ namespace Rosie{
 	
 	Address Parser::getVariable(const Token& token, Program& program)
 	{
-		return program.getVarAddress(token);
+		return program->getVarAddress(token);
 	}
 	
 	bool Parser::isVariable(Lexer& lexer)
@@ -146,9 +150,9 @@ namespace Rosie{
 			if(isFunction(lexer))
 			{
 				token.type = TokenType::FUNCNAME;
-				if(!program.hasFunctionAddress(token))
+				if(!program->hasFunctionAddress(token))
 				{
-					program.newFunctionAddress(token.value);
+					program->newFunctionAddress(token.value);
 				}
 			}
 			
@@ -164,7 +168,7 @@ namespace Rosie{
 		{
 			if(isConstant(token) || token.type == TokenType::VARNAME)
 			{
-				activeStack.push(program.getAddress(token, lexer));
+				activeStack.push(program->getAddress(token, lexer));
 			}
 			else if(token == "|")
 			{
@@ -176,25 +180,25 @@ namespace Rosie{
 			{
 				if(token.type == TokenType::OPERATOR)
 				{
-					if(!program.hasFunctionAddress(token))
+					if(!program->hasFunctionAddress(token))
 					{
-						program.newFunctionAddress(token.value);
+						program->newFunctionAddress(token.value);
 					}
 					if(token == "u-" || token == "u+")
 					{
-						program.setArguments(activeStack, 1);
+						program->setArguments(activeStack, 1);
 		
 					}
 					else
 					{
-						program.setArguments(activeStack, 2);
+						program->setArguments(activeStack, 2);
 					}
-					program.callFunction(activeStack, token, lexer, TokenType::CSTFLOAT);
+					program->callFunction(activeStack, token, lexer, TokenType::CSTFLOAT);
 	
 				}
 				else if(token.type == TokenType::FUNCNAME)//function
 				{
-					program.setArguments(activeStack);
+					program->setArguments(activeStack);
 					
 					if(!stack.empty())
 					{
@@ -202,7 +206,7 @@ namespace Rosie{
 						stack.pop();
 					}
 					
-					program.callFunction(activeStack, token, lexer);
+					program->callFunction(activeStack, token, lexer);
 				}
 				else
 				{	

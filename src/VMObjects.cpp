@@ -8,6 +8,7 @@ namespace Rosie
 	std::shared_ptr<IVariable> IVariable::subtract(const std::shared_ptr<IVariable> other){return nullptr;}
 	std::shared_ptr<IVariable> IVariable::multiply(const std::shared_ptr<IVariable> other){return nullptr;}
 	std::shared_ptr<IVariable> IVariable::divide(const std::shared_ptr<IVariable> other){return nullptr;}
+	std::shared_ptr<IVariable> IVariable::negate(){return nullptr;}
 
 	
 	Variable::Variable(const float& floatValue):variable(std::make_shared<Primitive>(floatValue))
@@ -49,6 +50,11 @@ namespace Rosie
 	Variable Variable::operator/(const Variable& other)
 	{
 		return Variable(variable->divide(other.variable));
+	}
+	
+	Variable Variable::operator-()
+	{
+		return Variable(variable->negate());
 	}
 	
 	void Variable::addVariable(const std::string& name, const int& type, const Handle& handle)
@@ -178,6 +184,11 @@ namespace Rosie
 			return std::make_shared<Primitive>(Primitive(std::get<0>(value)/std::get<0>(other->value)));
 		}
 		return nullptr;
+	}
+	
+	std::shared_ptr<IVariable> Primitive::negate()
+	{
+		return std::make_shared<Primitive>(Primitive(-std::get<0>(value)));
 	}
 	
 	std::string Primitive::toString() const

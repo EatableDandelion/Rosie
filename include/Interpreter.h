@@ -19,7 +19,8 @@ namespace Rosie{
 	{	
 		public:
 			FunctionParser(const Syntax& syntax);
-			Address parse(Lexer& lexer, Program& program);
+			Address parseCall(Lexer& lexer, Program& program);
+			void parseDefinition(Lexer& lexer, Program& program);
 			bool isFunction(Lexer& lexer);
 		
 		private:
@@ -42,6 +43,7 @@ namespace Rosie{
 			Syntax syntax;
 			FunctionParser functionParser;
 			
+			void parseLoop(Lexer& lexer, Program& program);
 			void parseAssignment(Lexer& lexer, Program& program);
 			void parseDeclaration(Lexer& lexer, Program& program);
 			void parseScope(Lexer& lexer, Program& program);

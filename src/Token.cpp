@@ -1,17 +1,7 @@
 #include "Token.h"
 
 namespace Rosie
-{
-	/*void Token::setAddress(const Address& address)
-	{
-		m_address = address;
-	}
-	
-	Address Token::getAddress() const
-	{
-		return m_address;
-	}*/
-	
+{	
 	int Token::length() const
 	{
 		return value.length();
@@ -123,7 +113,7 @@ namespace Rosie
 	{
 		return
 		name == "if" || name == "while" || name == "for" || 
-		name == "return" || name == "define";
+		name == "=>" || name == "define";
 	}
 	
 	bool LiteralCaster::isType(const std::string& name)

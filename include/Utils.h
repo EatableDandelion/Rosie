@@ -87,6 +87,16 @@ namespace Rosie
 				}
 				return res;
 			}
+			
+			std::vector<K2> getKey2() const
+			{
+				std::vector<K2> res;
+				for(const auto& pair : values)
+				{
+					res.push_back(pair.first);
+				}
+				return res;
+			}
 		
 		private:
 			std::unordered_map<K2, V> values;

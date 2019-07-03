@@ -8,6 +8,7 @@
 #include <memory>
 #include <stdio.h>
 #include <stack>
+#include <algorithm>
 #include "Lexer.h"
 #include "InterpreterObjects.h"
 #include "Syntax.h"
@@ -70,7 +71,7 @@ namespace Rosie
 	class Program
 	{
 		public:
-			Program();
+			Program(const std::string& fileName, const std::vector<std::string>& nativeFunctions);
 			
 			void startScope(const Address& destAddress);
 			void endScope();
@@ -83,31 +84,30 @@ namespace Rosie
 				return memory;
 			}
 			
+			bool hasFunction(const std::string& name);
+			
+			std::string getFileName() const;
+			
 		private:
 			Syntax syntax;
 			std::shared_ptr<Memory> memory;
+			std::vector<std::string> functionNames;
+			std::string fileName;
 	};
 	
 	
 	class HeaderWriter
 	{
 		public:
-			HeaderWriter(const std::string& fileName);
 			void write(Program& program);
-		private:
-			std::string fileName;
 	};
 	
 	class HeaderReader
 	{
 		public:
-			HeaderReader(const std::string& fileName);
 			void read(State& state);
 		
 		private:
-			std::string fileName;
-			int cstIndex;
-			
 			void defineConstant(State& state, const std::string& value, const int& type);
 			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
 			void defineFunction(State& state, const std::string& name, const int& id) const;
@@ -116,21 +116,16 @@ namespace Rosie
 	class ByteCodeWriter
 	{
 		public:
-			ByteCodeWriter(const std::string& fileName);
 			void write(Program& program) const;
-		private:
-			std::string fileName;
 	};
 	
 	class ByteCodeReader
 	{
 		public:
-			ByteCodeReader(const std::string& fileName, const Syntax& syntax);
+			ByteCodeReader(const Syntax& syntax);
 			void read(State& state) const;
 		
 		private:
-			std::string fileName;
-			
 			template<typename T, typename... Args>
 			void addInstruction(Args&&... args)
 			{

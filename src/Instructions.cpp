@@ -109,8 +109,8 @@ namespace Rosie
 	{
 		if(command != "")
 		{
-			Handle handle = getHandles(command)[0];
-			state.startScope(handle);
+			//Handle handle = getHandles(command)[0];
+			//state.startScope(handle);
 		}
 	}
 	

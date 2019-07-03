@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -13,23 +12,12 @@
 
 namespace Rosie
 {
-	class State;
-	struct Handle;
-	
-	class IVariable
+	/*struct MultiVariable
 	{
-		public:
-			virtual void addVariable(const std::string& name, const int& type, const Handle& handle);
-			virtual void addFunction(const int& id, const std::string& name);
-			virtual std::shared_ptr<IVariable> add(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> negate();
-			virtual std::string toString() const = 0;
-	};
+		std::unordered_map<std::string, Variable> variables;
+	};*/
 	
-	class Variable
+	struct Variable
 	{
 		public:
 			Variable(const float& floatValue);
@@ -37,8 +25,8 @@ namespace Rosie
 			Variable(const bool& booleanValue);
 			Variable(const std::string& stringValue);
 			Variable(const TokenType& tokenType);
-			Variable(const std::shared_ptr<IVariable>& variable);
 			Variable();
+			Variable(const Variable& other);
 			
 			Variable operator+(const Variable& other);
 			Variable operator-(const Variable& other);
@@ -46,54 +34,24 @@ namespace Rosie
 			Variable operator/(const Variable& other);
 			Variable operator-();
 			
-			friend std::ostream& operator <<(std::ostream& os, Variable& var)
-			{
-				std::string text = (var.variable)->toString();
-				os << text; 
-				return os;
-			}
-			
-			void addVariable(const std::string& name, const int& type, const Handle& handle);
-			void addFunction(const int& id, const std::string& name);		
-			std::shared_ptr<IVariable> getVariable() const;
-			
-		private:
-			std::shared_ptr<IVariable> variable;
-	};
-	
-	class Primitive : public IVariable
-	{
-		public:
-			Primitive(const float& floatValue);
-			Primitive(const int& integerValue);
-			Primitive(const bool& booleanValue);
-			Primitive(const std::string& stringValue);
-			Primitive(const TokenType& tokenType);
-			Primitive();
-			
-			virtual std::shared_ptr<IVariable> add(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> subtract(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> multiply(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> divide(const std::shared_ptr<IVariable> other);
-			virtual std::shared_ptr<IVariable> negate();
+			std::string toString() const;
 			
 			template<typename T>
 			T get() const
 			{
 				return std::get<T>(value);
 			}
-
-			void set(const float& newValue);
-			void set(const int& newValue);
-			void set(const bool& newValue);
-			void set(const std::string& newValue);
-			void set(const Primitive& other);
 			
-			virtual std::string toString() const;
+			friend std::ostream& operator<<(std::ostream& os, Variable& var)
+			{
+				os << var.toString(); 
+				return os;
+			}
 			
 		private:
 			int type;
 			std::variant<float, int, bool, std::string> value;
+			//std::variant<float, int, bool, std::string, MultiVariable> value;
 	};
 
 	struct Handle
@@ -178,48 +136,35 @@ namespace Rosie
 			std::stack<Variable> queue;
 	};
 	
-	class CompositeVariable : public IVariable
-	{
-		public:
-			void addVariable(const std::string& name, const int& type, const Handle& handle);
-			void addFunction(const int& id, const std::string& name);
-			void addConstant(const int& id, const Variable& cst);
-			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
-			void copyVariable(Handle& dest, const Handle& src);
-			Variable getVariable(const Handle& handle);	
-			void execute(const int& functionId);
-			virtual std::string toString() const;
-			void push(const Variable& variable);
-			void push(const Handle& handle);
-			
-		private:
-			DualMap<Handle, std::size_t, Variable> variables;
-			std::unordered_map<int, Variable> constants;
-			DualMap<int, std::string, Function<CallStack&>> functions;
-			CallStack callStack;
-			std::weak_ptr<IVariable> parent;
-	};
-	
 	class State
 	{
 		public:
-			State();
+			State(const std::string& fileName);
 			
 			void addVariable(const std::string& name, const int& type, const Handle& handle);
 			void addFunction(const int& id, const std::string& name);
-			void addConstant(const int& id, const Variable& cst);
+			void addConstant(const Variable& cst);
 			void setFunction(const std::string& name, const std::function<void(CallStack&)>& func);		
 			void copyVariable(Handle& dest, const Handle& src);
 			Variable getVariable(const Handle& handle);	
 			void execute(const int& functionId);
 			void push(const Variable& variable);
 			void push(const Handle& handle);
+			std::vector<std::string> getFunctionsList() const;
+			std::string getFileName() const;
+			std::string toString() const;
 			
-			void startScope(const Handle& handle);
-			void endScope();
+			template<typename T>
+			T getValue(const std::string& name)
+			{
+				return variables[Rosie::getId(name)].get<T>();
+			}
 				
 		private:				
-			std::shared_ptr<CompositeVariable> scope;
-			
+			DualMap<Handle, std::size_t, Variable> variables;
+			std::vector<Variable> constants;
+			DualMap<int, std::string, Function<CallStack&>> functions;
+			CallStack callStack;
+			std::string fileName;
 	};
 }

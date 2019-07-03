@@ -1,42 +1,7 @@
 #include "Syntax.h"
 
 namespace Rosie
-{
-	/*void Syntax::addMethod(const Function<Variable> func)
-	{
-		methods.add(methods.size(), func.getName(), func);
-	}
-	
-	bool Syntax::hasMethod(const std::string& name) const
-	{
-		return methods.contains(name);
-	}*/
-	/*
-	void Syntax::execute(const std::string& name, std::vector<Variable>& arguments, State& state) const
-	{
-		methods[name].execute(arguments, state);
-	}
-	
-	void Syntax::execute(const int& id, State& state)
-	{
-		std::vector<Variable> args;
-		while(!state.empty())
-		{
-			args.push_back(state.pop());
-		}
-		methods[id].execute(args, state);
-	}*/
-	
-	/*Function<Variable> Syntax::getMethod(const int& id) const
-	{
-		return methods[id];
-	}
-	
-	std::vector<Function<Variable>> Syntax::getNativeMethods() const
-	{
-		return methods.getValues();
-	}*/
-	
+{	
 	bool Syntax::isFunction(const Token& token, const Token& nextToken)
 	{
 		return (token.type == TokenType::VARNAME) && isListStart(nextToken);
@@ -85,5 +50,15 @@ namespace Rosie
 	bool Syntax::isListEnd(const Token& token)
 	{
 		return token == ")";
+	}
+	
+	void Syntax::setNativeFunctions(const std::vector<std::string>& nativeFunc)
+	{
+		nativeFunctions = nativeFunc;
+	}
+	
+	std::vector<std::string> Syntax::getNativeFunctions() const
+	{
+		return nativeFunctions;
 	}
 }

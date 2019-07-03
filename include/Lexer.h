@@ -50,7 +50,7 @@ namespace Rosie
 			
 			bool isLetter(const char c)
 			{
-				return isalpha(c);
+				return isalpha(c) || c=='.';
 			}
 		private:
 			void assignType(Token& token)

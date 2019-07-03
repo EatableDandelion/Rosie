@@ -1,98 +1,32 @@
 #include "VMObjects.h"
 
 namespace Rosie
-{
-	void IVariable::addVariable(const std::string& name, const int& type, const Handle& handle){}
-	void IVariable::addFunction(const int& id, const std::string& name){}
-	std::shared_ptr<IVariable> IVariable::add(const std::shared_ptr<IVariable> other){return nullptr;}
-	std::shared_ptr<IVariable> IVariable::subtract(const std::shared_ptr<IVariable> other){return nullptr;}
-	std::shared_ptr<IVariable> IVariable::multiply(const std::shared_ptr<IVariable> other){return nullptr;}
-	std::shared_ptr<IVariable> IVariable::divide(const std::shared_ptr<IVariable> other){return nullptr;}
-	std::shared_ptr<IVariable> IVariable::negate(){return nullptr;}
-
-	
-	Variable::Variable(const float& floatValue):variable(std::make_shared<Primitive>(floatValue))
-	{}
-
-	Variable::Variable(const int& integerValue):variable(std::make_shared<Primitive>(integerValue))
-	{}
-	
-	Variable::Variable(const bool& booleanValue):variable(std::make_shared<Primitive>(booleanValue))
-	{}
-	
-	Variable::Variable(const std::string& stringValue):variable(std::make_shared<Primitive>(stringValue))
-	{}
-	
-	Variable::Variable(const TokenType& tokenType):variable(std::make_shared<Primitive>(tokenType))
-	{}
-	
-	Variable::Variable(const std::shared_ptr<IVariable>& variable):variable(std::move(variable))
-	{}
-	
-	Variable::Variable():variable(std::make_shared<CompositeVariable>())
-	{}
-	
-	Variable Variable::operator+(const Variable& other)
+{		
+	Variable::Variable(const float& floatValue)
 	{
-		return Variable(variable->add(other.variable));
-	}
-	
-	Variable Variable::operator-(const Variable& other)
-	{
-		return Variable(variable->subtract(other.variable));
-	}
-	
-	Variable Variable::operator*(const Variable& other)
-	{
-		return Variable(variable->multiply(other.variable));
-	}
-	
-	Variable Variable::operator/(const Variable& other)
-	{
-		return Variable(variable->divide(other.variable));
-	}
-	
-	Variable Variable::operator-()
-	{
-		return Variable(variable->negate());
-	}
-	
-	void Variable::addVariable(const std::string& name, const int& type, const Handle& handle)
-	{
-		variable->addVariable(name, type, handle);
-	}
-	
-	void Variable::addFunction(const int& id, const std::string& name)
-	{
-		variable->addFunction(id, name);
-	}	
-	
-	std::shared_ptr<IVariable> Variable::getVariable() const
-	{
-		return variable;
-	}
-	
-	Primitive::Primitive(const float& floatValue)
-	{
-		set(floatValue);
+		value = floatValue;
+		type = 0;
 	}
 
-	Primitive::Primitive(const int& integerValue)
+	Variable::Variable(const int& integerValue)
 	{
-		set(integerValue);
+		value = integerValue;
+		type = 1;
 	}
 	
-	Primitive::Primitive(const bool& booleanValue)
+	Variable::Variable(const bool& booleanValue)
 	{
-		set(booleanValue);
+		value = booleanValue;
+		type = 2;
 	}
 	
-	Primitive::Primitive(const std::string& stringValue)
+	Variable::Variable(const std::string& stringValue)
 	{
-		set(stringValue);
+		value = stringValue;
+		type = 3;
 	}
 	
-	Primitive::Primitive(const TokenType& tokenType)
+	Variable::Variable(const TokenType& tokenType)
 	{
 		if(tokenType == TokenType::CSTFLOAT)
 		{
@@ -116,82 +50,41 @@ namespace Rosie
 		}
 	}
 	
-	Primitive::Primitive()
+	Variable::Variable()
 	{
+		value = 0;
 		type = 4;
 	}
 	
-	void Primitive::set(const float& newValue)
+	Variable::Variable(const Variable& other):value(other.value), type(other.type)
+	{}
+	
+	Variable Variable::operator+(const Variable& other)
 	{
-		value = newValue;
-		type = 0;
+		return Variable(std::get<0>(value)+std::get<0>(other.value));
 	}
 	
-	void Primitive::set(const int& newValue)
+	Variable Variable::operator-(const Variable& other)
 	{
-		set((float)newValue);
+		return Variable(std::get<0>(value)-std::get<0>(other.value));
 	}
 	
-	void Primitive::set(const bool& newValue)
+	Variable Variable::operator*(const Variable& other)
 	{
-		value = newValue;
-		type = 2;
+		return Variable(std::get<0>(value)*std::get<0>(other.value));
 	}
 	
-	void Primitive::set(const std::string& newValue)
+	Variable Variable::operator/(const Variable& other)
 	{
-		value = newValue;
-		type = 3;
+		return Variable(std::get<0>(value)/std::get<0>(other.value));
 	}
 	
-	void Primitive::set(const Primitive& other)
+	Variable Variable::operator-()
 	{
-		value = other.value;
-		type = other.type;
+		return Variable(-std::get<0>(value));
 	}
 	
-	std::shared_ptr<IVariable> Primitive::add(const std::shared_ptr<IVariable> other_t)
-	{/** This is ugly but running out of ideas here... */
-		if(std::shared_ptr<Primitive> other = std::dynamic_pointer_cast<Primitive>(other_t))
-		{
-			return std::make_shared<Primitive>(Primitive(std::get<0>(value)+std::get<0>(other->value)));
-		}
-		return nullptr;
-	}
-	
-	std::shared_ptr<IVariable> Primitive::subtract(const std::shared_ptr<IVariable> other_t)
-	{
-		if(std::shared_ptr<Primitive> other = std::dynamic_pointer_cast<Primitive>(other_t))
-		{
-			return std::make_shared<Primitive>(Primitive(std::get<0>(value)-std::get<0>(other->value)));
-		}
-		return nullptr;
-	}
-	
-	std::shared_ptr<IVariable> Primitive::multiply(const std::shared_ptr<IVariable> other_t)
-	{
-		if(std::shared_ptr<Primitive> other = std::dynamic_pointer_cast<Primitive>(other_t))
-		{
-			return std::make_shared<Primitive>(Primitive(std::get<0>(value)*std::get<0>(other->value)));
-		}
-		return nullptr;
-	}
-	
-	std::shared_ptr<IVariable> Primitive::divide(const std::shared_ptr<IVariable> other_t)
-	{
-		if(std::shared_ptr<Primitive> other = std::dynamic_pointer_cast<Primitive>(other_t))
-		{
-			return std::make_shared<Primitive>(Primitive(std::get<0>(value)/std::get<0>(other->value)));
-		}
-		return nullptr;
-	}
-	
-	std::shared_ptr<IVariable> Primitive::negate()
-	{
-		return std::make_shared<Primitive>(Primitive(-std::get<0>(value)));
-	}
-	
-	std::string Primitive::toString() const
+	std::string Variable::toString() const
 	{
 		if(type == 0)
 		{
@@ -209,17 +102,16 @@ namespace Rosie
 		{
 			return get<std::string>()+ " (string)"; 
 		}
-		return "";
-		/*else if(var.type == 4)
+		else if(type == 4)
 		{
-			os << "[";
-			for(const auto& member : var.members)
-			{
-				os << *(member.second) << ", ";
-			}
-			os << "]";
-		}*/
+			return "To be implemented";
+		}
+		return "";
 	}
+	
+	
+	
+	
 	
 	Handle::Handle(const int& id, const Category& category):id(id), category(category)
 	{}
@@ -264,33 +156,36 @@ namespace Rosie
 			
 			
 
+	State::State(const std::string& fileName):fileName(fileName)
+	{}
 	
-	void CompositeVariable::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
+	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
 	{
 		variables.add(handle, Rosie::getId(name), Variable(TokenType(tokenType)));
 	}
 	
-	void CompositeVariable::addFunction(const int& id, const std::string& name)
+	void State::addFunction(const int& id, const std::string& name)
 	{
 		functions.add(id, name, Function<CallStack&>(name, id));
 	}
 	
-	void CompositeVariable::addConstant(const int& id, const Variable& csts)
+	void State::addConstant(const Variable& csts)
 	{
-		constants[id] = csts;
+		//constants[id] = csts;
+		constants.push_back(csts);
 	}
 	
-	void CompositeVariable::setFunction(const std::string& name, const std::function<void(CallStack&)>& func)
+	void State::setFunction(const std::string& name, const std::function<void(CallStack&)>& func)
 	{
 		functions[name].setFunction(func);
 	}
 	
-	void CompositeVariable::copyVariable(Handle& dest, const Handle& src)
-	{	
+	void State::copyVariable(Handle& dest, const Handle& src)
+	{std::cout << constants.size() << std::endl;
 		variables[dest] = getVariable(src);
 	}
 	
-	Variable CompositeVariable::getVariable(const Handle& handle)
+	Variable State::getVariable(const Handle& handle)
 	{
 		if(handle.getCategory() == Category::CONSTANT)
 		{
@@ -321,88 +216,38 @@ namespace Rosie
 		}
 	}
 	
-	void CompositeVariable::execute(const int& functionId)
+	void State::execute(const int& functionId)
 	{
 		functions[functionId].execute(callStack);	
 	}
 	
-	std::string CompositeVariable::toString() const
+	std::string State::toString() const
 	{
-		/*std::string res = "[";
-		for(const auto& member : var.members)
+		std::string res = "[";
+		for(Variable var : variables.getValues())
 		{
-			res += member.second->toString() + ", ";
+			res += var.toString() + ", ";
 		}
-		return res+"]";*/
-		return "fdsa";
-	}
-	
-	void CompositeVariable::push(const Variable& variable)
-	{
-		callStack.push(variable);
-	}
-	
-	void CompositeVariable::push(const Handle& handle)
-	{
-		push(getVariable(handle));
-	}
-	
-	State::State():scope(std::make_shared<CompositeVariable>())
-	{}
-	
-	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
-	{
-		scope->addVariable(name, tokenType, handle);
-	}
-	
-	void State::addFunction(const int& id, const std::string& name)
-	{
-		scope->addFunction(id, name);
-	}
-	
-	void State::addConstant(const int& id, const Variable& csts)
-	{
-		scope->addConstant(id, csts);
-	}
-	
-	void State::setFunction(const std::string& name, const std::function<void(CallStack&)>& func)
-	{
-		scope->setFunction(name, func);
+		return res+"]";
 	}
 	
 	void State::push(const Variable& variable)
 	{
-		scope->push(variable);
+		callStack.push(variable);
 	}
 	
 	void State::push(const Handle& handle)
 	{
-		scope->push(handle);
+		push(getVariable(handle));
 	}
 	
-	void State::copyVariable(Handle& dest, const Handle& src)
-	{	
-		scope->copyVariable(dest, src);
-	}
-	
-	Variable State::getVariable(const Handle& handle)
+	std::vector<std::string> State::getFunctionsList() const
 	{
-		return scope->getVariable(handle);
+		return functions.getKey2();
 	}
 	
-	void State::execute(const int& functionId)
+	std::string State::getFileName() const
 	{
-		scope->execute(functionId);	
-	}
-	
-	void State::startScope(const Handle& handle)
-	{
-		//Variable newScope = getVariable(handle);
-		//scope = newScope;
-	}
-	
-	void State::endScope()
-	{
-		
+		return fileName;
 	}
 }

@@ -224,7 +224,7 @@ namespace Rosie
 	}
 	
 	
-	Program::Program():memory(std::make_shared<Memory>())
+	Program::Program(const std::string& fileName, const std::vector<std::string>& nativeFunctions):memory(std::make_shared<Memory>()), functionNames(nativeFunctions), fileName(fileName)
 	{}
 	
 	void Program::startScope(const Address& destAddress)
@@ -251,15 +251,21 @@ namespace Rosie
 		return res;
 	}
 	
+	bool Program::hasFunction(const std::string& name)
+	{
+		return std::find(functionNames.begin(), functionNames.end(), name) != functionNames.end();
+	}
 	
+	std::string Program::getFileName() const
+	{
+		return fileName;
+	}
 	
-	HeaderWriter::HeaderWriter(const std::string& fileName):fileName(fileName)
-	{}
 	
 	void HeaderWriter::write(Program& program)
 	{	
 		std::ofstream file;
-		file.open(fileName);
+		file.open(program.getFileName()+".hc");
 		
 		for(Constant constant : program->getConstants())
 		{
@@ -281,13 +287,11 @@ namespace Rosie
 	
 	
 	
-	HeaderReader::HeaderReader(const std::string& fileName):fileName(fileName), cstIndex(0)
-	{}
 	
 	void HeaderReader::read(State& state)
 	{
 		std::string line;
-		std::ifstream file(fileName);
+		std::ifstream file(state.getFileName()+".hc");
 		int typeId = 0;
 		if(file.is_open())
 		{
@@ -322,31 +326,29 @@ namespace Rosie
 	void HeaderReader::defineConstant(State& state, const std::string& value, const int& typeId)
 	{
 		TokenType type = TokenType(typeId);
-		
 		if(type == TokenType::CSTINT)
 		{			
-			state.addConstant(cstIndex, Variable(std::stoi(value)));
+			state.addConstant(Variable(std::stoi(value)));
 		}
 		else if(type == TokenType::CSTFLOAT)
 		{
-			state.addConstant(cstIndex, Variable(std::stof(value)));
+			state.addConstant(Variable(std::stof(value)));
 		}
 		else if(type == TokenType::CSTBOOLEAN)
 		{
 			if(value == "true")
 			{
-				state.addConstant(cstIndex, Variable(true));
+				state.addConstant(Variable(true));
 			}
 			else
 			{
-				state.addConstant(cstIndex, Variable(false));
+				state.addConstant(Variable(false));
 			}
 		}
 		else if(type == TokenType::CSTSTRING)
 		{
-			state.addConstant(cstIndex, Variable(value));
+			state.addConstant(Variable(value));
 		}
-		cstIndex++;
 	}
 	
 	void HeaderReader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const
@@ -360,13 +362,11 @@ namespace Rosie
 	}
 	
 	
-	ByteCodeWriter::ByteCodeWriter(const std::string& fileName):fileName(fileName)
-	{}
 	
 	void ByteCodeWriter::write(Program& program) const
 	{	
 		std::ofstream file;
-		file.open(fileName);
+		file.open(program.getFileName()+".bc");
 		
 		for(std::string command : program->getCommands())
 		{
@@ -380,7 +380,7 @@ namespace Rosie
 	
 	
 	
-	ByteCodeReader::ByteCodeReader(const std::string& fileName, const Syntax& syntax):fileName(fileName)
+	ByteCodeReader::ByteCodeReader(const Syntax& syntax)
 	{
 		addInstruction<SetInstruction>();
 		addInstruction<ArgumentInstruction>();
@@ -391,7 +391,7 @@ namespace Rosie
 	void ByteCodeReader::read(State& state) const
 	{
 		std::string command;
-		std::ifstream file(fileName);
+		std::ifstream file(state.getFileName()+".bc");
 		int instructionId = 0;
 		if(file.is_open())
 		{

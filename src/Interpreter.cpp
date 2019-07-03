@@ -9,21 +9,32 @@ namespace Rosie{
 	{
 		while(lexer.hasNext())
 		{
-			//if(lexer.getToken().type == TokenType::VARTYPE) 		//If it's a type such as float, int
-			if(functionParser.isFunction(lexer))		//If it's a function or a ctor
+			parseLoop(lexer, program);
+		}
+	}
+	
+	void Parser::parseLoop(Lexer& lexer, Program& program)
+	{
+		if(functionParser.isFunction(lexer))					//If it's a function
+		{
+			if(program.hasFunction(lexer.getToken().value))
 			{
-				functionParser.parse(lexer, program);				//add(a, b);
-			}
-			else if(isVariable(lexer))								//Else it's a variable
-			{
-				parseAssignment(lexer, program);					//a = 2.1;
+				functionParser.parseCall(lexer, program);				//add(a, b);
 			}
 			else
 			{
-				Rosie::error("Unexpected token.\n", lexer);
+				functionParser.parseDefinition(lexer, program);
 			}
-			lexer++;
 		}
+		else if(isVariable(lexer))								//Else it's a variable
+		{
+			parseAssignment(lexer, program);					//a = 2.1;
+		}
+		else
+		{
+			Rosie::error("Unexpected token.\n", lexer);
+		}
+		lexer++;
 	}
 	
 	void Parser::parseDeclaration(Lexer& lexer, Program& program)
@@ -92,7 +103,7 @@ namespace Rosie{
 		}
 		else
 		{	
-			destAddress = program->setAddress(var, functionParser.parse(lexer, program));
+			destAddress = program->setAddress(var, functionParser.parseCall(lexer, program));
 		}
 		checkToken(syntax.isTerminator(lexer.getToken()), lexer, "Terminator expected.");
 	}
@@ -102,8 +113,9 @@ namespace Rosie{
 		lexer++;
 		while(!syntax.isEndScope(lexer.getToken()))
 		{
-			parseAssignment(lexer, program);
-			lexer++;
+			/*parseAssignment(lexer, program);
+			lexer++;*/
+			parseLoop(lexer, program);
 		}
 		lexer++;
 	}
@@ -141,7 +153,7 @@ namespace Rosie{
 	FunctionParser::FunctionParser(const Syntax& syntax):syntax(syntax)
 	{}
 	
-	Address FunctionParser::parse(Lexer& lexer, Program& program)
+	Address FunctionParser::parseCall(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
 		while(!syntax.isTerminator(lexer.getToken()))
@@ -224,6 +236,20 @@ namespace Rosie{
 		}
 	}
 	
+	void FunctionParser::parseDefinition(Lexer& lexer, Program& program)
+	{
+		std::string funcName = lexer.getToken().value;
+		lexer++;
+		std::vector<Token> args; 
+		while(!syntax.isListEnd(lexer.getToken()))
+		{
+			lexer++;
+			args.push_back(lexer.getToken());std::cout << lexer.getToken() << std::endl;
+			lexer++;
+		}
+		lexer++;//token = "="
+	}
+	
 	std::vector<Token> FunctionParser::getRPN(const std::vector<Token>& input)
 	{
 		std::stack<Token> stack;
@@ -231,7 +257,7 @@ namespace Rosie{
 		Token previousToken;
 		bool firstToken = true;
 		for(Token token : input)
-		{		
+		{
 			if(isConstant(token) || token.type == TokenType::VARNAME)
 			{
 				output.push_back(token);
@@ -353,10 +379,10 @@ namespace Rosie{
 	}
 	
 	Program Interpreter::read(const std::string& fileName, const Syntax& syntax)
-	{
-		Program program;
+	{	
+		Program program(fileName, syntax.getNativeFunctions());
 		
-		Lexer stream(fileName);
+		Lexer stream(fileName+".ros");
 
 		Parser parser(syntax);
 		

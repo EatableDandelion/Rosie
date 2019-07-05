@@ -157,4 +157,41 @@ namespace Rosie
 		private:
 			Address parent;
 	};
+	
+	
+	class ConstantHeader : public TemplateInstruction<ConstantHeader>
+	{
+		public:
+		  	ConstantHeader(const std::string& value, const int& type);
+			ConstantHeader();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+		
+		private:
+			void defineConstant(State& state, const std::string& value, const int& typeId) const;
+	};
+	
+	class VariableHeader : public TemplateInstruction<VariableHeader>
+	{
+		public:
+		  	VariableHeader(const int& id, const std::string& name, const int& type);
+			VariableHeader();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+		
+		private:
+			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
+	};
+	
+	class FunctionHeader : public TemplateInstruction<FunctionHeader>
+	{
+		public:
+		  	FunctionHeader(const int& id, const std::string& name);
+			FunctionHeader();
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
+		
+		private:
+			void defineFunction(State& state, const std::string& name, const int& id) const;
+	};
 }

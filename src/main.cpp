@@ -8,7 +8,7 @@ int main()
 	vm.compile();
 	vm.run();
 	
-	std::cout << vm.getValue<float>("a") << std::endl;
+	std::cout << vm.getValue<float>("c.e.g") << std::endl;
 	
 	return 0;
 }

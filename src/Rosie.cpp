@@ -26,21 +26,38 @@ namespace Rosie{
 		Interpreter interpreter;
 		Program program = interpreter.read(fileName, syntax);
 		
-		ByteCodeWriter writer;
-		writer.write(program);
+		ByteCodeWriter declarationWriter(fileName, ".tc");
+		declarationWriter.write(program->getHeader());
 		
-		HeaderWriter headerWriter;
-		headerWriter.write(program);	
+		ByteCodeWriter instructionWriter(fileName, ".bc");
+		instructionWriter.write(program->getCommands());
+		
+		/*HeaderWriter headerWriter;
+		headerWriter.write(program);	*/
 	}
 	
 	void RosieVM::run()
 	{
-		HeaderReader headerReader;
+		/*HeaderReader headerReader;
+		headerReader.read(state);*/
+		
+		ByteCodeReader headerReader(".tc");
+		
+		headerReader.addInstruction<ConstantHeader>();
+		headerReader.addInstruction<VariableHeader>();
+		headerReader.addInstruction<FunctionHeader>();
+		headerReader.addInstruction<ScopeInstruction>();
 		headerReader.read(state);
-		std::cout << std::endl;
 		
-		ByteCodeReader reader(syntax);
+		std::cout << "=================================" << std::endl;
 		
-		reader.read(state);
+		ByteCodeReader instructionReader(".bc", true);
+		
+		instructionReader.addInstruction<SetInstruction>();
+		instructionReader.addInstruction<ArgumentInstruction>();
+		instructionReader.addInstruction<CallInstruction>(syntax);
+		instructionReader.addInstruction<ScopeInstruction>();
+		
+		instructionReader.read(state);
 	}
 }

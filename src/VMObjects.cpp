@@ -2,6 +2,26 @@
 
 namespace Rosie
 {		
+	
+	Handle::Handle(const int& id, const Category& category):id(id), category(category)
+	{}
+	
+	int Handle::getId() const
+	{
+		return id;
+	}
+	
+	Category Handle::getCategory() const
+	{
+		return category;
+	}
+	
+	bool Handle::operator==(const Handle& other) const
+	{
+		return id == other.id;
+	}
+
+
 	Variable::Variable(const float& floatValue)
 	{
 		value = floatValue;
@@ -10,8 +30,8 @@ namespace Rosie
 
 	Variable::Variable(const int& integerValue)
 	{
-		value = integerValue;
-		type = 1;
+		value = (float)integerValue;
+		type = 0;
 	}
 	
 	Variable::Variable(const bool& booleanValue)
@@ -46,13 +66,18 @@ namespace Rosie
 		}
 		else
 		{
+			value = std::make_shared<Object>();
 			type = 4;
 		}
 	}
 	
-	Variable::Variable()
+	Variable::Variable(const std::shared_ptr<Object>& object):value(std::shared_ptr<Object>(object))
 	{
-		value = 0;
+		type = 4;
+	}
+	
+	Variable::Variable(): value(std::make_shared<Object>())
+	{
 		type = 4;
 	}
 	
@@ -110,25 +135,69 @@ namespace Rosie
 	}
 	
 	
-	
-	
-	
-	Handle::Handle(const int& id, const Category& category):id(id), category(category)
-	{}
-	
-	int Handle::getId() const
+	void Object::addMember(const std::string& name, const int& type, const Handle& handle)
 	{
-		return id;
+		members.add(handle, Rosie::getId(name), Variable(TokenType(type)));
 	}
 	
-	Category Handle::getCategory() const
+	void Object::setMember(const Handle& handle, const Variable& variable)
 	{
-		return category;
+		members[handle] = variable;
 	}
 	
-	bool Handle::operator==(const Handle& other) const
+	Variable Object::getMember(const Handle& handle)
 	{
-		return id == other.id;
+		if(hasMember(handle))
+		{
+			return members[handle];	
+		}
+		else
+		{
+			if(getParent() != nullptr)
+			{
+				return getParent()->getMember(handle);
+			}
+			else
+			{
+				std::cout << "Variable "<< handle.getId() <<" not found." << std::endl;
+				return Variable();
+			}
+		}
+	}
+	
+	Variable Object::getMember(const std::string& name)
+	{
+		std::size_t firstDot = name.find_first_of(".");
+		
+		if(firstDot != std::string::npos)
+		{
+			std::string memberName = name.substr(0, firstDot);
+			return  members[Rosie::getId(memberName)].get<std::shared_ptr<Object>>()->getMember(name.substr(firstDot+1, name.length()));
+		}
+		else
+		{
+			return members[Rosie::getId(name)];
+		}
+	}
+	
+	bool Object::hasMember(const Handle& handle) const
+	{
+		return members.contains(handle);
+	}
+			
+	std::string Object::toString() const
+	{
+		return "Object";
+	}	
+	
+	void Object::setParent(const std::shared_ptr<Object> parent)
+	{
+		m_parent = std::weak_ptr<Object>(parent);
+	}
+	
+	std::shared_ptr<Object> Object::getParent() const
+	{
+		return m_parent.lock();
 	}
 	
 	
@@ -156,12 +225,12 @@ namespace Rosie
 			
 			
 
-	State::State(const std::string& fileName):fileName(fileName)
+	State::State(const std::string& fileName):fileName(fileName), activeScope(std::make_shared<Object>())
 	{}
 	
 	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
 	{
-		variables.add(handle, Rosie::getId(name), Variable(TokenType(tokenType)));
+		activeScope->addMember(name, tokenType, handle);
 	}
 	
 	void State::addFunction(const int& id, const std::string& name)
@@ -171,7 +240,6 @@ namespace Rosie
 	
 	void State::addConstant(const Variable& csts)
 	{
-		//constants[id] = csts;
 		constants.push_back(csts);
 	}
 	
@@ -181,8 +249,8 @@ namespace Rosie
 	}
 	
 	void State::copyVariable(Handle& dest, const Handle& src)
-	{std::cout << constants.size() << std::endl;
-		variables[dest] = getVariable(src);
+	{
+		activeScope->setMember(dest, getVariable(src));
 	}
 	
 	Variable State::getVariable(const Handle& handle)
@@ -199,11 +267,7 @@ namespace Rosie
 			}
 			else
 			{
-				if(!variables.contains(handle))
-				{
-					variables.add(handle, std::size_t(0), Variable());
-				}
-				return variables[handle];				
+				return activeScope->getMember(handle);	
 			}
 		}
 		else if(handle.getCategory() == Category::INTEGER)
@@ -224,10 +288,10 @@ namespace Rosie
 	std::string State::toString() const
 	{
 		std::string res = "[";
-		for(Variable var : variables.getValues())
+		/*for(Variable var : variables.getValues())
 		{
 			res += var.toString() + ", ";
-		}
+		}*/
 		return res+"]";
 	}
 	
@@ -249,5 +313,19 @@ namespace Rosie
 	std::string State::getFileName() const
 	{
 		return fileName;
+	}
+	
+	void State::startScope(const Handle& handle)
+	{
+		scopeStack.push(activeScope);
+		std::shared_ptr<Object> oldScope(activeScope);
+		activeScope = std::move(getVariable(handle).get<std::shared_ptr<Object>>());
+		activeScope->setParent(oldScope);
+	}
+	
+	void State::endScope()
+	{
+		activeScope = std::move(scopeStack.top());
+		scopeStack.pop();
 	}
 }

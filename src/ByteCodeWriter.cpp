@@ -40,13 +40,16 @@ namespace Rosie
 		address.setType(type);
 		
 		constants.push_back(Constant(type, value));
-
+		
+		addDeclaration<ConstantHeader>(value, type);
+		
 		return address;//Constants have a negative index to differentiate from addresses.	
 	}
 	
 	Address Memory::newVarAddress(const std::string& name, const TokenType& type)
 	{
 		Address newAddress = variables.newAddress(rename(name), type);
+		addDeclaration<VariableHeader>(newAddress.getId(), name, type);
 		return newAddress;
 	}
 	
@@ -99,7 +102,9 @@ namespace Rosie
 	
 	Address Memory::newFunctionAddress(const std::string& name)
 	{
-		return functions.newAddress(name);
+		Address res = functions.newAddress(name);
+		addDeclaration<FunctionHeader>(res.getId(), name);
+		return res;
 	}
 	
 	Address Memory::getFunctionAddress(const Token& token, const Lexer& lexer)
@@ -134,6 +139,11 @@ namespace Rosie
 	std::vector<std::string> Memory::getCommands() const
 	{
 		return instructions.getCommands();
+	}
+	
+	std::vector<std::string> Memory::getHeader() const
+	{
+		return header.getCommands();
 	}
 	
 	void Memory::setArguments(std::stack<Address>& activeStack, const int& nbArgs)
@@ -178,7 +188,8 @@ namespace Rosie
 		{
 			scopes.push_back(scopePrefix.substr(dotPos+1, scopePrefix.length()));
 		}
-		
+		addDeclaration<ScopeInstruction>(destAddress);
+		addInstruction<ScopeInstruction>(destAddress);
 	}
 		
 	void Memory::endScope()
@@ -193,7 +204,8 @@ namespace Rosie
 		{
 			scopePrefix = scopePrefix.substr(0, dotPos);
 		}
-		
+		addDeclaration<ScopeInstruction>();
+		addInstruction<ScopeInstruction>();
 	}
 	
 	std::string Memory::rename(const std::string& name) const
@@ -229,13 +241,11 @@ namespace Rosie
 	
 	void Program::startScope(const Address& destAddress)
 	{
-		//addInstruction<ScopeInstruction>(destAddress);
 		memory->startScope(destAddress);
 	}
 	
 	void Program::endScope()
 	{
-		//addInstruction<ScopeInstruction>();
 		memory->endScope();
 	}
 	
@@ -262,7 +272,7 @@ namespace Rosie
 	}
 	
 	
-	void HeaderWriter::write(Program& program)
+	/*void HeaderWriter::write(Program& program)
 	{	
 		std::ofstream file;
 		file.open(program.getFileName()+".hc");
@@ -359,16 +369,18 @@ namespace Rosie
 	void HeaderReader::defineFunction(State& state, const std::string& name, const int& id) const
 	{
 		state.addFunction(id, name);
-	}
+	}*/
 	
 	
+	ByteCodeWriter::ByteCodeWriter(const std::string& fileName, const std::string& extension):fileName(fileName+extension)
+	{}
 	
-	void ByteCodeWriter::write(Program& program) const
+	void ByteCodeWriter::write(const std::vector<std::string>& lines) const
 	{	
 		std::ofstream file;
-		file.open(program.getFileName()+".bc");
+		file.open(fileName);
 		
-		for(std::string command : program->getCommands())
+		for(std::string command : lines)
 		{
 			file << command << std::endl;
 		}
@@ -380,18 +392,13 @@ namespace Rosie
 	
 	
 	
-	ByteCodeReader::ByteCodeReader(const Syntax& syntax)
-	{
-		addInstruction<SetInstruction>();
-		addInstruction<ArgumentInstruction>();
-		addInstruction<CallInstruction>(syntax);
-		addInstruction<ScopeInstruction>();
-	}
+	ByteCodeReader::ByteCodeReader(const std::string& extension, const bool& verbose):extension(extension), verbose(verbose)
+	{}
 	
 	void ByteCodeReader::read(State& state) const
 	{
 		std::string command;
-		std::ifstream file(state.getFileName()+".bc");
+		std::ifstream file(state.getFileName()+extension);
 		int instructionId = 0;
 		if(file.is_open())
 		{
@@ -401,8 +408,11 @@ namespace Rosie
 
 				if(instructions.find(instructionId) != instructions.end())
 				{
-					std::cout << command << std::endl;
-					std::cout << instructions.at(instructionId)->getName() << std::endl;
+					std::cout << command;
+					if(verbose)
+					{
+						std::cout << "\t" << "\t" << instructions.at(instructionId)->getName();
+					}
 					std::cout << std::endl;
 					instructions.at(instructionId)->read(command.substr(command.find("|", std::size_t(0))+1, command.size()), state);
 				}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -12,10 +13,35 @@
 
 namespace Rosie
 {
-	/*struct MultiVariable
+	struct Handle
 	{
-		std::unordered_map<std::string, Variable> variables;
-	};*/
+		public:
+			Handle(const int& id, const Category& category);
+		
+			int getId() const;
+			Category getCategory() const;
+			bool operator==(const Handle& other) const;
+		
+		private:
+			int id;
+			Category category;
+	};
+}
+namespace std 
+{
+   	template<>
+	struct hash<Rosie::Handle>{
+		public:
+		    size_t operator()(const Rosie::Handle& handle) const
+		    {
+				return hash<int>()(handle.getId());
+		    }
+   	 };
+}
+
+namespace Rosie
+{
+	struct Object;
 	
 	struct Variable
 	{
@@ -25,6 +51,7 @@ namespace Rosie
 			Variable(const bool& booleanValue);
 			Variable(const std::string& stringValue);
 			Variable(const TokenType& tokenType);
+			Variable(const std::shared_ptr<Object>& object);
 			Variable();
 			Variable(const Variable& other);
 			
@@ -50,22 +77,25 @@ namespace Rosie
 			
 		private:
 			int type;
-			std::variant<float, int, bool, std::string> value;
-			//std::variant<float, int, bool, std::string, MultiVariable> value;
+			std::variant<float, int, bool, std::string, std::shared_ptr<Object>> value;
+			
 	};
-
-	struct Handle
+	
+	struct Object
 	{
 		public:
-			Handle(const int& id, const Category& category);
-		
-			int getId() const;
-			Category getCategory() const;
-			bool operator==(const Handle& other) const;
-		
+			void addMember(const std::string& name, const int& type, const Handle& handle);
+			void setMember(const Handle& handle, const Variable& variable);
+			Variable getMember(const Handle& handle);
+			Variable getMember(const std::string& name);
+			bool hasMember(const Handle& handle) const;
+			virtual std::string toString() const;
+			void setParent(const std::shared_ptr<Object> parent);
+			std::shared_ptr<Object> getParent() const;
+			
 		private:
-			int id;
-			Category category;
+			DualMap<Handle, std::size_t, Variable> members;
+			std::weak_ptr<Object> m_parent;
 	};
 	
 	template<typename... A>
@@ -107,23 +137,6 @@ namespace Rosie
 			std::function<void(A...)> m_func;
 	};
 	
-}
-
-namespace std 
-{
-   	template<>
-	struct hash<Rosie::Handle>{
-		public:
-		    size_t operator()(const Rosie::Handle& handle) const
-		    {
-				return hash<int>()(handle.getId());
-		    }
-   	 };
-}
-
-namespace Rosie
-{
-	
 	struct CallStack
 	{
 		public:
@@ -153,18 +166,21 @@ namespace Rosie
 			std::vector<std::string> getFunctionsList() const;
 			std::string getFileName() const;
 			std::string toString() const;
+			void startScope(const Handle& handle);
+			void endScope();
 			
 			template<typename T>
 			T getValue(const std::string& name)
 			{
-				return variables[Rosie::getId(name)].get<T>();
+				return activeScope->getMember(name).get<T>();
 			}
 				
-		private:				
-			DualMap<Handle, std::size_t, Variable> variables;
+		private:
+			std::shared_ptr<Object> activeScope;
 			std::vector<Variable> constants;
 			DualMap<int, std::string, Function<CallStack&>> functions;
 			CallStack callStack;
 			std::string fileName;
+			std::stack<std::shared_ptr<Object>> scopeStack;
 	};
 }

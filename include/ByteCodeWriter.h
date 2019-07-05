@@ -42,6 +42,13 @@ namespace Rosie
 			std::vector<Address> getVariables() const;
 			std::vector<Address> getFunctions() const;
 			std::vector<std::string> getCommands() const;
+			std::vector<std::string> getHeader() const;
+			
+			template<typename T, typename... Args>
+			std::string addDeclaration(Args&&... args)
+	  		{
+				return header.addInstruction<T>(args...);
+			}
 			
 			template<typename T, typename... Args>
 			std::string addInstruction(Args&&... args)
@@ -60,6 +67,7 @@ namespace Rosie
 			std::vector<Constant> constants;
 			AddressMap variables;
 			AddressMap functions;
+			InstructionCollection header;
 			InstructionCollection instructions;
 			std::string scopePrefix;
 			std::deque<std::string> scopes;
@@ -96,7 +104,7 @@ namespace Rosie
 	};
 	
 	
-	class HeaderWriter
+	/*class HeaderWriter
 	{
 		public:
 			void write(Program& program);
@@ -111,27 +119,34 @@ namespace Rosie
 			void defineConstant(State& state, const std::string& value, const int& type);
 			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
 			void defineFunction(State& state, const std::string& name, const int& id) const;
-	};
+	};*/
 	
 	class ByteCodeWriter
 	{
 		public:
-			void write(Program& program) const;
+			ByteCodeWriter(const std::string& fileName, const std::string& extension);
+			void write(const std::vector<std::string>& lines) const;
+		
+		private:
+			std::string fileName;
 	};
 	
 	class ByteCodeReader
 	{
 		public:
-			ByteCodeReader(const Syntax& syntax);
-			void read(State& state) const;
+			ByteCodeReader(const std::string& extension, const bool& verbose = false);
 		
-		private:
+			void read(State& state) const;
+			
 			template<typename T, typename... Args>
 			void addInstruction(Args&&... args)
 			{
 				instructions.insert(std::pair<int, std::shared_ptr<T>>(T::getId(), std::make_shared<T>(std::forward<Args>(args)...)));
 			}
-			
+		
+		private:
+			std::string extension;
 			std::unordered_map<int, std::shared_ptr<Instruction>> instructions;
+			bool verbose;
 	};
  }

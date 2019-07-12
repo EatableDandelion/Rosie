@@ -23,24 +23,25 @@ namespace Rosie{
 	
 	void RosieVM::compile()
 	{
-		Interpreter interpreter;
-		Program program = interpreter.read(fileName, syntax);
-		
-		ByteCodeWriter declarationWriter(fileName, ".tc");
-		declarationWriter.write(program->getHeader());
-		
-		ByteCodeWriter instructionWriter(fileName, ".bc");
-		instructionWriter.write(program->getCommands());
-		
-		/*HeaderWriter headerWriter;
-		headerWriter.write(program);	*/
+		try{
+			Interpreter interpreter;
+			Program program = interpreter.read(fileName, syntax);
+			
+			ByteCodeWriter declarationWriter(fileName, ".tc");
+			declarationWriter.write(program->getHeader());
+			
+			ByteCodeWriter instructionWriter(fileName, ".bc");
+			instructionWriter.write(program->getCommands());
+		}
+		catch(const std::exception& error)
+		{
+			std::cerr << error.what();
+		}
+	
 	}
 	
 	void RosieVM::run()
-	{
-		/*HeaderReader headerReader;
-		headerReader.read(state);*/
-		
+	{	
 		ByteCodeReader headerReader(".tc");
 		
 		headerReader.addInstruction<ConstantHeader>();

@@ -34,17 +34,29 @@ namespace Rosie
 		return index<m_line.size();
 	}
 	
-	
+	int CharStream::getCharIndex() const
+	{
+		return index;
+	}
 	
 	LineStream::LineStream(const std::string& fileName)
 	{
-		stream.open(fileName);
+		openFile(fileName);
 		lineIndex = 0;
 	}
 	
 	LineStream::~LineStream()
 	{
 		stream.close();
+	}
+	
+	void LineStream::openFile(const std::string& fileName)
+	{
+		stream.open(fileName);
+		if(stream.fail())
+		{
+			throw FileError(fileName);
+		}
 	}
 	
 	bool LineStream::nextLine()
@@ -72,7 +84,7 @@ namespace Rosie
 	
 	
 	
-	FileStream::FileStream(const std::string& fileName):lineStream(fileName)
+	FileStream::FileStream(const std::string& fileName):fileName(fileName), lineStream(fileName)
 	{}
 	
 	bool FileStream::nextChar(char& ch)
@@ -113,6 +125,27 @@ namespace Rosie
 	int FileStream::getLineIndex() const
 	{
 		return lineStream.getLineIndex();
+	}
+	
+	std::string FileStream::getFileName() const
+	{
+		return fileName;
+	}
+	
+	int FileStream::getCharIndex() const
+	{
+		return charStream.getCharIndex();
+	}
+	
+	
+	FileError::FileError(const std::string& fileName):fileName(fileName)
+	{}
+	
+	const char*  FileError::what() const throw()
+	{
+		ErrorDisplay display;
+		display.show("File \"" + fileName + "\" not found.");
+		return "";
 	}
 	
 }

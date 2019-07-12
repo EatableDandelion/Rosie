@@ -32,7 +32,8 @@ namespace Rosie{
 		}
 		else
 		{
-			Rosie::error("Unexpected token.\n", lexer);
+			//Rosie::error("Unexpected token.\n", lexer);
+			throw SyntaxError("Unexpected token.", lexer);
 		}
 		lexer++;
 	}
@@ -144,7 +145,7 @@ namespace Rosie{
 	{
 		if(!isCorrectToken)
 		{
-			Rosie::error("Unexpected token.\n"+errorMsg, lexer);
+			throw SyntaxError("Unexpected token: "+errorMsg, lexer);
 		}
 	}
 	
@@ -222,7 +223,8 @@ namespace Rosie{
 				}
 				else
 				{	
-					Rosie::error("Unexpected token "+token.getString(), lexer);
+					//Rosie::error("Unexpected token "+token.getString(), lexer);
+					throw SyntaxError("Unexpected token "+token.getString(), lexer);
 				}
 			}
 		}
@@ -387,7 +389,7 @@ namespace Rosie{
 		Parser parser(syntax);
 		
 		parser.parse(stream, program);
-		
+
 		return program;
 	}
 

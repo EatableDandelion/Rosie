@@ -6,11 +6,10 @@
 #include <unordered_map>
 #include <memory>
 #include <functional>
+#include <windows.h>
 
 namespace Rosie
 {
-	template<typename Key, typename T> class TreeNode;
-	
 	std::size_t getId(const std::string& name);
 	
 	std::vector<std::string> split(const std::string& line, const std::string& separator);
@@ -103,76 +102,28 @@ namespace Rosie
 			std::unordered_map<K1, K2> keymap;
 	};
 	
-	/*template<typename Key, typename T>
-	class TreeNode
+	class ErrorDisplay
 	{
 		public:
-			TreeNode(const T& value):m_value(std::make_shared<T>(value))
-			{}
-		
-			std::shared_ptr<T> operator->()
-			{
-				return m_value;
-			}
+			ErrorDisplay();
+			~ErrorDisplay();
 			
-			void addChild(const Key& key, const T& child)
-			{
-				std::shared_ptr<TreeNode<Key, T>> childNode = std::make_shared<TreeNode<Key, T>>(child);
-				childNode->parent = std::weak_ptr<T>(std::make_shared<TreeNode<Key, T>>(TreeNode(m_value)));
-				children.insert(std::pair<Key, std::shared_ptr<TreeNode<Key, T>>>(key, childNode));
-			}
+			void show(const std::string& msg, const bool& warningOn = true) const;
 			
-			std::shared_ptr<TreeNode<Key, T>> getChild(const Key& key)
-			{
-				return children[key];
-			}
-			
-			std::shared_ptr<TreeNode<Key, T>> getParent()
-			{
-				return parent.lock();
-			}
-		
-			std::shared_ptr<T> getValue()
-			{
-				return m_value;
-			}
-		
 		private:
-			std::shared_ptr<T> m_value;
-			std::unordered_map<Key, std::shared_ptr<TreeNode<Key, T>>> children;
-			std::weak_ptr<TreeNode<Key,T>> parent;
+			void start() const;
+			void end() const;
+	};
+	
+	class BaseError : public std::exception
+	{
+		public:
+			BaseError(const std::string& msg);
+			
+			const char* what() const throw();
+			
+		private:
+			const std::string msg;
 	};
 
-	
-	template<typename Key, typename T>
-	class Scope
-	{
-		public:
-			Scope(const T& value):m_node(std::make_shared<TreeNode<Key, T>>(value))
-			{}
-		
-			void createScope(const Key& key, const T& value)
-			{
-				m_node->addChild(key, value);
-			}
-		
-			void scopeIn(const Key& key)
-			{
-				m_node = m_node->getChild(key);
-			}
-			
-			void scopeOut()
-			{
-				m_node = m_node->getParent();
-			}
-			
-			std::shared_ptr<T> getValue()
-			{
-				return m_node->getValue();
-			}
-			
-		private:
-			std::shared_ptr<TreeNode<Key, T>> m_node;
-	};*/
-	
 }

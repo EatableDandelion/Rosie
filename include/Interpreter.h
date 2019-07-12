@@ -15,6 +15,7 @@ namespace Rosie{
 	class FunctionParser;
 	class Interpreter;
 	
+	
 	class FunctionParser
 	{	
 		public:

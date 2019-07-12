@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include "Utils.h"
 
 namespace Rosie
 {
@@ -16,6 +17,7 @@ namespace Rosie
 			bool nextChar(char& ch);
 			bool hasNextChar();
 			char getChar() const;
+			int getCharIndex() const;
 		
 		private:
 			std::string m_line;
@@ -29,6 +31,7 @@ namespace Rosie
 			LineStream(const std::string& fileName);
 			~LineStream();
 			
+			void openFile(const std::string& fileName);
 			bool nextLine();
 			bool hasNextLine();
 			std::string getLine() const;
@@ -53,10 +56,25 @@ namespace Rosie
 			bool hasNextLine();
 			std::string getLine() const;
 			int getLineIndex() const;
+			std::string getFileName() const;
+			int getCharIndex() const;
 			
 		private:
 			CharStream charStream;
 			LineStream lineStream;
+			const std::string fileName;
+	};
+	
+	
+	class FileError : public std::exception
+	{
+		public:
+			FileError(const std::string& fileName);
+			
+			const char* what() const throw();
+		
+		private:
+			const std::string fileName;
 	};
 
 }

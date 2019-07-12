@@ -17,7 +17,6 @@
 namespace Rosie
 {
 	
-	void error(const std::string& text, const Lexer& lexer);
 	
 	struct Memory
 	{

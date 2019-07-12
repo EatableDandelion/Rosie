@@ -115,6 +115,9 @@ namespace Rosie
 			
 			std::string getLine() const;
 			
+			std::string getFileName() const;
+			
+			
 		private:
 			FileStream fileStream;
 			std::vector<std::shared_ptr<Rule>> rules;
@@ -124,5 +127,24 @@ namespace Rosie
 			bool next();
 			bool loadNextLine();
 			bool nextToken(Token& token);
+	};
+	
+	
+	class SyntaxError : public std::exception
+	{
+		public:
+			SyntaxError(const std::string& fileName, const std::string& line, const int& lineIndex, const std::string& token, const int& charIndex, const int& tokenLength, const std::string& msg);
+			SyntaxError(const std::string& msg, const Lexer& lexer);
+			
+			const char* what() const throw();
+		
+		private:
+			const std::string fileName;
+			const std::string line;
+			const int lineIndex;
+			const std::string token;
+			const int charIndex;
+			const std::string msg;
+			const int tokenLength;
 	};
 }

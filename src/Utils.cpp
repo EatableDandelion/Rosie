@@ -22,4 +22,54 @@ namespace Rosie
 		
 		return res;
 	}
+	
+	ErrorDisplay::ErrorDisplay()
+	{
+		start();
+	}
+	
+	ErrorDisplay::~ErrorDisplay()
+	{
+		end();
+	}
+	
+	void ErrorDisplay::start() const
+	{
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+		std::cout << std::endl;
+	}
+			
+	void ErrorDisplay::show(const std::string& msg, const bool& warningOn) const
+	{
+		if(warningOn)
+		{
+			std::cout << "/!\\ ";
+		}
+		
+		std::cout << msg;
+		
+		if(warningOn)
+		{
+			std::cout << " /!\\";
+		}
+		std::cout << std::endl;	
+	}
+	
+	void ErrorDisplay::end() const
+	{
+		std::cout << std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	BaseError::BaseError(const std::string& msg):msg(msg)
+	{}
+			
+	const char*  BaseError::what() const throw()
+	{
+		ErrorDisplay().show(msg);
+		return "";
+	}
+			
 }

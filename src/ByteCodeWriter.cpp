@@ -2,15 +2,6 @@
 
 namespace Rosie
 {
-	void error(const std::string& text, const Lexer& lexer)
-	{
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, 12);
-		std::cout << "Error line "<<std::to_string(lexer.getLineIndex())<<", at token ["<<lexer.getToken()<<"]:"<< std::endl;
-		std::cout << lexer.getLine() << std::endl;
-		std::cout << text << std::endl;
-		SetConsoleTextAttribute(hConsole, 7);
-	}
 	
 	Memory::Memory():variables(Category::VARIABLE,1), functions(Category::FUNCTION, 1), scopePrefix("")
 	{}
@@ -68,7 +59,8 @@ namespace Rosie
 			}
 		}
 		
-		std::cout << "Error, variable " << token << " undefined." <<std::endl;
+		throw BaseError("Error, variable " + token.getString() + " undefined.");
+
 		return Address(0, Category::VARIABLE);
 	}
 	
@@ -111,7 +103,7 @@ namespace Rosie
 	{
 		if(!hasFunctionAddress(token))
 		{
-			Rosie::error("Error, function " + token.getString() + " undefined.", lexer);
+			throw SyntaxError("Error, function " + token.getString() + " undefined.", lexer);
 		}
 		return functions.getAddress(token.value);
 	}

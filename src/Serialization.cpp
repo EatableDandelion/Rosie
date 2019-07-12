@@ -2,113 +2,158 @@
 
 namespace Rosie
 {
-	/*
-	Serializable::Serializable(const std::string& name):name(name)
-	{}
-	
-	Serializable::Serializable(const Serializable& copyObject):name(copyObject.name)
+	void Serializable::uploadMember(const std::string& name, const Serializable& member, std::ostream& stream, std::string& indentation) const
 	{
-		for(std::shared_ptr<Serializable> member : copyObject.members)
-		{
-			members.push_back(std::shared_ptr<Serializable>(member));
-		}
+		stream << indentation << name << " = {" << std::endl;
+		indentation+="\t";
+		member.serialize(stream, indentation);
+		indentation.pop_back();
+		stream << indentation << "};" << std::endl;
 	}
 	
-	Serializable::Serializable(const std::string& name, Serializable* copyObject):name(name), members(copyObject->members)
-	{}
-	
-	void Serializable::addMember(const std::string& name, Serializable* member)
+	void Serializable::uploadMember(const std::string& name, const float& member, std::ostream& stream, std::string& indentation) const
 	{
-		member->name = name;
-		members.push_back(std::shared_ptr<Serializable>(member));
+		stream << indentation << name << " = " << member << ";" << std::endl;
+	}	
+	
+	void Serializable::uploadMember(const std::string& name, const int& member, std::ostream& stream, std::string& indentation) const
+	{
+		stream << indentation << name << " = " << member << ";" << std::endl;
 	}
 	
-	void Serializable::addMember(const std::string& name, float* member)
+	void Serializable::uploadMember(const std::string& name, const bool& member, std::ostream& stream, std::string& indentation) const
 	{
-		members.push_back(std::make_shared<PrimitiveMember<float>>(name, member));
+		stream << indentation << name << " = " << member << ";" << std::endl;
 	}
 	
-	void Serializable::addMember(const std::string& name, int* member)
+	void Serializable::uploadMember(const std::string& name, const std::string& member, std::ostream& stream, std::string& indentation) const
 	{
-		members.push_back(std::make_shared<PrimitiveMember<int>>(name, member));
+		stream << indentation << name << " = \"" << member << "\";" << std::endl;
 	}
 	
-	void Serializable::addMember(const std::string& name, bool* member)
-	{
-		members.push_back(std::make_shared<PrimitiveMember<bool>>(name, member));
-	}
-	
-	void Serializable::addMember(const std::string& name, std::string* member)
-	{
-		members.push_back(std::make_shared<PrimitiveMember<std::string>>(name, member));
-	}
-	
-	
-	void Serializable::deserialize(RosieVM& vm)
-	{
-		deserialize(vm.getState().getActiveScope());
-	}
-	
-	void Serializable::deserialize(std::shared_ptr<RosieObject> parent)
-	{
-		for(std::shared_ptr<Serializable> member : members)
-		{
-			member->deserialize(parent->getScope(name));
-		}
-	}*/
-	
-	void Serializable::setMember(const std::string& name, Serializable* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<RosieObject>& object)
 	{
 		member->deserialize(object->getScope(name));
 	}
 	
-	void Serializable::setMember(const std::string& name, float* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, float* member, const std::shared_ptr<RosieObject>& object)
 	{
 		*member = object->getValue<float>(name);
 	}
 	
-	void Deserializer::run(RosieVM& vm)
+	void Serializable::downloadMember(const std::string& name, int* member, const std::shared_ptr<RosieObject>& object)
 	{
-		for(std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
+		*member = object->getValue<int>(name);
+	}
+	
+	void Serializable::downloadMember(const std::string& name, bool* member, const std::shared_ptr<RosieObject>& object)
+	{
+		*member = object->getValue<bool>(name);
+	}
+	
+	void Serializable::downloadMember(const std::string& name, std::string* member, const std::shared_ptr<RosieObject>& object)
+	{
+		*member = object->getValue<std::string>(name);
+	}
+	
+	
+	Serializer::Serializer(const std::string& fileName):fileName(fileName)
+	{}
+	
+	Serializer::~Serializer()
+	{
+		if(file.is_open())
 		{
-			pair.second->deserialize(vm.getState().getActiveScope()->getScope(pair.first));
+			file.close();
 		}
 	}
+	
+	void Serializer::serialize()
+	{
+		file.open(fileName+".ros");
+		std::string indentation = "";
+		serialize(file, indentation);
+		file.close();
+	}
+	
+	void Serializer::deserialize()
+	{
+		RosieVM vm("myTest", Syntax());
+		vm.compile();
+		vm.run();
+		
+		deserialize(vm.getState().getActiveScope());
+		
+		/*for(std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
+		{
+			pair.second->deserialize(vm.getState().getActiveScope()->getScope(pair.first));
 			
-	void Deserializer::addMember(const std::string& name, Serializable* member)
+		}*/
+	}
+			
+	void Serializer::addMember(const std::string& name, Serializable* member)
 	{
 		members.insert(std::pair<std::string, std::shared_ptr<Serializable>>(name, std::shared_ptr<Serializable>(member)));
 	}
 	
 	
-	Position::Position(const float& x0):x(x0)
-	{}
-	
-	void Position::setX(const float& x0)
+	void Serializer::serialize(std::ostream& stream, std::string& indentation) const
 	{
-		x = x0;
+		for(const std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
+		{
+			uploadMember(pair.first, *(pair.second), stream, indentation);
+		}
 	}
 	
-	float Position::getX() const
+	void Serializer::deserialize(const std::shared_ptr<RosieObject>& object)
+	{
+		for(std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
+		{
+			downloadMember(pair.first, pair.second.get(), object);
+		}
+	}
+
+	
+	Position::Position(const float& x0, const std::string& text):x(x0), text(text)
+	{}
+	
+	float& Position::getX()
 	{
 		return x;
 	}
 	
+	std::string& Position::getText()
+	{
+		return text;
+	}
+	
+	void Position::serialize(std::ostream& stream, std::string& indentation) const
+	{
+		uploadMember("x", x, stream, indentation);
+		uploadMember("text", text, stream, indentation);
+	}
+	
 	void Position::deserialize(const std::shared_ptr<RosieObject>& object)
 	{
-		setMember("x", &x, object);
+		downloadMember("x", &x, object);
+		downloadMember("text", &text, object);
 	}
 	
 	Mesh::Mesh(Position position0):position(position0)
 	{}
 
-	Position Mesh::getPosition() const
+	Position& Mesh::getPosition()
 	{
 		return position;
 	}
 	
+	void Mesh::serialize(std::ostream& stream, std::string& indentation) const
+	{
+		uploadMember("position", position, stream, indentation);
+	}
+	
 	void Mesh::deserialize(const std::shared_ptr<RosieObject>& object)
 	{
-		setMember("position", &position, object);
+		downloadMember("position", &position, object);
 	}
 }

@@ -182,12 +182,15 @@ namespace Rosie
 			}
 			
 			Token token;
+			int charIndex;
 			while(fileStream.hasNextChar())
 			{
+				charIndex = fileStream.getCharIndex();
 				if(nextToken(token))
 				{
+					token.charIndex = charIndex;
 					tokens.push_back(token);
-					token.clear();				
+					token.clear();			
 				}
 			}
 		}
@@ -247,5 +250,46 @@ namespace Rosie
 	std::string Lexer::getLine() const
 	{
 		return fileStream.getLine();
+	}
+	
+	std::string Lexer::getFileName() const
+	{
+		return fileStream.getFileName();
+	}
+	
+	
+		SyntaxError::SyntaxError(const std::string& fileName, const std::string& line, const int& lineIndex, const std::string& token, const int& charIndex, const int& tokenLength, const std::string& msg):fileName(fileName), line(line), lineIndex(lineIndex), token(token), charIndex(charIndex), tokenLength(tokenLength), msg(msg)
+	{}
+	
+	SyntaxError::SyntaxError(const std::string& msg, const Lexer& lexer):fileName(lexer.getFileName()), line(lexer.getLine()), lineIndex(lexer.getLineIndex()), token(lexer.getToken().getString()), charIndex(lexer.getToken().charIndex), tokenLength(lexer.getToken().value.length()), msg(msg)
+	{}
+	
+	const char*  SyntaxError::what() const throw()
+	{
+		ErrorDisplay display;
+		display.show("Syntax error:");
+		display.show("File \""+fileName+"\"", false);
+		std::cout << std::endl;
+		
+		std::string errorLine = std::string("Line "+std::to_string(lineIndex)+": \"");
+		display.show(errorLine+line+"\"", false);
+		
+		/** Just because we're fancy in here, we display the error with little hats ^^ */
+		std::string hatLine;
+		for(int i = 0; i < (errorLine.length()+charIndex); i++)
+		{
+			hatLine+=" ";
+		}
+		for(int i = 0; i < tokenLength; i++)
+		{
+			hatLine+="^";
+		}
+		std::cout << hatLine << std::endl;
+		
+		display.show("Token ["+token+"]", false);
+		
+		display.show(msg, false);
+		
+		return "";
 	}
 }

@@ -25,6 +25,7 @@ namespace Rosie
 	{
 		Rosie::TokenType type = UNDEFINED;
 		std::string value;
+		int charIndex;
 		
 		void operator+=(const char c);
 		
@@ -42,14 +43,7 @@ namespace Rosie
 			return os;
 		}
 		
-		/*void setAddress(const Address& address);
-		
-		Address getAddress() const;*/
-		
-		std::string getString() const;
-		
-		private:
-			//Address m_address;
+		std::string getString() const;		
 	};
 	
 	

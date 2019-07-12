@@ -66,17 +66,17 @@ namespace Rosie
 		}
 		else
 		{
-			value = std::make_shared<Object>();
+			value = std::make_shared<RosieObject>();
 			type = 4;
 		}
 	}
 	
-	Variable::Variable(const std::shared_ptr<Object>& object):value(std::shared_ptr<Object>(object))
+	Variable::Variable(const std::shared_ptr<RosieObject>& object):value(std::shared_ptr<RosieObject>(object))
 	{
 		type = 4;
 	}
 	
-	Variable::Variable(): value(std::make_shared<Object>())
+	Variable::Variable(): value(std::make_shared<RosieObject>())
 	{
 		type = 4;
 	}
@@ -133,19 +133,19 @@ namespace Rosie
 		}
 		return "";
 	}
+
 	
-	
-	void Object::addMember(const std::string& name, const int& type, const Handle& handle)
+	void RosieObject::addMember(const std::string& name, const int& type, const Handle& handle)
 	{
 		members.add(handle, Rosie::getId(name), Variable(TokenType(type)));
 	}
 	
-	void Object::setMember(const Handle& handle, const Variable& variable)
+	void RosieObject::setMember(const Handle& handle, const Variable& variable)
 	{
 		members[handle] = variable;
 	}
 	
-	Variable Object::getMember(const Handle& handle)
+	Variable RosieObject::getMember(const Handle& handle)
 	{
 		if(hasMember(handle))
 		{
@@ -165,14 +165,14 @@ namespace Rosie
 		}
 	}
 	
-	Variable Object::getMember(const std::string& name)
+	Variable RosieObject::getMember(const std::string& name)
 	{
 		std::size_t firstDot = name.find_first_of(".");
 		
 		if(firstDot != std::string::npos)
 		{
 			std::string memberName = name.substr(0, firstDot);
-			return  members[Rosie::getId(memberName)].get<std::shared_ptr<Object>>()->getMember(name.substr(firstDot+1, name.length()));
+			return  members[Rosie::getId(memberName)].get<std::shared_ptr<RosieObject>>()->getMember(name.substr(firstDot+1, name.length()));
 		}
 		else
 		{
@@ -180,24 +180,34 @@ namespace Rosie
 		}
 	}
 	
-	bool Object::hasMember(const Handle& handle) const
+	std::shared_ptr<RosieObject> RosieObject::getScope(const std::string& name)
+	{
+		return members[Rosie::getId(name)].get<std::shared_ptr<RosieObject>>();
+	}
+	
+	bool RosieObject::hasMember(const Handle& handle) const
 	{
 		return members.contains(handle);
 	}
 			
-	std::string Object::toString() const
+	std::string RosieObject::toString() const
 	{
 		return "Object";
 	}	
 	
-	void Object::setParent(const std::shared_ptr<Object> parent)
+	void RosieObject::setParent(const std::shared_ptr<RosieObject> parent)
 	{
-		m_parent = std::weak_ptr<Object>(parent);
+		m_parent = std::weak_ptr<RosieObject>(parent);
 	}
 	
-	std::shared_ptr<Object> Object::getParent() const
+	std::shared_ptr<RosieObject> RosieObject::getParent() const
 	{
 		return m_parent.lock();
+	}
+	
+	void RosieObject::copyMembers(const std::shared_ptr<RosieObject>& object)
+	{
+		members = object->members;
 	}
 	
 	
@@ -225,7 +235,7 @@ namespace Rosie
 			
 			
 
-	State::State(const std::string& fileName):fileName(fileName), activeScope(std::make_shared<Object>())
+	State::State(const std::string& fileName):fileName(fileName), activeScope(std::make_shared<RosieObject>())
 	{}
 	
 	void State::addVariable(const std::string& name, const int& tokenType, const Handle& handle)
@@ -318,8 +328,8 @@ namespace Rosie
 	void State::startScope(const Handle& handle)
 	{
 		scopeStack.push(activeScope);
-		std::shared_ptr<Object> oldScope(activeScope);
-		activeScope = std::move(getVariable(handle).get<std::shared_ptr<Object>>());
+		std::shared_ptr<RosieObject> oldScope(activeScope);
+		activeScope = std::move(getVariable(handle).get<std::shared_ptr<RosieObject>>());
 		activeScope->setParent(oldScope);
 	}
 	
@@ -327,5 +337,10 @@ namespace Rosie
 	{
 		activeScope = std::move(scopeStack.top());
 		scopeStack.pop();
+	}
+	
+	std::shared_ptr<RosieObject> State::getActiveScope() const
+	{
+		return activeScope;
 	}
 }

@@ -60,4 +60,9 @@ namespace Rosie{
 		
 		instructionReader.read(state);
 	}
+	
+	State RosieVM::getState() const
+	{
+		return state;
+	}
 }

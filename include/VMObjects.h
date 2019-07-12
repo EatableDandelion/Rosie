@@ -41,7 +41,8 @@ namespace std
 
 namespace Rosie
 {
-	struct Object;
+	struct RosieObject;
+	class State;
 	
 	struct Variable
 	{
@@ -51,7 +52,7 @@ namespace Rosie
 			Variable(const bool& booleanValue);
 			Variable(const std::string& stringValue);
 			Variable(const TokenType& tokenType);
-			Variable(const std::shared_ptr<Object>& object);
+			Variable(const std::shared_ptr<RosieObject>& object);
 			Variable();
 			Variable(const Variable& other);
 			
@@ -69,34 +70,49 @@ namespace Rosie
 				return std::get<T>(value);
 			}
 			
+			//Position p = vm.getVariable<Position>("p");
+			
 			friend std::ostream& operator<<(std::ostream& os, Variable& var)
 			{
 				os << var.toString(); 
 				return os;
 			}
-			
+
 		private:
 			int type;
-			std::variant<float, int, bool, std::string, std::shared_ptr<Object>> value;
+			std::variant<float, bool, int, std::string, std::shared_ptr<RosieObject>> value;
 			
 	};
+
 	
-	struct Object
+	struct RosieObject
 	{
 		public:
-			void addMember(const std::string& name, const int& type, const Handle& handle);
-			void setMember(const Handle& handle, const Variable& variable);
-			Variable getMember(const Handle& handle);
-			Variable getMember(const std::string& name);
-			bool hasMember(const Handle& handle) const;
 			virtual std::string toString() const;
-			void setParent(const std::shared_ptr<Object> parent);
-			std::shared_ptr<Object> getParent() const;
+			Variable getMember(const std::string& name);
+			std::shared_ptr<RosieObject> getScope(const std::string& name);
+			
+			void copyMembers(const std::shared_ptr<RosieObject>& object);
+			
+			template<typename T>
+			T getValue(const std::string& name)
+			{
+				return getMember(name).get<T>();
+			}
 			
 		private:
 			DualMap<Handle, std::size_t, Variable> members;
-			std::weak_ptr<Object> m_parent;
+			std::weak_ptr<RosieObject> m_parent;
+			friend class State;
+			
+			void addMember(const std::string& name, const int& type, const Handle& handle);
+			void setMember(const Handle& handle, const Variable& variable);
+			Variable getMember(const Handle& handle);
+			bool hasMember(const Handle& handle) const;
+			void setParent(const std::shared_ptr<RosieObject> parent);
+			std::shared_ptr<RosieObject> getParent() const;
 	};
+
 	
 	template<typename... A>
 	struct Function
@@ -172,15 +188,17 @@ namespace Rosie
 			template<typename T>
 			T getValue(const std::string& name)
 			{
-				return activeScope->getMember(name).get<T>();
+				return activeScope->getValue<T>(name);
 			}
+			
+			std::shared_ptr<RosieObject> getActiveScope() const;
 				
 		private:
-			std::shared_ptr<Object> activeScope;
+			std::shared_ptr<RosieObject> activeScope;
 			std::vector<Variable> constants;
 			DualMap<int, std::string, Function<CallStack&>> functions;
 			CallStack callStack;
 			std::string fileName;
-			std::stack<std::shared_ptr<Object>> scopeStack;
+			std::stack<std::shared_ptr<RosieObject>> scopeStack;
 	};
 }

@@ -87,6 +87,7 @@ namespace Rosie{
 		checkToken(syntax.isAssignment(lexer.getToken()),lexer, "Assignment operator expected.");
 		
 		lexer++;//token = "2.21"
+		
 		if(syntax.isStartScope(lexer.getToken()))
 		{
 			if(program->hasVarAddress(var))
@@ -102,6 +103,21 @@ namespace Rosie{
 			parseScope(lexer, program);
 			program.endScope();
 		}
+		else if(syntax.isCollectionStart(lexer.getToken()))
+		{
+			destAddress = program->newVarAddress(var, TokenType::CSTARRAY);
+			
+			program.startScope(destAddress);
+			while(syntax.isCollectionEnd(lexer.getToken()))
+			{
+				lexer++;
+				// TODO add members here
+				//program.add
+				//
+				lexer++;
+			}
+			program.endScope();
+		}
 		else
 		{	
 			destAddress = program->setAddress(var, functionParser.parseCall(lexer, program));
@@ -114,8 +130,6 @@ namespace Rosie{
 		lexer++;
 		while(!syntax.isEndScope(lexer.getToken()))
 		{
-			/*parseAssignment(lexer, program);
-			lexer++;*/
 			parseLoop(lexer, program);
 		}
 		lexer++;
@@ -243,7 +257,7 @@ namespace Rosie{
 		std::string funcName = lexer.getToken().value;
 		lexer++;
 		std::vector<Token> args; 
-		while(!syntax.isListEnd(lexer.getToken()))
+		while(!syntax.isArgEnd(lexer.getToken()))
 		{
 			lexer++;
 			args.push_back(lexer.getToken());std::cout << lexer.getToken() << std::endl;
@@ -276,7 +290,7 @@ namespace Rosie{
 			else if(token.type == TokenType::OPERATOR)
 			{			
 				while(
-					!stack.empty() && !syntax.isListStart(stack.top()) &&
+					!stack.empty() && !syntax.isArgStart(stack.top()) &&
 					(stack.top().type == TokenType::FUNCNAME ||
 					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
 					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
@@ -289,13 +303,13 @@ namespace Rosie{
 			}
 			else if(syntax.isListSeparator(token))
 			{
-				while(!syntax.isListStart(stack.top()))
+				while(!syntax.isArgStart(stack.top()))
 				{
 					output.push_back(stack.top());
 					stack.pop();
 				}
 			}
-			else if(syntax.isListStart(token))
+			else if(syntax.isArgStart(token))
 			{
 				Token wallSeparator; //WAAAALL notation, to know how many args for the function called
 				wallSeparator.value = "|";
@@ -303,9 +317,9 @@ namespace Rosie{
 				output.push_back(wallSeparator);
 				stack.push(token);
 			}				
-			else if(syntax.isListEnd(token))
+			else if(syntax.isArgEnd(token))
 			{
-				while(!syntax.isListStart(stack.top()))
+				while(!syntax.isArgStart(stack.top()))
 				{
 					output.push_back(stack.top());
 					stack.pop();
@@ -326,16 +340,17 @@ namespace Rosie{
 	
 	bool FunctionParser::isConstant(Token& token)
 	{
-		return 	token.type == TokenType::CSTFLOAT || 
-				token.type == TokenType::CSTINT || 
+		return 	token.type == TokenType::CSTFLOAT 	|| 
+				token.type == TokenType::CSTINT 	|| 
 				token.type == TokenType::CSTBOOLEAN ||
-				token.type == TokenType::CSTSTRING;
+				token.type == TokenType::CSTSTRING	||
+				token.type == TokenType::CSTARRAY;
 	}
 	
 	bool FunctionParser::isUnary(Token& token, Token& previousToken)
 	{
 		if(token.type != TokenType::OPERATOR)return false;
-		if(syntax.isListEnd(previousToken))return false;
+		if(syntax.isArgEnd(previousToken))return false;
 		if(previousToken.type == TokenType::SEPARATOR || previousToken.type == TokenType::OPERATOR) return true;
 		return false;
 	}

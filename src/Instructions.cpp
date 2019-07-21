@@ -165,6 +165,10 @@ namespace Rosie
 		{
 			state.addConstant(Variable(value));
 		}
+		else if(type == TokenType::CSTARRAY)
+		{
+			state.addConstant(Variable());
+		}
 	}
 	
 	std::string ConstantHeader::getName() const

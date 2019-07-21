@@ -75,7 +75,6 @@ namespace Rosie
 		
 		int index = head;
 		head+=1;
-		//newAddress.setScope(scope.top()-1);
 		Address newAddress = Address(index, category, name, tokenType);
 		addresses.insert(std::pair<std::size_t, Address>(id, newAddress));
 

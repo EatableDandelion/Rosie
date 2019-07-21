@@ -13,7 +13,7 @@ namespace Rosie
 		protected:
 			/** To be overriden by the derived classes */
 			virtual void serialize(std::ostream& stream, std::string& indentation) const = 0;
-			virtual void deserialize(const std::shared_ptr<RosieObject>& object) = 0;
+			virtual void deserialize(const std::shared_ptr<Scope>& object) = 0;
 			
 			void uploadMember(const std::string& name, const Serializable& member, std::ostream& stream, std::string& indentation) const;
 			void uploadMember(const std::string& name, const float& member, std::ostream& stream, std::string& indentation) const;
@@ -21,11 +21,11 @@ namespace Rosie
 			void uploadMember(const std::string& name, const bool& member, std::ostream& stream, std::string& indentation) const;
 			void uploadMember(const std::string& name, const std::string& member, std::ostream& stream, std::string& indentation) const;
 			
-			void downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<RosieObject>& object);
-			void downloadMember(const std::string& name, float* member, const std::shared_ptr<RosieObject>& object);
-			void downloadMember(const std::string& name, int* member, const std::shared_ptr<RosieObject>& object);
-			void downloadMember(const std::string& name, bool* member, const std::shared_ptr<RosieObject>& object);
-			void downloadMember(const std::string& name, std::string* member, const std::shared_ptr<RosieObject>& object);
+			void downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<Scope>& object);
+			void downloadMember(const std::string& name, float* member, const std::shared_ptr<Scope>& object);
+			void downloadMember(const std::string& name, int* member, const std::shared_ptr<Scope>& object);
+			void downloadMember(const std::string& name, bool* member, const std::shared_ptr<Scope>& object);
+			void downloadMember(const std::string& name, std::string* member, const std::shared_ptr<Scope>& object);
 			
 			friend class Serializer;
 	};
@@ -43,7 +43,7 @@ namespace Rosie
 		
 		protected:
 			virtual void serialize(std::ostream& stream, std::string& indentation) const;
-			virtual void deserialize(const std::shared_ptr<RosieObject>& object);
+			virtual void deserialize(const std::shared_ptr<Scope>& object);
 		
 		private:
 			std::ofstream file;
@@ -62,7 +62,7 @@ namespace Rosie
 			
 			void serialize(std::ostream& stream, std::string& indentation) const;
 			
-			void deserialize(const std::shared_ptr<RosieObject>& object);
+			void deserialize(const std::shared_ptr<Scope>& object);
 			
 		private:
 			float x;
@@ -78,7 +78,7 @@ namespace Rosie
 			
 			void serialize(std::ostream& stream, std::string& indentation) const;
 			
-			void deserialize(const std::shared_ptr<RosieObject>& object);
+			void deserialize(const std::shared_ptr<Scope>& object);
 		
 		private:
 			Position position;

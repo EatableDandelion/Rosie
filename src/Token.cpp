@@ -51,7 +51,7 @@ namespace Rosie
 	{
 		return 
 		c == "," || c == ";" || c == "(" || 
-		c == ")" ||	c == "{" || c == "}";
+		c == ")" ||	c == "{" || c == "}" || c == "[" || c == "]";
 	}
 	
 	bool SpecialCharCaster::isComparator(const std::string& c) const

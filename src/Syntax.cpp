@@ -4,7 +4,7 @@ namespace Rosie
 {	
 	bool Syntax::isFunction(const Token& token, const Token& nextToken)
 	{
-		return (token.type == TokenType::VARNAME) && isListStart(nextToken);
+		return (token.type == TokenType::VARNAME) && isArgStart(nextToken);
 	}
 	
 	bool Syntax::isFunctionDeclaration(const Token& token)
@@ -42,14 +42,24 @@ namespace Rosie
 		return token == ",";
 	}
 	
-	bool Syntax::isListStart(const Token& token)
+	bool Syntax::isArgStart(const Token& token)
 	{
 		return token == "(";
 	}
 	
-	bool Syntax::isListEnd(const Token& token)
+	bool Syntax::isArgEnd(const Token& token)
 	{
 		return token == ")";
+	}
+	
+	bool Syntax::isCollectionStart(const Token& token)
+	{
+		return token == "[";
+	}
+	
+	bool Syntax::isCollectionEnd(const Token& token)
+	{
+		return token == "]";
 	}
 	
 	void Syntax::setNativeFunctions(const std::vector<std::string>& nativeFunc)

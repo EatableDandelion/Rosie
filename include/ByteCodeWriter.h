@@ -102,24 +102,6 @@ namespace Rosie
 			std::string fileName;
 	};
 	
-	
-	/*class HeaderWriter
-	{
-		public:
-			void write(Program& program);
-	};
-	
-	class HeaderReader
-	{
-		public:
-			void read(State& state);
-		
-		private:
-			void defineConstant(State& state, const std::string& value, const int& type);
-			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
-			void defineFunction(State& state, const std::string& name, const int& id) const;
-	};*/
-	
 	class ByteCodeWriter
 	{
 		public:

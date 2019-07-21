@@ -8,7 +8,7 @@ int main()
 	
 	//TODO: arrays and maps
 	
-	int exampleId = 2;
+	int exampleId = 1;
 	
 	if(exampleId == 1)
 	{

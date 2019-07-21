@@ -131,12 +131,13 @@ namespace Rosie
 		return false;
 	}
 	
+	
 	bool SpecialCharLex::appendToToken(char& c, FileStream& stream, Token& token)
 	{
 		if(isSpecialChar(c))
-		{			
+		{	
 			token+=c;
-			stream.nextChar(c);
+			stream.nextChar(c);	
 			return true;
 		}
 		return false;
@@ -258,7 +259,7 @@ namespace Rosie
 	}
 	
 	
-		SyntaxError::SyntaxError(const std::string& fileName, const std::string& line, const int& lineIndex, const std::string& token, const int& charIndex, const int& tokenLength, const std::string& msg):fileName(fileName), line(line), lineIndex(lineIndex), token(token), charIndex(charIndex), tokenLength(tokenLength), msg(msg)
+	SyntaxError::SyntaxError(const std::string& fileName, const std::string& line, const int& lineIndex, const std::string& token, const int& charIndex, const int& tokenLength, const std::string& msg):fileName(fileName), line(line), lineIndex(lineIndex), token(token), charIndex(charIndex), tokenLength(tokenLength), msg(msg)
 	{}
 	
 	SyntaxError::SyntaxError(const std::string& msg, const Lexer& lexer):fileName(lexer.getFileName()), line(lexer.getLine()), lineIndex(lexer.getLineIndex()), token(lexer.getToken().getString()), charIndex(lexer.getToken().charIndex), tokenLength(lexer.getToken().value.length()), msg(msg)

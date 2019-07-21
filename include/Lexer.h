@@ -95,6 +95,7 @@ namespace Rosie
 		private:
 			bool runMultiLineComment(char& c, FileStream& stream);
 	};
+	
 
 	class Lexer
 	{

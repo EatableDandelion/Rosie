@@ -31,29 +31,29 @@ namespace Rosie
 		stream << indentation << name << " = \"" << member << "\";" << std::endl;
 	}
 	
-	void Serializable::downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<Scope>& object)
 	{
 		member->deserialize(object->getScope(name));
 	}
 	
-	void Serializable::downloadMember(const std::string& name, float* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, float* member, const std::shared_ptr<Scope>& object)
 	{
-		*member = object->getValue<float>(name);
+		*member = object->getMember(name).get<float>();
 	}
 	
-	void Serializable::downloadMember(const std::string& name, int* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, int* member, const std::shared_ptr<Scope>& object)
 	{
-		*member = object->getValue<int>(name);
+		*member = object->getMember(name).get<int>();
 	}
 	
-	void Serializable::downloadMember(const std::string& name, bool* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, bool* member, const std::shared_ptr<Scope>& object)
 	{
-		*member = object->getValue<bool>(name);
+		*member = object->getMember(name).get<bool>();
 	}
 	
-	void Serializable::downloadMember(const std::string& name, std::string* member, const std::shared_ptr<RosieObject>& object)
+	void Serializable::downloadMember(const std::string& name, std::string* member, const std::shared_ptr<Scope>& object)
 	{
-		*member = object->getValue<std::string>(name);
+		*member = object->getMember(name).get<std::string>();
 	}
 	
 	
@@ -105,7 +105,7 @@ namespace Rosie
 		}
 	}
 	
-	void Serializer::deserialize(const std::shared_ptr<RosieObject>& object)
+	void Serializer::deserialize(const std::shared_ptr<Scope>& object)
 	{
 		for(std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
 		{
@@ -133,7 +133,7 @@ namespace Rosie
 		uploadMember("text", text, stream, indentation);
 	}
 	
-	void Position::deserialize(const std::shared_ptr<RosieObject>& object)
+	void Position::deserialize(const std::shared_ptr<Scope>& object)
 	{
 		downloadMember("x", &x, object);
 		downloadMember("text", &text, object);
@@ -152,7 +152,7 @@ namespace Rosie
 		uploadMember("position", position, stream, indentation);
 	}
 	
-	void Mesh::deserialize(const std::shared_ptr<RosieObject>& object)
+	void Mesh::deserialize(const std::shared_ptr<Scope>& object)
 	{
 		downloadMember("position", &position, object);
 	}

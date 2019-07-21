@@ -81,6 +81,8 @@ namespace Rosie
 			}
 
 		protected:
+			std::string text;
+			
 			std::vector<Handle> getHandles(const std::string& string) const
 			{
 				std::vector<Handle> res;
@@ -104,7 +106,6 @@ namespace Rosie
 			}
 
 		private:
-			std::string text;
 			static int id;
 	};
 
@@ -156,6 +157,15 @@ namespace Rosie
 		
 		private:
 			Address parent;
+	};
+	
+	class CollectionAddInstruction : public TemplateInstruction<CollectionAddInstruction>
+	{
+		public:
+			CollectionAddInstruction();
+			CollectionAddInstruction(const Address& destAddress, const int& index, const Address& srcAddress);
+			virtual void read(const std::string& command, State& state) const;
+			virtual std::string getName() const;
 	};
 	
 	

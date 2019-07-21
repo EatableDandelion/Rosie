@@ -36,6 +36,8 @@ namespace Rosie
 			Address newFunctionAddress(const std::string& name);
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
+			
+			Address addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress);
 		
 			std::vector<Constant> getConstants() const;
 			std::vector<Address> getVariables() const;

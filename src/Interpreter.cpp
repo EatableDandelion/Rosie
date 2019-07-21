@@ -107,7 +107,6 @@ namespace Rosie{
 		{
 			destAddress = program->newVarAddress(var, TokenType::CSTARRAY);
 			
-			program.startScope(destAddress);
 			while(syntax.isCollectionEnd(lexer.getToken()))
 			{
 				lexer++;
@@ -116,7 +115,6 @@ namespace Rosie{
 				//
 				lexer++;
 			}
-			program.endScope();
 		}
 		else
 		{	

@@ -124,6 +124,26 @@ namespace Rosie
 	}
 	
 	
+	//TODO
+	ollectionAddInstruction::CollectionAddInstruction(const Address& destAddress, const int& index, const Address& srcAddress)
+	{
+		
+	}
+	
+	CollectionAddInstruction::CollectionAddInstruction()
+	{}
+	
+	void CollectionAddInstruction::read(const std::string& command, State& state) const
+	{
+		
+	}
+	
+	std::string CollectionAddInstruction::getName() const
+	{
+		return "Collection Add";
+	}
+	
+	
 	
 	ConstantHeader::ConstantHeader(const std::string& value, const int& type):TemplateInstruction(value+" "+std::to_string(type))
 	{}

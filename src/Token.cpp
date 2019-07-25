@@ -2,6 +2,12 @@
 
 namespace Rosie
 {	
+	Token::Token():value(""), type(TokenType::UNDEFINED)
+	{}
+		
+	Token::Token(const std::string& value, const TokenType& type):value(value), type(type)
+	{}
+	
 	int Token::length() const
 	{
 		return value.length();

@@ -32,6 +32,7 @@ namespace Rosie
 			Address getVarAddress(const Token& token);
 			bool hasVarAddress(const Token& token);
 			Address setAddress(const Token& destToken, const Address& srcAddress);
+			Address setAddress(const std::string& newName, const Address& srcAddress)
 			
 			Address newFunctionAddress(const std::string& name);
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);

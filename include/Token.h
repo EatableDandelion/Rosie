@@ -27,10 +27,6 @@ namespace Rosie
 		std::string value;
 		int charIndex;
 		
-		Token();
-		
-		Token(const std::string& value, const TokenType& type);
-		
 		void operator+=(const char c);
 		
 		bool operator==(const std::string& stringValue) const;

@@ -82,13 +82,13 @@ namespace Rosie{
 	{
 		Address destAddress;
 		Token var = lexer.getToken();
-		checkToken(var.type == TokenType::VARNAME,lexer, "Variable name expected.");
+		checkToken(var.type == TokenType::VARNAME, lexer, "Variable name expected.");
 		lexer++;//token = "="
-		checkToken(syntax.isAssignment(lexer.getToken()),lexer, "Assignment operator expected.");
+		checkToken(syntax.isAssignment(lexer.getToken()), lexer, "Assignment operator expected.");
 		
 		lexer++;//token = "2.21"
 		
-		if(syntax.isStartScope(lexer.getToken()))
+		if(syntax.isStartScope(lexer.getToken())) // If token = {
 		{
 			if(program->hasVarAddress(var))
 			{
@@ -103,18 +103,18 @@ namespace Rosie{
 			parseScope(lexer, program);
 			program.endScope();
 		}
-		else if(syntax.isCollectionStart(lexer.getToken()))
+		else if(syntax.isCollectionStart(lexer.getToken())) // If token = [
 		{
 			destAddress = program->newVarAddress(var, TokenType::CSTARRAY);
 			
+			program.startScope(destAddress);
 			while(syntax.isCollectionEnd(lexer.getToken()))
 			{
-				lexer++;
-				// TODO add members here
-				//program.add
-				//
-				lexer++;
+				lexer++; // Skips either the comma or the termination token
+				program->setAddress(Token(std::to_string(index)), program->getAddress(lexer.getToken(), lexer));
+				lexer++; // Skips the argument.
 			}
+			program.endScope();
 		}
 		else
 		{	
@@ -258,7 +258,7 @@ namespace Rosie{
 		while(!syntax.isArgEnd(lexer.getToken()))
 		{
 			lexer++;
-			args.push_back(lexer.getToken());std::cout << lexer.getToken() << std::endl;
+			args.push_back(lexer.getToken());
 			lexer++;
 		}
 		lexer++;//token = "="

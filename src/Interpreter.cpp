@@ -111,7 +111,7 @@ namespace Rosie{
 			while(syntax.isCollectionEnd(lexer.getToken()))
 			{
 				lexer++; // Skips either the comma or the termination token
-				program->setAddress(Token(std::to_string(index)), program->getAddress(lexer.getToken(), lexer));
+				program->setAddress(std::to_string(index), program->getAddress(lexer.getToken(), lexer));
 				lexer++; // Skips the argument.
 			}
 			program.endScope();

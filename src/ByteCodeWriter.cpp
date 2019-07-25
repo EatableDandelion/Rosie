@@ -92,6 +92,13 @@ namespace Rosie
 		return destAddress;
 	}
 	
+	Address Memory::setAddress(const std::string& newName, const Address& srcAddress)
+	{
+		Address destAddress = newVarAddress(newName, srcAddress.getType());
+		addInstruction<SetInstruction>(destAddress, srcAddress);
+		return destAddress;
+	}
+	
 	Address Memory::addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress)
 	{
 		Address destAddress;

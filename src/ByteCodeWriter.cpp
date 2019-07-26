@@ -99,7 +99,7 @@ namespace Rosie
 		return destAddress;
 	}
 	
-	Address Memory::addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress)
+	/*Address Memory::addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress)
 	{
 		Address destAddress;
 		if(hasVarAddress(destToken))
@@ -111,7 +111,7 @@ namespace Rosie
 			destAddress = newVarAddress(destToken, srcAddress.getType());
 		}
 		addInstruction<CollectionAddInstruction>(destAddress, index, srcAddress);
-	}
+	}*/
 	
 	Address Memory::newFunctionAddress(const std::string& name)
 	{
@@ -159,7 +159,18 @@ namespace Rosie
 		return header.getCommands();
 	}
 	
-	void Memory::setArguments(std::stack<Address>& activeStack, const int& nbArgs)
+	void Memory::setArgument(const Token& token, Lexer& lexer) //Set args for the array like {a, 2.0}
+	{
+		//TODO, uniformize the function argument with the array argument
+		if(!scopeArgIndex.empty())
+		{
+			Address argAddress = getAddress(token, lexer);
+			setAddress(scopeArgIndex.top(), argAddress);
+			scopeArgIndex.top()++;
+		}
+	}
+	
+	void Memory::setArguments(std::stack<Address>& activeStack, const int& nbArgs) //Set args for the functions, like print
 	{
 		if(nbArgs == -1)
 		{
@@ -203,6 +214,8 @@ namespace Rosie
 		}
 		addDeclaration<ScopeInstruction>(destAddress);
 		addInstruction<ScopeInstruction>(destAddress);
+		
+		scopeArgIndex.push(0);
 	}
 		
 	void Memory::endScope()
@@ -219,6 +232,8 @@ namespace Rosie
 		}
 		addDeclaration<ScopeInstruction>();
 		addInstruction<ScopeInstruction>();
+		
+		scopeArgIndex.pop();
 	}
 	
 	std::string Memory::rename(const std::string& name) const

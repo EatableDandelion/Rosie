@@ -37,7 +37,7 @@ namespace Rosie
 	return token == ";";
 	}
 	
-	bool Syntax::isListSeparator(const Token& token)
+	bool Syntax::isSeparator(const Token& token)
 	{
 		return token == ",";
 	}
@@ -50,16 +50,6 @@ namespace Rosie
 	bool Syntax::isArgEnd(const Token& token)
 	{
 		return token == ")";
-	}
-	
-	bool Syntax::isCollectionStart(const Token& token)
-	{
-		return token == "[";
-	}
-	
-	bool Syntax::isCollectionEnd(const Token& token)
-	{
-		return token == "]";
 	}
 	
 	void Syntax::setNativeFunctions(const std::vector<std::string>& nativeFunc)

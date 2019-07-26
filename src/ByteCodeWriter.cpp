@@ -165,7 +165,7 @@ namespace Rosie
 		if(!scopeArgIndex.empty())
 		{
 			Address argAddress = getAddress(token, lexer);
-			setAddress(scopeArgIndex.top(), argAddress);
+			setAddress(std::to_string(scopeArgIndex.top()), argAddress);
 			scopeArgIndex.top()++;
 		}
 	}

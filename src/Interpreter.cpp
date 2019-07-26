@@ -15,6 +15,8 @@ namespace Rosie{
 	
 	void Parser::parseLoop(Lexer& lexer, Program& program)
 	{
+		
+		
 		if(functionParser.isFunction(lexer))					//If it's a function
 		{
 			if(program.hasFunction(lexer.getToken().value))
@@ -28,17 +30,34 @@ namespace Rosie{
 		}
 		else if(isVariable(lexer))						//Else it's a variable
 		{
-			parseAssignment(lexer, program);				//a = 2.1;
+			//parseAssignment(lexer, program);
+			
+			Token nextToken;						
+			if(lexer.peekToken(nextToken, 1))
+			{
+				if(syntax.isAssignment(nextToken))			//a = 2.1;
+				{
+					parseAssignment(lexer, program);
+				}
+				else if(syntax.isSeparator(nextToken) || syntax.isEndScope(nextToken))
+				{
+					parseArgument(lexer, program);
+				}
+				else
+				{
+					lexer++;
+					throw SyntaxError("Unexpected token.", lexer);
+				}
+			}
 		}
 		else
 		{
-			//Rosie::error("Unexpected token.\n", lexer);
 			throw SyntaxError("Unexpected token.", lexer);
 		}
 		lexer++;
 	}
 	
-	void Parser::parseDeclaration(Lexer& lexer, Program& program)
+	/*void Parser::parseDeclaration(Lexer& lexer, Program& program)
 	{	
 		Address returnAddress; 
 		
@@ -88,7 +107,7 @@ namespace Rosie{
 				throw SyntaxError("Unexpected token.", lexer);
 			}
 		}
-	}
+	}*/
 	
 	void Parser::parseAssignment(Lexer& lexer, Program& program)
 	{
@@ -116,31 +135,19 @@ namespace Rosie{
 			parseScope(lexer, program);
 			program.endScope();
 		}
-		/*else if(syntax.isCollectionStart(lexer.getToken())) // If token = [
-		{
-			destAddress = program->newVarAddress(var, TokenType::CSTARRAY);
-			
-			program.startScope(destAddress);
-			while(syntax.isCollectionEnd(lexer.getToken()))
-			{
-				lexer++; // Skips either the comma or the termination token
-				program->setAddress(std::to_string(index), program->getAddress(lexer.getToken(), lexer));
-				lexer++; // Skips the argument.
-			}
-			program.endScope();
-		}*/
 		else
 		{	
 			destAddress = program->setAddress(var, functionParser.parseCall(lexer, program));
 		}
-		checkToken(syntax.isTerminator(lexer.getToken()), lexer, "Terminator expected.");
+		checkToken(syntax.isTerminator(lexer.getToken()) || syntax.isEndScope(lexer.getToken()), lexer, "Terminator expected.");
 	}
 
 	void Parser::parseArgument(Lexer& lexer, Program& program)
 	{
 		Token argument = lexer.getToken();
-		program.addArgument(argument);
+		program->addArgument(argument, lexer);
 		lexer++;//token = "," or "}"
+		checkToken(syntax.isSeparator(lexer.getToken()) || syntax.isEndScope(lexer.getToken()));
 	}
 	
 	void Parser::parseScope(Lexer& lexer, Program& program)

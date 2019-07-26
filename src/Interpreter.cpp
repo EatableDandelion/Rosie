@@ -162,6 +162,7 @@ namespace Rosie{
 				argument = program->newVarAddress(var, TokenType::CSTARRAY);
 				program->startScope(destAddress);
 				program->setArgument(destAddress);
+				parseArray(lexer, program);
 				program->endScope();
 			}
 			else

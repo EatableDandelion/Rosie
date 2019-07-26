@@ -58,7 +58,7 @@ namespace Rosie
 				return instructions.addInstruction<T>(args...);
 			}
 			
-			void setArgument(const Token& token);
+			void setArgument(const Token& token, Lexer& lexer);
 			void setArguments(std::stack<Address>& activeStack, const int& nbArgs = -1);
 			void callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType = TokenType::UNDEFINED);
 			
@@ -74,6 +74,7 @@ namespace Rosie
 			InstructionCollection instructions;
 			std::string scopePrefix;
 			std::deque<std::string> scopes;
+			std::stack<int> scopeArgIndex;
 			
 			std::string rename(const std::string& name) const;
 			std::vector<std::string> getPossibleNames(const std::string& name) const;

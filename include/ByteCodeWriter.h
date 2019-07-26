@@ -38,7 +38,7 @@ namespace Rosie
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
 			
-			Address addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress);
+			//Address addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress);
 		
 			std::vector<Constant> getConstants() const;
 			std::vector<Address> getVariables() const;
@@ -58,6 +58,7 @@ namespace Rosie
 				return instructions.addInstruction<T>(args...);
 			}
 			
+			void setArgument(const Token& token);
 			void setArguments(std::stack<Address>& activeStack, const int& nbArgs = -1);
 			void callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType = TokenType::UNDEFINED);
 			

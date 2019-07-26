@@ -58,7 +58,7 @@ namespace Rosie
 				return instructions.addInstruction<T>(args...);
 			}
 			
-			void setArgument(const Token& token, Lexer& lexer);
+			void setArgument(const Address& argument);
 			void setArguments(std::stack<Address>& activeStack, const int& nbArgs = -1);
 			void callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType = TokenType::UNDEFINED);
 			

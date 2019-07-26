@@ -159,13 +159,12 @@ namespace Rosie
 		return header.getCommands();
 	}
 	
-	void Memory::setArgument(const Token& token, Lexer& lexer) //Set args for the array like {a, 2.0}
+	void Memory::setArgument(const Address& argument) //Set args for the array like {a, 2.0}
 	{
 		//TODO, uniformize the function argument with the array argument
 		if(!scopeArgIndex.empty())
 		{
-			Address argAddress = getAddress(token, lexer);
-			setAddress(std::to_string(scopeArgIndex.top()), argAddress);
+			setAddress(std::to_string(scopeArgIndex.top()), argument);
 			scopeArgIndex.top()++;
 		}
 	}

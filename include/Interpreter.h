@@ -43,6 +43,7 @@ namespace Rosie{
 		private:
 			Syntax syntax;
 			FunctionParser functionParser;
+			//std::stack<Address> scopes;
 			
 			void parseLoop(Lexer& lexer, Program& program);
 			void parseAssignment(Lexer& lexer, Program& program);

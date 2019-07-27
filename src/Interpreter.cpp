@@ -124,7 +124,7 @@ namespace Rosie{
 		{
 			if(program->hasVarAddress(var))
 			{
-				destAddress = program->getVarAddress(var);
+				destAddress = getVariable(var, program);
 			}
 			else
 			{
@@ -230,6 +230,8 @@ namespace Rosie{
 	Address FunctionParser::parseCall(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
+		
+		/** Create function addresses */
 		while(!syntax.isTerminator(lexer.getToken()))
 		{
 			Token token = lexer.getToken();
@@ -245,19 +247,24 @@ namespace Rosie{
 			infixInput.push_back(token);
 			lexer++;
 		}
+		
+		/** Get the reverse polish notation of the line */
 		std::vector<Token> rpn = getRPN(infixInput);
 
+		
+		/** Process line, token by token */
 		std::stack<std::stack<Address>> stack; //stack of stack to handle variable nb of args.
 		std::stack<Address> activeStack;
 		
 		for(Token token : rpn)
 		{
+			
 			if(isConstant(token) || token.type == TokenType::VARNAME)
-			{
+			{	/** If it's a variable or a constant */
 				activeStack.push(program->getAddress(token, lexer));
 			}
 			else if(token == "|")
-			{
+			{	/** If it's the end of the sequence of argument */
 				stack.push(activeStack);
 				std::stack<Address> newActiveStack;
 				activeStack = newActiveStack;

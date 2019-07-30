@@ -338,6 +338,98 @@ namespace Rosie{
 		std::vector<Token> output;
 		Token previousToken;
 		bool firstToken = true;
+		bool hasSeparator = false;
+		bool isFunction = false;
+
+		for(Token token : input)
+		{
+			if(isConstant(token) || token.type == TokenType::VARNAME)
+			{
+				output.push_back(token);
+			}
+			else if(token.type == TokenType::FUNCNAME)
+			{
+				stack.push(token);
+				isFunction = true;
+			}
+			else if((token.type == TokenType::OPERATOR && firstToken) || isUnary(token, previousToken))
+			{
+				token.value = "u"+token.value;
+				stack.push(token);
+			}
+			else if(token.type == TokenType::OPERATOR)
+			{			
+				while(
+					!stack.empty() && !syntax.isArgStart(stack.top()) &&
+					(stack.top().type == TokenType::FUNCNAME ||
+					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
+					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
+					)
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+				stack.push(token);
+			}
+			else if(syntax.isSeparator(token))
+			{
+				while(!syntax.isArgStart(stack.top()))
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+				
+				/** If there is a separator, it may be an array */
+				hasSeparator = true;
+			}
+			else if(syntax.isArgStart(token))
+			{
+				Token wallSeparator; //WAAAALL notation, to know how many args for the function called
+				wallSeparator.value = "|";
+				wallSeparator.type = TokenType::SEPARATOR;
+				output.push_back(wallSeparator);
+				stack.push(token);
+			}				
+			else if(syntax.isArgEnd(token))
+			{
+				while(!syntax.isArgStart(stack.top()))
+				{
+					output.push_back(stack.top());
+					stack.pop();
+				}
+				stack.pop();
+				
+				if(!isFunction && hasSeparator)
+				{
+					//Mark as an array
+					Token arrayMarker;
+					arrayMarker.type = TokenType::CSTARRAY;
+					output.push_back(arrayMarker);
+				}
+				
+				/** Reset flags */
+				isFunction = false;
+				hasSeparator = false;
+			}
+			
+			previousToken = token;
+			firstToken = false;
+		}
+		while(!stack.empty())
+		{
+			output.push_back(stack.top());
+			stack.pop();
+		}
+		return output;
+	}
+			
+	/*
+	std::vector<Token> FunctionParser::getRPN(const std::vector<Token>& input)
+	{
+		std::stack<Token> stack;
+		std::vector<Token> output;
+		Token previousToken;
+		bool firstToken = true;
 		for(Token token : input)
 		{
 			if(isConstant(token) || token.type == TokenType::VARNAME)
@@ -403,6 +495,7 @@ namespace Rosie{
 		}
 		return output;
 	}
+	*/
 	
 	bool FunctionParser::isConstant(Token& token)
 	{

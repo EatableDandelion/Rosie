@@ -338,8 +338,6 @@ namespace Rosie{
 		std::vector<Token> output;
 		Token previousToken;
 		bool firstToken = true;
-		bool hasSeparator = false;
-		bool isFunction = false;
 
 		for(Token token : input)
 		{
@@ -382,14 +380,14 @@ namespace Rosie{
 				/** If there is a separator, it may be an array */
 				hasSeparator = true;
 			}
-			else if(syntax.isArgStart(token))
+			else if(syntax.isArgStart(token) || syntax.isArrayStart(token))
 			{
 				Token wallSeparator; //WAAAALL notation, to know how many args for the function called
 				wallSeparator.value = "|";
 				wallSeparator.type = TokenType::SEPARATOR;
 				output.push_back(wallSeparator);
 				stack.push(token);
-			}				
+			}			
 			else if(syntax.isArgEnd(token))
 			{
 				while(!syntax.isArgStart(stack.top()))
@@ -399,17 +397,15 @@ namespace Rosie{
 				}
 				stack.pop();
 				
-				if(!isFunction && hasSeparator)
+			}
+			else if(syntax.isArrayEnd(token))
+			{
+				while(!syntax.isArrayStart(stack.top()))
 				{
-					//Mark as an array
-					Token arrayMarker;
-					arrayMarker.type = TokenType::CSTARRAY;
-					output.push_back(arrayMarker);
+					output.push_back(stack.top());
+					stack.pop();
 				}
-				
-				/** Reset flags */
-				isFunction = false;
-				hasSeparator = false;
+				stack.pop();
 			}
 			
 			previousToken = token;

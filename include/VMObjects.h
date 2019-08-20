@@ -82,15 +82,6 @@ namespace Rosie
 			
 	};
 	
-	/*class Composite
-	{
-		public:
-			Variant getMember(const std::string& name);
-		
-		private:
-			std::unordered_map<const std::string, 
-	};*/
-	
 	class Scope
 	{
 		public:
@@ -99,6 +90,12 @@ namespace Rosie
 			virtual std::shared_ptr<Scope> getScope(const std::string& name);
 			virtual void addMember(const std::string& name, const int& type, const Handle& handle);
 			void copyMembers(const std::shared_ptr<Scope>& object);
+			
+			friend std::ostream& operator<<(std::ostream& os, Scope& var)
+			{
+				os << var.toString(); 
+				return os;
+			}
 			
 		private:
 			DualMap<Handle, std::size_t, Variable> members;
@@ -111,16 +108,6 @@ namespace Rosie
 			std::shared_ptr<Scope> getParent() const;
 			
 			friend class State;
-	};
-	
-	class List : public Scope
-	{
-		public:
-			virtual void addMember(const int& type, const Handle& handle);
-		
-		private:
-			std::shared_ptr<Scope> scope;
-			int size;
 	};
 
 	

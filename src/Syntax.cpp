@@ -52,6 +52,16 @@ namespace Rosie
 		return token == ")";
 	}
 	
+	bool Syntax::isArrayStart(const Token& token)
+	{
+		return token == "[";
+	}
+	
+	bool Syntax::isArrayEnd(const Token& token)
+	{
+		return token == "]";
+	}
+	
 	void Syntax::setNativeFunctions(const std::vector<std::string>& nativeFunc)
 	{
 		nativeFunctions = nativeFunc;

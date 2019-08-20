@@ -39,8 +39,9 @@ namespace Rosie
 	
 	Address Memory::newVarAddress(const std::string& name, const TokenType& type)
 	{
-		Address newAddress = variables.newAddress(rename(name), type);
-		addDeclaration<VariableHeader>(newAddress.getId(), name, type);
+		std::string newName = rename(name);
+		Address newAddress = variables.newAddress(newName, type);
+		addDeclaration<VariableHeader>(newAddress.getId(), newName, type);
 		return newAddress;
 	}
 	
@@ -92,26 +93,43 @@ namespace Rosie
 		return destAddress;
 	}
 	
+	Address Memory::setAddress(const Token& destToken, const std::stack<Address>& srcAddresses)
+	{
+		if(srcAddresses.size() == 1)
+		{
+			return setAddress(destToken, srcAddresses.top());
+		}
+		else
+		{	
+			Address destAddress;
+			if(hasVarAddress(destToken))
+			{
+				destAddress = getVarAddress(destToken);
+			}
+			else
+			{
+				destAddress = newVarAddress(destToken, TokenType::CSTARRAY);
+			}
+			startScope(destAddress, false);
+			
+			std::stack<Address> addresses = srcAddresses;
+			while(!addresses.empty())
+			{
+				setAddress(std::to_string(addresses.size()), addresses.top());
+				addresses.pop();
+			}
+			endScope();
+			
+			return destAddress;
+		}
+	}
+	
 	Address Memory::setAddress(const std::string& newName, const Address& srcAddress)
 	{
 		Address destAddress = newVarAddress(newName, srcAddress.getType());
 		addInstruction<SetInstruction>(destAddress, srcAddress);
 		return destAddress;
 	}
-	
-	/*Address Memory::addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress)
-	{
-		Address destAddress;
-		if(hasVarAddress(destToken))
-		{
-			destAddress = getVarAddress(destToken);
-		}
-		else
-		{
-			destAddress = newVarAddress(destToken, srcAddress.getType());
-		}
-		addInstruction<CollectionAddInstruction>(destAddress, index, srcAddress);
-	}*/
 	
 	Address Memory::newFunctionAddress(const std::string& name)
 	{
@@ -161,7 +179,6 @@ namespace Rosie
 	
 	void Memory::setArgument(const Address& argument) //Set args for the array like {a, 2.0}
 	{
-		//TODO, uniformize the function argument with the array argument
 		if(!scopeArgIndex.empty())
 		{
 			setAddress(std::to_string(scopeArgIndex.top()), argument);
@@ -198,8 +215,9 @@ namespace Rosie
 		activeStack.push(stackAddress);
 	}
 	
-	void Memory::startScope(const Address& destAddress)
+	void Memory::startScope(const Address& destAddress, const bool& privateScope)
 	{
+		m_privateScope = privateScope;
 		scopePrefix = destAddress.getName();
 		
 		std::size_t dotPos = scopePrefix.find_last_of(".");
@@ -211,8 +229,12 @@ namespace Rosie
 		{
 			scopes.push_back(scopePrefix.substr(dotPos+1, scopePrefix.length()));
 		}
-		addDeclaration<ScopeInstruction>(destAddress);
-		addInstruction<ScopeInstruction>(destAddress);
+		
+		if(m_privateScope)
+		{
+			addDeclaration<ScopeInstruction>(destAddress);
+			addInstruction<ScopeInstruction>(destAddress);
+		}
 		
 		scopeArgIndex.push(0);
 	}
@@ -229,8 +251,12 @@ namespace Rosie
 		{
 			scopePrefix = scopePrefix.substr(0, dotPos);
 		}
-		addDeclaration<ScopeInstruction>();
-		addInstruction<ScopeInstruction>();
+		
+		if(m_privateScope)
+		{
+			addDeclaration<ScopeInstruction>();
+			addInstruction<ScopeInstruction>();
+		}
 		
 		scopeArgIndex.pop();
 	}

@@ -133,56 +133,24 @@ namespace Rosie{
 			
 			program.startScope(destAddress);
 			
-			if(syntax.isStartScope(lexer.getToken())
+			if(syntax.isStartScope(lexer.getToken()))
 			{
 				parseScope(lexer, program);
 			}
 			else
 			{
-				parseArray(lexer, program);
+				
 			}
 			program.endScope();
 		}
-		else if(
 		else
 		{	
-			destAddress = program->setAddress(var, functionParser.parseCall(lexer, program));
+			destAddress = program->setAddress(var, functionParser.parseCall(lexer, program));	
 		}
-		checkToken(syntax.isTerminator(lexer.getToken()) || syntax.isArgEnd(lexer.getToken()), lexer, "Terminator expected.");
+		bool tokenCheck = syntax.isTerminator(lexer.getToken()) || syntax.isArgEnd(lexer.getToken());
+		checkToken(tokenCheck, lexer, "Terminator expected.");
 	}
 
-	void Parser::parseArray(Lexer& lexer, Program& program)
-	{
-		lexer++;
-		while(!syntax.isArgEnd(lexer.getToken()))
-		{
-			Address argument;
-			if(syntax.isArgStart(lexer.getToken()))
-			{
-				argument = program->newVarAddress(var, TokenType::CSTARRAY);
-				program->startScope(destAddress);
-				program->setArgument(destAddress);
-				parseArray(lexer, program);
-				program->endScope();
-			}
-			else
-			{
-				Token nextToken;
-				if(syntax.isAssignment(nextToken))
-				{
-					parseAssignment(lexer, program);
-				}
-				else
-				{
-					argument = program->getAddress(lexer.getToken(), lexer);
-					program->setArgument(argument);
-				}
-				
-			}
-			lexer++;
-		}
-		lexer++;
-	}
 	
 	void Parser::parseScope(Lexer& lexer, Program& program)
 	{
@@ -227,7 +195,7 @@ namespace Rosie{
 	FunctionParser::FunctionParser(const Syntax& syntax):syntax(syntax)
 	{}
 	
-	Address FunctionParser::parseCall(Lexer& lexer, Program& program)
+	std::stack<Address> FunctionParser::parseCall(Lexer& lexer, Program& program)
 	{
 		std::vector<Token> infixInput;
 		
@@ -258,7 +226,6 @@ namespace Rosie{
 		
 		for(Token token : rpn)
 		{
-			
 			if(isConstant(token) || token.type == TokenType::VARNAME)
 			{	/** If it's a variable or a constant */
 				activeStack.push(program->getAddress(token, lexer));
@@ -268,6 +235,18 @@ namespace Rosie{
 				stack.push(activeStack);
 				std::stack<Address> newActiveStack;
 				activeStack = newActiveStack;
+			}
+			else if(syntax.isArrayStart(token))
+			{
+				/*program->setArguments(activeStack);
+				
+				if(!stack.empty())
+				{
+					activeStack = stack.top();
+					stack.pop();
+				}
+				
+				activeStack.push(program.getStackAddress());*/
 			}
 			else
 			{
@@ -303,19 +282,15 @@ namespace Rosie{
 				}
 				else
 				{	
-					//Rosie::error("Unexpected token "+token.getString(), lexer);
 					throw SyntaxError("Unexpected token "+token.getString(), lexer);
 				}
 			}
 		}
-		if(!activeStack.empty())
+		if(activeStack.empty())
 		{
-			return activeStack.top();
+			activeStack.push(program.getStackAddress());
 		}
-		else
-		{
-			return program.getStackAddress();
-		}
+		return activeStack;
 	}
 	
 	void FunctionParser::parseDefinition(Lexer& lexer, Program& program)
@@ -348,7 +323,6 @@ namespace Rosie{
 			else if(token.type == TokenType::FUNCNAME)
 			{
 				stack.push(token);
-				isFunction = true;
 			}
 			else if((token.type == TokenType::OPERATOR && firstToken) || isUnary(token, previousToken))
 			{
@@ -358,7 +332,9 @@ namespace Rosie{
 			else if(token.type == TokenType::OPERATOR)
 			{			
 				while(
-					!stack.empty() && !syntax.isArgStart(stack.top()) &&
+					!stack.empty() && 
+					!syntax.isArgStart(stack.top()) &&
+					!syntax.isArrayStart(stack.top()) &&
 					(stack.top().type == TokenType::FUNCNAME ||
 					getOperatorPrecedence(token) < getOperatorPrecedence(stack.top()) ||
 					(getOperatorPrecedence(token) == getOperatorPrecedence(stack.top()) && isLeftAssociative(stack.top())))
@@ -371,14 +347,13 @@ namespace Rosie{
 			}
 			else if(syntax.isSeparator(token))
 			{
-				while(!syntax.isArgStart(stack.top()))
+				while(!syntax.isArgStart(stack.top()) && !syntax.isArrayStart(stack.top()))
 				{
 					output.push_back(stack.top());
 					stack.pop();
 				}
 				
-				/** If there is a separator, it may be an array */
-				hasSeparator = true;
+				
 			}
 			else if(syntax.isArgStart(token) || syntax.isArrayStart(token))
 			{
@@ -387,6 +362,11 @@ namespace Rosie{
 				wallSeparator.type = TokenType::SEPARATOR;
 				output.push_back(wallSeparator);
 				stack.push(token);
+				
+				/*if(syntax.isArrayStart(token))
+				{
+					output.push_back(token);
+				}*/
 			}			
 			else if(syntax.isArgEnd(token))
 			{

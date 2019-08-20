@@ -159,15 +159,6 @@ namespace Rosie
 			Address parent;
 	};
 	
-	class CollectionAddInstruction : public TemplateInstruction<CollectionAddInstruction>
-	{
-		public:
-			CollectionAddInstruction();
-			CollectionAddInstruction(const Address& destAddress, const int& index, const Address& srcAddress);
-			virtual void read(const std::string& command, State& state) const;
-			virtual std::string getName() const;
-	};
-	
 	
 	class ConstantHeader : public TemplateInstruction<ConstantHeader>
 	{

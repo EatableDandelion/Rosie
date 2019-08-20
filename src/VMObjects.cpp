@@ -129,7 +129,7 @@ namespace Rosie
 		}
 		else if(type == 4)
 		{
-			return "To be implemented";
+			return get<std::shared_ptr<Scope>>()->toString();
 		}
 		return "";
 	}
@@ -192,7 +192,12 @@ namespace Rosie
 			
 	std::string Scope::toString() const
 	{
-		return "Object";
+		std::string res = "[";
+		for(const Variable& member : members.getValues())
+		{
+			res+=member.toString();
+		}
+		return res+"]";
 	}	
 	
 	void Scope::setParent(const std::shared_ptr<Scope> parent)

@@ -21,6 +21,8 @@ namespace Rosie
 			bool isSeparator(const Token& token);
 			bool isArgStart(const Token& token);	
 			bool isArgEnd(const Token& token);
+			bool isArrayStart(const Token& token);	
+			bool isArrayEnd(const Token& token);
 			
 			void setNativeFunctions(const std::vector<std::string>& nativeFunctions);
 			std::vector<std::string> getNativeFunctions() const;

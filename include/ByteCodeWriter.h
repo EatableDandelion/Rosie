@@ -32,14 +32,13 @@ namespace Rosie
 			Address getVarAddress(const Token& token);
 			bool hasVarAddress(const Token& token);
 			Address setAddress(const Token& destToken, const Address& srcAddress);
-			Address setAddress(const std::string& newName, const Address& srcAddress)
+			Address setAddress(const Token& destToken, const std::stack<Address>& srcAdresses);
+			Address setAddress(const std::string& newName, const Address& srcAddress);
 			
 			Address newFunctionAddress(const std::string& name);
 			Address getFunctionAddress(const Token& token, const Lexer& lexer);
 			bool hasFunctionAddress(const Token& token);
 			
-			//Address addToCollection(const Token& collectionToken, const int& index, const Address& srcAddress);
-		
 			std::vector<Constant> getConstants() const;
 			std::vector<Address> getVariables() const;
 			std::vector<Address> getFunctions() const;
@@ -62,7 +61,7 @@ namespace Rosie
 			void setArguments(std::stack<Address>& activeStack, const int& nbArgs = -1);
 			void callFunction(std::stack<Address>& activeStack, const Token& token, const Lexer& lexer, const TokenType& returnType = TokenType::UNDEFINED);
 			
-			void startScope(const Address& destAddress);
+			void startScope(const Address& destAddress, const bool& privateScope = true);
 			void endScope();
 			
 			
@@ -75,6 +74,7 @@ namespace Rosie
 			std::string scopePrefix;
 			std::deque<std::string> scopes;
 			std::stack<int> scopeArgIndex;
+			bool m_privateScope;
 			
 			std::string rename(const std::string& name) const;
 			std::vector<std::string> getPossibleNames(const std::string& name) const;

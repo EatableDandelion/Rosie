@@ -20,7 +20,7 @@ namespace Rosie{
 	{	
 		public:
 			FunctionParser(const Syntax& syntax);
-			Address parseCall(Lexer& lexer, Program& program);
+			std::stack<Address> parseCall(Lexer& lexer, Program& program);
 			void parseDefinition(Lexer& lexer, Program& program);
 			bool isFunction(Lexer& lexer);
 		
@@ -46,7 +46,7 @@ namespace Rosie{
 			
 			void parseLoop(Lexer& lexer, Program& program);
 			void parseAssignment(Lexer& lexer, Program& program);
-			void parseArray(Lexer& lexer, Program& program);
+			
 			//void parseDeclaration(Lexer& lexer, Program& program);
 			void parseScope(Lexer& lexer, Program& program);
 			Address getVariable(const Token& token, Program& program);

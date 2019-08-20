@@ -77,12 +77,12 @@ namespace Rosie
 				}
 			}
 			
-			std::vector<V> getValues() const
+			std::vector<K1> getKey1() const
 			{
-				std::vector<V> res;
-				for(const auto& pair : values)
+				std::vector<K1> res;
+				for(const auto& pair : keymap)
 				{
-					res.push_back(pair.second);
+					res.push_back(pair.first);
 				}
 				return res;
 			}
@@ -93,6 +93,16 @@ namespace Rosie
 				for(const auto& pair : values)
 				{
 					res.push_back(pair.first);
+				}
+				return res;
+			}
+			
+			std::vector<V> getValues() const
+			{
+				std::vector<V> res;
+				for(const auto& pair : values)
+				{
+					res.push_back(pair.second);
 				}
 				return res;
 			}

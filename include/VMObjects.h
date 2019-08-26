@@ -12,18 +12,20 @@
 #include "Syntax.h"
 
 namespace Rosie
-{
+{	
 	struct Handle
 	{
 		public:
 			Handle(const int& id, const Category& category);
+			Handle(const std::vector<int>& ids, const Category& category);
+			Handle(const std::string& textIds, const Category& category);
 		
 			int getId() const;
 			Category getCategory() const;
 			bool operator==(const Handle& other) const;
 		
 		private:
-			int id;
+			std::vector<int> m_id;
 			Category category;
 	};
 }

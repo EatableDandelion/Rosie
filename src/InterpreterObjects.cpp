@@ -3,7 +3,51 @@
 namespace Rosie
 {
 	
-	Address::Address(const int& id, const Category& category, const std::string& name, const TokenType& type):id(id), category(category), name(name), type(type), scope(0)
+	AddressId::AddressId(const int id)
+	{
+		ids.push_back(id);
+	}
+	
+	AddressId::AddressId(const AddressId& copyId):ids(copyId.ids)
+	{}
+	
+	AddressId::AddressId(const std::string& textId)
+	{
+		for(const std::string& id : Rosie::split(textId, "."))
+		{
+			ids.push_back(std::stoi(id));
+		}
+	}
+	
+	AddressId::AddressId(const int id, const AddressId& parentId):ids(parentId.ids)
+	{
+		ids.push_back(id);
+	}
+			
+	AddressId AddressId::operator++(int)
+	{
+		ids[ids.size()-1] = ids[ids.size()-1]+1;
+		return *this;
+	}
+	
+	void AddressId::scopeIn()
+	{
+		ids.push_back(0);
+	}
+	
+	std::string AddressId::toString() const
+	{
+		std::string res = std::to_string(ids[0]);
+		for(int i = 1; i<ids.size(); i++)
+		{
+			res+="."+std::to_string(ids[i]);
+		}
+		return res;
+	}
+	
+	
+	
+	Address::Address(const AddressId& id, const Category& category, const std::string& name, const TokenType& type):id(id), category(category), name(name), type(type), scope(0)
 	{}
 	
 	Address::Address(const Address& address):id(address.id), name(address.name), category(address.category), type(address.type), scope(address.scope)
@@ -12,7 +56,7 @@ namespace Rosie
 	Address::Address():id(0), name(""), category(Category::CONSTANT), type(TokenType::UNDEFINED), scope(0)
 	{}
 	
-	int Address::getId() const
+	AddressId Address::getId() const
 	{
 		return id;
 	}
@@ -29,7 +73,7 @@ namespace Rosie
 	
 	std::string Address::getString() const
 	{
-		return std::to_string(id)+"/"+std::to_string(category);
+		return id.toString()+"/"+std::to_string(category);
 	}
 	
 	void Address::setType(const TokenType& tokenType)
@@ -59,9 +103,9 @@ namespace Rosie
 	
 	
 	
-	AddressMap::AddressMap(const Category& category, const int& startIndex):category(category), head(startIndex)
+	AddressMap::AddressMap(const Category& category, const int& startIndex):category(category), currentScope(startIndex)
 	{
-		scope.push(startIndex);
+		//scope.push(startIndex);
 	}
 	
 	Address AddressMap::newAddress(const std::string& name)//, const int& size)
@@ -71,14 +115,14 @@ namespace Rosie
 	
 	Address AddressMap::newAddress(const std::string& name, const TokenType& tokenType)
 	{
-		std::size_t id = Rosie::getId(name);
+		std::size_t nameId = Rosie::getId(name);
 		
-		int index = head;
-		head+=1;
+		AddressId index(currentScope);
+		currentScope++;
 		Address newAddress = Address(index, category, name, tokenType);
-		addresses.insert(std::pair<std::size_t, Address>(id, newAddress));
+		addresses.insert(std::pair<std::size_t, Address>(nameId, newAddress));
 
-		return addresses[id];
+		return addresses[nameId];
 	}
 			
 	Address AddressMap::getAddress(const std::string& name)
@@ -101,15 +145,22 @@ namespace Rosie
 		return res; 
 	}
 	
-	void AddressMap::startScope()
+	void AddressMap::startScope(const AddressId& parentId)
 	{
-		scope.push(head);
+		//scope.push(head);
+		
+		previousScopes.push(currentScope);
+		currentScope = parentId;
+		currentScope.scopeIn();
 	}
 			
 	void AddressMap::endScope()
 	{
-		head = scope.top();
-		scope.pop();
+		//head = scope.top();
+		//scope.pop();
+		
+		currentScope = previousScopes.top();
+		previousScopes.pop();
 	}
 	
 	

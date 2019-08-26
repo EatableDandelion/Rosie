@@ -237,6 +237,8 @@ namespace Rosie
 		}
 		
 		scopeArgIndex.push(0);
+		
+		variables.startScope(destAddress.getId());
 	}
 		
 	void Memory::endScope()
@@ -259,6 +261,8 @@ namespace Rosie
 		}
 		
 		scopeArgIndex.pop();
+		
+		variables.endScope();
 	}
 	
 	std::string Memory::rename(const std::string& name) const

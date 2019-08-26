@@ -36,15 +36,34 @@ namespace Rosie{
 		FUNCTION,
 		INTEGER
 	};
-		
+	
+	struct AddressId
+	{
+		public:
+			AddressId(const int id);
+			AddressId(const AddressId& copyId);
+			AddressId(const std::string& textId);
+			AddressId(const int id, const AddressId& parentId);
+			
+			AddressId operator++(int);
+			void scopeIn();
+			
+			std::string toString() const;
+			
+		private:
+			std::vector<int> ids;
+			/*std::vector<std::shared_ptr<AddressId>> children;
+			std::weak_ptr<AddressId> parent;*/
+	};
+	
 	struct Address
 	{
 		public:
-			Address(const int& id, const Category& category = Category::CONSTANT, const std::string& name = "", const TokenType& type = TokenType::UNDEFINED);
+			Address(const AddressId& id, const Category& category = Category::CONSTANT, const std::string& name = "", const TokenType& type = TokenType::UNDEFINED);
 			Address(const Address& address);
 			Address();
 			
-			int getId() const;
+			AddressId getId() const;
 			std::string getName() const;
 			Category getCategory() const;
 			std::string getString() const;
@@ -55,7 +74,7 @@ namespace Rosie{
 			int getScope();
 		
 		private:
-			int id;
+			AddressId id;
 			std::string name;
 			Category category;
 			TokenType type;
@@ -77,15 +96,17 @@ namespace Rosie{
 		
 			std::vector<Address> getAddresses() const;
 			
-			void startScope();
+			void startScope(const AddressId& parentId);
 			
 			void endScope();
 						
 		private:
 			std::unordered_map<std::size_t, Address> addresses;
-			int head;
-			std::stack<int> scope;
+			//AddressId head;
+			//std::stack<AddressId> scope;
 			Category category;
+			std::stack<AddressId> previousScopes;
+			AddressId currentScope;
 	};
 	
 	struct Constant

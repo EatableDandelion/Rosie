@@ -8,7 +8,7 @@ namespace Rosie
 		std::string res = "";
 		for(const Address& address : addresses)
 		{
-			res+=std::to_string(address.getId())+" "+std::to_string(address.getCategory())+" ";
+			res+=address.getId().toString()+" "+std::to_string(address.getCategory())+" ";
 		}
 		return res;
 	}
@@ -82,7 +82,7 @@ namespace Rosie
 	}
 	
 	
-	CallInstruction::CallInstruction(const int& functionId):TemplateInstruction(std::to_string(functionId))
+	CallInstruction::CallInstruction(const AddressId& functionId):TemplateInstruction(functionId.toString())
 	{}
 	
 	CallInstruction::CallInstruction(const Syntax& syntax):syntax(syntax)
@@ -177,7 +177,7 @@ namespace Rosie
 	}
 	
 	
-	VariableHeader::VariableHeader(const int& id, const std::string& name, const int& type):TemplateInstruction(std::to_string(id)+" "+name+" "+std::to_string(type))
+	VariableHeader::VariableHeader(const AddressId& id, const std::string& name, const int& type):TemplateInstruction(id.toString()+" "+name+" "+std::to_string(type))
 	{}
 	
 	VariableHeader::VariableHeader()
@@ -185,16 +185,16 @@ namespace Rosie
 	
 	void VariableHeader::read(const std::string& command, State& state) const
 	{
-		int id;
-		char name[20];
+		char textId[32];
+		char name[32];
 		int type;
-		sscanf(command.c_str(), "%d %s %d", &id, &name, &type);
-		defineVariable(state, std::string(name), id, type);
+		sscanf(command.c_str(), "%s %s %d", &textId, &name, &type);
+		defineVariable(state, std::string(name), textId, type);
 	}
 	
-	void VariableHeader::defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const
+	void VariableHeader::defineVariable(State& state, const std::string& name, const std::string& textId, const int& typeId) const
 	{
-		state.addVariable(name, typeId, Handle(id, Category::VARIABLE));
+		state.addVariable(name, typeId, Handle(textId, Category::VARIABLE));
 	}
 	
 	std::string VariableHeader::getName() const
@@ -203,7 +203,7 @@ namespace Rosie
 	}
 	
 	
-	FunctionHeader::FunctionHeader(const int& id, const std::string& name):TemplateInstruction(std::to_string(id)+" "+name)
+	FunctionHeader::FunctionHeader(const AddressId& id, const std::string& name):TemplateInstruction(id.toString()+" "+name)
 	{}
 	
 	FunctionHeader::FunctionHeader()

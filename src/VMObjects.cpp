@@ -1,14 +1,48 @@
 #include "VMObjects.h"
 
 namespace Rosie
-{		
-	
-	Handle::Handle(const int& id, const Category& category):id(id), category(category)
+{	
+	/*	
+	Id::Id(const std::vector<int>& ids):m_id(ids)
 	{}
+	
+	Id::Id(const std::string& textId)
+	{
+		for(const std::string& id : Rosie::split(textId, "."))
+		{
+			m_id.push_back(id);
+		}
+	}*/
+	
+	/*std::string Id::toString() const
+	{
+		std::string res = std::to_string(m_id[0]);
+		for(int i = 1; i<m_id.size(); i++)
+		{
+			res+="."+std::to_string(m_id[i]);
+		}
+		return res;
+	}*/
+	
+	Handle::Handle(const int& id, const Category& category):category(category)
+	{
+		m_id.push_back(id);
+	}
+	
+	Handle::Handle(const std::vector<int>& ids, const Category& category):m_id(ids), category(category)
+	{}
+	
+	Handle::Handle(const std::string& textId, const Category& category):category(category)
+	{
+		for(const std::string& id : Rosie::split(textId, "."))
+		{
+			m_id.push_back(std::stoi(id));
+		}
+	}
 	
 	int Handle::getId() const
 	{
-		return id;
+		return m_id[0];
 	}
 	
 	Category Handle::getCategory() const
@@ -18,7 +52,7 @@ namespace Rosie
 	
 	bool Handle::operator==(const Handle& other) const
 	{
-		return id == other.id;
+		return m_id == other.m_id;
 	}
 
 

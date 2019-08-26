@@ -62,7 +62,7 @@ namespace Rosie
 			{
 				for(const Address& address : addresses)
 				{
-					text+=std::to_string(address.getId())+" "+std::to_string(address.getCategory())+" ";
+					text+=address.getId().toString()+" "+std::to_string(address.getCategory())+" ";
 				}
 				text.pop_back();//remove last character (white space).
 			}
@@ -95,11 +95,14 @@ namespace Rosie
 				
 				while(!args.empty())
 				{
-					int id = std::stoi(args.front());
+					/*int id = std::stoi(args.front());
+					args.pop();*/
+					std::string textId = args.front();
 					args.pop();
+					
 					int category = std::stoi(args.front());
 					args.pop();
-					res.push_back(Handle(id, Category(category)));
+					res.push_back(Handle(textId, Category(category)));
 				}
 				
 				return res;
@@ -137,7 +140,7 @@ namespace Rosie
 	class CallInstruction : public TemplateInstruction<CallInstruction>
 	{
 		public:
-		  	CallInstruction(const int& functionId);
+		  	CallInstruction(const AddressId& functionId);
 			CallInstruction(const Syntax& syntax);
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
@@ -175,19 +178,19 @@ namespace Rosie
 	class VariableHeader : public TemplateInstruction<VariableHeader>
 	{
 		public:
-		  	VariableHeader(const int& id, const std::string& name, const int& type);
+		  	VariableHeader(const AddressId& stringId, const std::string& name, const int& type);
 			VariableHeader();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;
 		
 		private:
-			void defineVariable(State& state, const std::string& name, const int& id, const int& typeId) const;
+			void defineVariable(State& state, const std::string& name, const std::string& textId, const int& typeId) const;
 	};
 	
 	class FunctionHeader : public TemplateInstruction<FunctionHeader>
 	{
 		public:
-		  	FunctionHeader(const int& id, const std::string& name);
+		  	FunctionHeader(const AddressId& id, const std::string& name);
 			FunctionHeader();
 			virtual void read(const std::string& command, State& state) const;
 			virtual std::string getName() const;

@@ -30,6 +30,18 @@ namespace Rosie
 		return *this;
 	}
 	
+	bool AddressId::operator==(const AddressId& other) const
+	{
+		for(int i = 0; i<std::min(ids.size(), other.ids.size()); i++)
+		{
+			if(ids[i] != other.ids[i])
+			{
+				return false;
+			}
+		}
+		return ids.size() == other.ids.size();
+	}
+	
 	void AddressId::scopeIn()
 	{
 		ids.push_back(0);
@@ -41,6 +53,27 @@ namespace Rosie
 		for(int i = 1; i<ids.size(); i++)
 		{
 			res+="."+std::to_string(ids[i]);
+		}
+		return res;
+	}
+	
+	int AddressId::getIndex(const int& depth) const
+	{
+		return ids[depth];
+	}
+	
+	int AddressId::getDepth() const
+	{
+		return ids.size()-1;
+	}
+	
+	int AddressId::getKey() const
+	{
+		int res = 0;
+		for(int id : ids)
+		{
+			res+=id;
+			res*=100;
 		}
 		return res;
 	}

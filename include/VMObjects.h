@@ -17,15 +17,16 @@ namespace Rosie
 	{
 		public:
 			Handle(const int& id, const Category& category);
-			Handle(const std::vector<int>& ids, const Category& category);
+			//Handle(const std::vector<int>& ids, const Category& category);
 			Handle(const std::string& textIds, const Category& category);
 		
-			int getId() const;
+			std::shared_ptr<AddressId> operator->() const;
+
 			Category getCategory() const;
 			bool operator==(const Handle& other) const;
 		
 		private:
-			std::vector<int> m_id;
+			std::shared_ptr<AddressId> m_id;
 			Category category;
 	};
 }
@@ -36,7 +37,7 @@ namespace std
 		public:
 		    size_t operator()(const Rosie::Handle& handle) const
 		    {
-				return hash<int>()(handle.getId());
+				return hash<int>()(handle->getKey());
 		    }
    	 };
 }
@@ -64,6 +65,11 @@ namespace Rosie
 			Variable operator/(const Variable& other);
 			Variable operator-();
 			
+			virtual void addMember(const std::string& name, const int& type, const Handle& handle, const int& depth);
+			virtual void setMember(const Handle& handle, const Variable& variable, const int& depth);
+			virtual Variable getMember(const Handle& handle, const int& depth);
+			virtual bool hasMember(const Handle& handle, const int& depth) const;
+			
 			std::string toString() const;
 			
 			template<typename T>
@@ -77,6 +83,8 @@ namespace Rosie
 				os << var.toString(); 
 				return os;
 			}
+		
+		
 
 		private:
 			int type;
@@ -84,14 +92,19 @@ namespace Rosie
 			
 	};
 	
-	class Scope
+	struct Scope
 	{
 		public:
+			
 			virtual std::string toString() const;
 			virtual Variable getMember(const std::string& name);
-			virtual std::shared_ptr<Scope> getScope(const std::string& name);
-			virtual void addMember(const std::string& name, const int& type, const Handle& handle);
+			virtual void addMember(const std::string& name, const int& type, const Handle& handle, const int& depth);
 			void copyMembers(const std::shared_ptr<Scope>& object);
+			virtual std::shared_ptr<Scope> getScope(const std::string& name);
+			
+			void setMember(const Handle& handle, const Variable& variable, const int& depth);
+			Variable getMember(const Handle& handle, const int& depth);
+			bool hasMember(const Handle& handle, const int& depth) const;
 			
 			friend std::ostream& operator<<(std::ostream& os, Scope& var)
 			{
@@ -100,12 +113,9 @@ namespace Rosie
 			}
 			
 		private:
-			DualMap<Handle, std::size_t, Variable> members;
-			std::weak_ptr<Scope> m_parent;		
-
-			void setMember(const Handle& handle, const Variable& variable);
-			Variable getMember(const Handle& handle);
-			bool hasMember(const Handle& handle) const;
+			DualMap<int, std::size_t, Variable> members;
+			std::weak_ptr<Scope> m_parent;
+			
 			void setParent(const std::shared_ptr<Scope> parent);
 			std::shared_ptr<Scope> getParent() const;
 			
@@ -187,13 +197,14 @@ namespace Rosie
 			template<typename T>
 			T getValue(const std::string& name)
 			{
-				return activeScope->getMember(name).get<T>();
+				return root->getMember(name).get<T>();
 			}
 			
 			std::shared_ptr<Scope> getActiveScope() const;
 				
 		private:
-			std::shared_ptr<Scope> activeScope;
+			std::shared_ptr<Scope> root;
+			//std::shared_ptr<Scope> activeScope;
 			std::vector<Variable> constants;
 			DualMap<int, std::string, Function<CallStack&>> functions;
 			CallStack callStack;

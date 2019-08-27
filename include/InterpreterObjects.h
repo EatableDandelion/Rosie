@@ -46,7 +46,12 @@ namespace Rosie{
 			AddressId(const int id, const AddressId& parentId);
 			
 			AddressId operator++(int);
+			bool operator==(const AddressId& other) const;
+			
 			void scopeIn();
+			int getIndex(const int& depth) const;
+			int getDepth() const;
+			int getKey() const;
 			
 			std::string toString() const;
 			

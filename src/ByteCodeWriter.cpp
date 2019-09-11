@@ -110,12 +110,12 @@ namespace Rosie
 			{
 				destAddress = newVarAddress(destToken, TokenType::CSTARRAY);
 			}
-			startScope(destAddress, false);
+			startScope(destAddress);
 			
 			std::stack<Address> addresses = srcAddresses;
 			while(!addresses.empty())
 			{
-				setAddress(std::to_string(addresses.size()), addresses.top());
+				setAddress(std::to_string(addresses.size()-1), addresses.top());
 				addresses.pop();
 			}
 			endScope();
@@ -181,7 +181,7 @@ namespace Rosie
 	{
 		if(!scopeArgIndex.empty())
 		{
-			setAddress(std::to_string(scopeArgIndex.top()), argument);
+			setAddress(std::to_string(scopeArgIndex.top()-1), argument);
 			scopeArgIndex.top()++;
 		}
 	}
@@ -215,9 +215,8 @@ namespace Rosie
 		activeStack.push(stackAddress);
 	}
 	
-	void Memory::startScope(const Address& destAddress, const bool& privateScope)
+	void Memory::startScope(const Address& destAddress)
 	{
-		m_privateScope = privateScope;
 		scopePrefix = destAddress.getName();
 		
 		std::size_t dotPos = scopePrefix.find_last_of(".");
@@ -228,12 +227,6 @@ namespace Rosie
 		else
 		{
 			scopes.push_back(scopePrefix.substr(dotPos+1, scopePrefix.length()));
-		}
-		
-		if(m_privateScope)
-		{
-			addDeclaration<ScopeInstruction>(destAddress);
-			addInstruction<ScopeInstruction>(destAddress);
 		}
 		
 		scopeArgIndex.push(0);
@@ -252,12 +245,6 @@ namespace Rosie
 		else
 		{
 			scopePrefix = scopePrefix.substr(0, dotPos);
-		}
-		
-		if(m_privateScope)
-		{
-			addDeclaration<ScopeInstruction>();
-			addInstruction<ScopeInstruction>();
 		}
 		
 		scopeArgIndex.pop();

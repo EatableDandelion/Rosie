@@ -44,6 +44,7 @@ namespace Rosie{
 			AddressId(const AddressId& copyId);
 			AddressId(const std::string& textId);
 			AddressId(const int id, const AddressId& parentId);
+			AddressId(const std::initializer_list<int>& initList);
 			
 			AddressId operator++(int);
 			bool operator==(const AddressId& other) const;

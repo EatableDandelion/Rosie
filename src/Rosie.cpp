@@ -42,24 +42,31 @@ namespace Rosie{
 	
 	void RosieVM::run()
 	{	
-		ByteCodeReader headerReader(".tc");
-		
-		headerReader.addInstruction<ConstantHeader>();
-		headerReader.addInstruction<VariableHeader>();
-		headerReader.addInstruction<FunctionHeader>();
-		headerReader.addInstruction<ScopeInstruction>();
-		headerReader.read(state);
-		
-		std::cout << "=================================" << std::endl;
-		
-		ByteCodeReader instructionReader(".bc", true);
-		
-		instructionReader.addInstruction<SetInstruction>();
-		instructionReader.addInstruction<ArgumentInstruction>();
-		instructionReader.addInstruction<CallInstruction>(syntax);
-		instructionReader.addInstruction<ScopeInstruction>();
-		
-		instructionReader.read(state);
+		try{
+			ByteCodeReader headerReader(".tc");
+			
+			headerReader.addInstruction<ConstantHeader>();
+			headerReader.addInstruction<VariableHeader>();
+			headerReader.addInstruction<FunctionHeader>();
+			//headerReader.addInstruction<ScopeInstruction>();
+			headerReader.read(state);
+			
+			std::cout << "=================================" << std::endl;
+			
+			ByteCodeReader instructionReader(".bc", true);
+			
+			instructionReader.addInstruction<SetInstruction>();
+			instructionReader.addInstruction<ArgumentInstruction>();
+			instructionReader.addInstruction<CallInstruction>(syntax);
+			//instructionReader.addInstruction<ScopeInstruction>();
+			
+			instructionReader.read(state);
+			
+		}
+		catch(const std::exception& error)
+		{
+			std::cerr << error.what();
+		}
 	}
 	
 	State RosieVM::getState() const

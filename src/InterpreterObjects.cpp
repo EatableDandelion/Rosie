@@ -23,6 +23,14 @@ namespace Rosie
 	{
 		ids.push_back(id);
 	}
+	
+	AddressId::AddressId(const std::initializer_list<int>& initList)
+	{
+		for(int id : initList)
+		{
+			ids.push_back(id);
+		}
+	}
 			
 	AddressId AddressId::operator++(int)
 	{

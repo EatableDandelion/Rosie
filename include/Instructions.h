@@ -150,7 +150,7 @@ namespace Rosie
 	};
 	
 	//This instruction deals with non-primitive variabless
-	class ScopeInstruction : public TemplateInstruction<ScopeInstruction>
+	/*class ScopeInstruction : public TemplateInstruction<ScopeInstruction>
 	{
 		public:
 		  	ScopeInstruction(const Address& parent);
@@ -160,7 +160,7 @@ namespace Rosie
 		
 		private:
 			Address parent;
-	};
+	};*/
 	
 	
 	class ConstantHeader : public TemplateInstruction<ConstantHeader>

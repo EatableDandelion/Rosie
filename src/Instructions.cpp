@@ -99,7 +99,7 @@ namespace Rosie
 	}
 
 	
-	ScopeInstruction::ScopeInstruction(const Address& parent):TemplateInstruction({parent}), parent(parent)
+	/*ScopeInstruction::ScopeInstruction(const Address& parent):TemplateInstruction({parent}), parent(parent)
 	{}
 	
 	ScopeInstruction::ScopeInstruction()
@@ -121,7 +121,7 @@ namespace Rosie
 	std::string ScopeInstruction::getName() const
 	{
 		return "SCOPE";
-	}
+	}*/
 	
 	
 	

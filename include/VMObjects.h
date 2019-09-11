@@ -17,7 +17,7 @@ namespace Rosie
 	{
 		public:
 			Handle(const int& id, const Category& category);
-			//Handle(const std::vector<int>& ids, const Category& category);
+			Handle(const std::initializer_list<int>& id, const Category& category);
 			Handle(const std::string& textIds, const Category& category);
 		
 			std::shared_ptr<AddressId> operator->() const;
@@ -47,18 +47,30 @@ namespace Rosie
 	class Scope;
 	class State;
 	
+	class NullPointerError : public std::exception
+	{
+		public:
+			NullPointerError(const std::string& variableName);
+			
+			const char* what() const throw();
+			
+		private:
+			const std::string varName;
+	};
+	
 	struct Variable
 	{
 		public:
-			Variable(const float& floatValue);
-			Variable(const int& integerValue);
-			Variable(const bool& booleanValue);
-			Variable(const std::string& stringValue);
-			Variable(const TokenType& tokenType);
-			Variable(const std::shared_ptr<Scope>& object);
+			Variable(const float& floatValue, const std::string& name = "");
+			Variable(const int& integerValue, const std::string& name = "");
+			Variable(const bool& booleanValue, const std::string& name = "");
+			Variable(const std::string& stringValue, const std::string& name = "");
+			Variable(const TokenType& tokenType, const std::string& name = "");
+			Variable(const std::shared_ptr<Scope>& object, const std::string& name = "");
 			Variable();
 			Variable(const Variable& other);
 			
+			Variable& operator=(const Variable& other);
 			Variable operator+(const Variable& other);
 			Variable operator-(const Variable& other);
 			Variable operator*(const Variable& other);
@@ -84,12 +96,14 @@ namespace Rosie
 				return os;
 			}
 		
+			std::string getName() const;
 		
 
 		private:
 			int type;
 			std::variant<float, bool, int, std::string, std::shared_ptr<Scope>> value;
-			
+			bool defined;
+			std::string name;
 	};
 	
 	struct Scope
@@ -118,6 +132,7 @@ namespace Rosie
 			
 			void setParent(const std::shared_ptr<Scope> parent);
 			std::shared_ptr<Scope> getParent() const;
+			std::string getShortName(const std::string& longName) const;
 			
 			friend class State;
 	};
@@ -204,11 +219,9 @@ namespace Rosie
 				
 		private:
 			std::shared_ptr<Scope> root;
-			//std::shared_ptr<Scope> activeScope;
 			std::vector<Variable> constants;
 			DualMap<int, std::string, Function<CallStack&>> functions;
 			CallStack callStack;
 			std::string fileName;
-			std::stack<std::shared_ptr<Scope>> scopeStack;
 	};
 }

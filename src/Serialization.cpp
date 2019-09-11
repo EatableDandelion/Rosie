@@ -2,33 +2,33 @@
 
 namespace Rosie
 {
-	void Serializable::uploadMember(const std::string& name, const Serializable& member, std::ostream& stream, std::string& indentation) const
+	void Serializable::uploadMember(const std::string& name, const Serializable& member, std::ostream& stream, int& depth) const
 	{
-		stream << indentation << name << " = {" << std::endl;
-		indentation+="\t";
-		member.serialize(stream, indentation);
-		indentation.pop_back();
-		stream << indentation << "};" << std::endl;
+		stream << getIndentation(depth) << name << " = {" << std::endl;
+		depth++;
+		member.serialize(stream, depth);
+		depth--;
+		stream << getIndentation(depth) << "};" << std::endl;
 	}
 	
-	void Serializable::uploadMember(const std::string& name, const float& member, std::ostream& stream, std::string& indentation) const
+	void Serializable::uploadMember(const std::string& name, const float& member, std::ostream& stream, int& depth) const
 	{
-		stream << indentation << name << " = " << member << ";" << std::endl;
+		stream << getIndentation(depth) << name << " = " << member << ";" << std::endl;
 	}	
 	
-	void Serializable::uploadMember(const std::string& name, const int& member, std::ostream& stream, std::string& indentation) const
+	void Serializable::uploadMember(const std::string& name, const int& member, std::ostream& stream, int& depth) const
 	{
-		stream << indentation << name << " = " << member << ";" << std::endl;
+		stream << getIndentation(depth) << name << " = " << member << ";" << std::endl;
 	}
 	
-	void Serializable::uploadMember(const std::string& name, const bool& member, std::ostream& stream, std::string& indentation) const
+	void Serializable::uploadMember(const std::string& name, const bool& member, std::ostream& stream, int& depth) const
 	{
-		stream << indentation << name << " = " << member << ";" << std::endl;
+		stream << getIndentation(depth) << name << " = " << member << ";" << std::endl;
 	}
 	
-	void Serializable::uploadMember(const std::string& name, const std::string& member, std::ostream& stream, std::string& indentation) const
+	void Serializable::uploadMember(const std::string& name, const std::string& member, std::ostream& stream, int& depth) const
 	{
-		stream << indentation << name << " = \"" << member << "\";" << std::endl;
+		stream << getIndentation(depth) << name << " = \"" << member << "\";" << std::endl;
 	}
 	
 	void Serializable::downloadMember(const std::string& name, Serializable* member, const std::shared_ptr<Scope>& object)
@@ -53,7 +53,17 @@ namespace Rosie
 	
 	void Serializable::downloadMember(const std::string& name, std::string* member, const std::shared_ptr<Scope>& object)
 	{
-		*member = object->getMember(name).get<std::string>();
+		*member = object->getMember(name).get<std::string>();		
+	}
+	
+	std::string Serializable::getIndentation(const int& depth) const
+	{
+		std::string indentation = "";
+		for(int i = 0; i<depth; i++)
+		{
+			indentation+="\t";
+		}
+		return indentation;
 	}
 	
 	
@@ -70,9 +80,9 @@ namespace Rosie
 	
 	void Serializer::serialize()
 	{
+		int depth = 0;
 		file.open(fileName+".ros");
-		std::string indentation = "";
-		serialize(file, indentation);
+		serialize(file, depth);
 		file.close();
 	}
 	
@@ -83,12 +93,6 @@ namespace Rosie
 		vm.run();
 		
 		deserialize(vm.getState().getActiveScope());
-		
-		/*for(std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
-		{
-			pair.second->deserialize(vm.getState().getActiveScope()->getScope(pair.first));
-			
-		}*/
 	}
 			
 	void Serializer::addMember(const std::string& name, Serializable* member)
@@ -97,11 +101,11 @@ namespace Rosie
 	}
 	
 	
-	void Serializer::serialize(std::ostream& stream, std::string& indentation) const
+	void Serializer::serialize(std::ostream& stream, int& depth) const
 	{
 		for(const std::pair<std::string, std::shared_ptr<Serializable>> pair : members)
 		{
-			uploadMember(pair.first, *(pair.second), stream, indentation);
+			uploadMember(pair.first, *(pair.second), stream, depth);
 		}
 	}
 	
@@ -114,12 +118,15 @@ namespace Rosie
 	}
 
 	
-	Position::Position(const float& x0, const std::string& text):x(x0), text(text)
-	{}
-	
-	float& Position::getX()
+	Position::Position(const float& x0, const float& y0, const std::string& text):text(text)
 	{
-		return x;
+		X.push_back(x0);
+		X.push_back(y0);
+	}
+	
+	std::vector<float>& Position::getX()
+	{
+		return X;
 	}
 	
 	std::string& Position::getText()
@@ -127,15 +134,15 @@ namespace Rosie
 		return text;
 	}
 	
-	void Position::serialize(std::ostream& stream, std::string& indentation) const
+	void Position::serialize(std::ostream& stream, int& depth) const
 	{
-		uploadMember("x", x, stream, indentation);
-		uploadMember("text", text, stream, indentation);
+		uploadMember("X", X, stream, depth);
+		uploadMember("text", text, stream, depth);
 	}
 	
 	void Position::deserialize(const std::shared_ptr<Scope>& object)
 	{
-		downloadMember("x", &x, object);
+		downloadMember("X", &X, object);
 		downloadMember("text", &text, object);
 	}
 	
@@ -147,9 +154,9 @@ namespace Rosie
 		return position;
 	}
 	
-	void Mesh::serialize(std::ostream& stream, std::string& indentation) const
+	void Mesh::serialize(std::ostream& stream, int& depth) const
 	{
-		uploadMember("position", position, stream, indentation);
+		uploadMember("position", position, stream, depth);
 	}
 	
 	void Mesh::deserialize(const std::shared_ptr<Scope>& object)

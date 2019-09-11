@@ -5,8 +5,8 @@ namespace Rosie
 	Handle::Handle(const int& id, const Category& category):m_id(std::make_shared<AddressId>(id)), category(category)
 	{}
 	
-	/*Handle::Handle(const std::vector<int>& ids, const Category& category):m_id(ids), category(category)
-	{}*/
+	Handle::Handle(const std::initializer_list<int>& id, const Category& category):m_id(std::make_shared<AddressId>(id)), category(category)
+	{}
 	
 	Handle::Handle(const std::string& textId, const Category& category):m_id(std::make_shared<AddressId>(textId)), category(category)
 	{}
@@ -27,31 +27,42 @@ namespace Rosie
 	}
 
 
-	Variable::Variable(const float& floatValue)
+	NullPointerError::NullPointerError(const std::string& variableName):varName(variableName)
+	{}
+
+	const char*  NullPointerError::what() const throw()
+	{
+		ErrorDisplay display;
+		display.show("Null pointer exception:");
+		display.show(varName+" is undefined.");
+		return "";
+	}
+
+	Variable::Variable(const float& floatValue, const std::string& name):defined(true), name(name)
 	{
 		value = floatValue;
 		type = 0;
 	}
 
-	Variable::Variable(const int& integerValue)
+	Variable::Variable(const int& integerValue, const std::string& name):defined(true), name(name)
 	{
 		value = (float)integerValue;
 		type = 0;
 	}
 	
-	Variable::Variable(const bool& booleanValue)
+	Variable::Variable(const bool& booleanValue, const std::string& name):defined(true), name(name)
 	{
 		value = booleanValue;
 		type = 2;
 	}
 	
-	Variable::Variable(const std::string& stringValue)
+	Variable::Variable(const std::string& stringValue, const std::string& name):defined(true), name(name)
 	{
 		value = stringValue;
 		type = 3;
 	}
 	
-	Variable::Variable(const TokenType& tokenType)
+	Variable::Variable(const TokenType& tokenType, const std::string& name):defined(false), name(name)
 	{
 		if(tokenType == TokenType::CSTFLOAT)
 		{
@@ -76,18 +87,26 @@ namespace Rosie
 		}
 	}
 	
-	Variable::Variable(const std::shared_ptr<Scope>& object):value(std::shared_ptr<Scope>(object))
+	Variable::Variable(const std::shared_ptr<Scope>& object, const std::string& name):value(std::shared_ptr<Scope>(object)), defined(true), name(name)
 	{
 		type = 4;
 	}
 	
-	Variable::Variable(): value(std::make_shared<Scope>())
+	Variable::Variable(): value(std::make_shared<Scope>()), defined(true)
 	{
-		type = 4;
+		type = 4; 
 	}
 	
-	Variable::Variable(const Variable& other):value(other.value), type(other.type)
+	Variable::Variable(const Variable& other):value(other.value), type(other.type), defined(other.defined), name(other.name)
 	{}
+	
+	Variable& Variable::operator=(const Variable& other)
+	{
+		value = other.value;
+		type = other.type;
+		defined = other.defined;
+		return *this;
+	}
 	
 	Variable Variable::operator+(const Variable& other)
 	{
@@ -138,25 +157,30 @@ namespace Rosie
 	{
 		if(type == 0)
 		{
-			return std::to_string(get<float>())+ " (float)"; 
+			return name+" = "+std::to_string(get<float>())+ " (float)"; 
 		}
 		else if(type == 1)
 		{
-			return std::to_string(get<int>())+ " (int)"; 
+			return name+" = "+std::to_string(get<int>())+ " (int)"; 
 		}
 		else if(type == 2)
 		{
-			return std::to_string(get<bool>())+ " (boolean)"; 
+			return name+" = "+std::to_string(get<bool>())+ " (boolean)"; 
 		}
 		else if(type == 3)
 		{
-			return get<std::string>()+ " (string)"; 
+			return name+" = "+get<std::string>()+ " (string)"; 
 		}
 		else if(type == 4)
 		{
-			return get<std::shared_ptr<Scope>>()->toString();
+			return name+" = "+get<std::shared_ptr<Scope>>()->toString();
 		}
 		return "";
+	}
+	
+	std::string Variable::getName() const
+	{
+		return name;
 	}
 
 	
@@ -167,8 +191,8 @@ namespace Rosie
 			members[handle->getIndex(depth)].addMember(name, type, handle, depth+1);
 		}
 		else if(handle->getDepth() == depth)
-		{
-			members.add(handle->getIndex(depth), Rosie::getId(name), Variable(TokenType(type)));
+		{	
+			members.add(handle->getIndex(depth), Rosie::getId(getShortName(name)), Variable(TokenType(type), name));
 		}
 	}
 	
@@ -185,7 +209,7 @@ namespace Rosie
 	}
 	
 	Variable Scope::getMember(const Handle& handle, const int& depth)
-	{
+	{	
 		if(handle->getDepth() > depth)
 		{
 			return members[handle->getIndex(depth)].getMember(handle, depth+1);
@@ -250,17 +274,37 @@ namespace Rosie
 	std::string Scope::toString() const
 	{
 		std::string res = "[";
+		bool hasMember = false;
 		for(const Variable& member : members.getValues())
 		{
 			res+=member.toString()+", ";
+			hasMember = true;
 		}
-		res.pop_back(); res.pop_back();//remove last comma.
+		if(hasMember)
+		{
+			res.pop_back();
+			res.pop_back();//remove last comma.
+		}
 		return res+"]";
 	}	
 	
 	void Scope::setParent(const std::shared_ptr<Scope> parent)
 	{
 		m_parent = std::weak_ptr<Scope>(parent);
+	}
+	
+	std::string Scope::getShortName(const std::string& longName) const
+	{
+		std::size_t lastDot = longName.find_last_of(".");
+		
+		if(lastDot != std::string::npos)
+		{
+			return longName.substr(lastDot+1, longName.length());
+		}
+		else
+		{
+			return longName;
+		}
 	}
 	
 	std::shared_ptr<Scope> Scope::getParent() const
@@ -386,20 +430,6 @@ namespace Rosie
 	std::string State::getFileName() const
 	{
 		return fileName;
-	}
-	
-	void State::startScope(const Handle& handle)
-	{
-		/*scopeStack.push(activeScope);
-		std::shared_ptr<Scope> oldScope(activeScope);
-		activeScope = std::move(getVariable(handle).get<std::shared_ptr<Scope>>());
-		activeScope->setParent(oldScope);*/
-	}
-	
-	void State::endScope()
-	{
-		/*activeScope = std::move(scopeStack.top());
-		scopeStack.pop();*/
 	}
 	
 	std::shared_ptr<Scope> State::getActiveScope() const
